@@ -1,0 +1,3474 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MGtrauma">
+<meta name="theme-color" content="#0ea5e9">
+<title>MGtrauma</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{--bg:#0a0f1e;--surface:#111827;--surface2:#1a2236;--border:#1e2d45;--accent:#0ea5e9;--accent2:#38bdf8;--green:#10b981;--yellow:#f59e0b;--red:#ef4444;--purple:#8b5cf6;--orange:#f97316;--text:#f0f4f8;--text2:#8899aa;--text3:#4a6080;--radius:16px;--radius-sm:10px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;max-width:430px;margin:0 auto;overflow-x:hidden}
+h1,h2,h3,h4{font-family:'Syne',sans-serif}
+
+/* LOGIN */
+#screen-login{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px 24px}
+.login-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:40px;margin-bottom:6px}
+.login-logo span{color:var(--accent)}
+.login-sub{font-size:13px;color:var(--text2);margin-bottom:40px}
+.login-box{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px}
+.login-error{color:var(--red);font-size:13px;margin-bottom:12px;display:none}
+#screen-app{display:none}
+
+/* HEADER */
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;letter-spacing:-.5px}
+.logo span{color:var(--accent)}
+.header-right{display:flex;align-items:center;gap:8px}
+.icon-btn{width:34px;height:34px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px}
+.header-user{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer}
+
+/* TABS */
+.tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;padding:0 4px}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;padding:11px 12px;font-family:'Syne',sans-serif;font-weight:600;font-size:12px;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* PAGES */
+.page{display:none;padding:16px;padding-bottom:90px}
+.page.active{display:block}
+
+/* SEARCH */
+.search-bar{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);display:flex;align-items:center;gap:8px;padding:10px 14px;margin-bottom:14px}
+.search-bar input{flex:1;background:none;border:none;outline:none;color:var(--text);font-size:14px}
+.search-bar input::placeholder{color:var(--text3)}
+
+/* STATS */
+.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 6px;text-align:center}
+.stat-number{font-family:'Syne',sans-serif;font-weight:800;font-size:20px}
+.stat-label{font-size:9px;color:var(--text3);margin-top:1px}
+.sn-blue{color:var(--accent)}
+.sn-green{color:var(--green)}
+.sn-yellow{color:var(--yellow)}
+.sn-purple{color:var(--purple)}
+
+/* FILTERS */
+.filter-row{display:flex;gap:7px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.filter-row::-webkit-scrollbar{display:none}
+.filter-chip{flex-shrink:0;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:500;background:var(--surface2);color:var(--text2);border:1px solid var(--border);cursor:pointer;transition:all .2s}
+.filter-chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+/* CARDS */
+.surgery-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px;cursor:pointer;position:relative;overflow:hidden;transition:transform .15s}
+.surgery-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px}
+.surgery-card.pre::before{background:var(--yellow)}
+.surgery-card.post::before{background:var(--green)}
+.surgery-card.anulada::before{background:var(--red)}
+.surgery-card:active{transform:scale(.98)}
+.card-num{font-size:10px;color:var(--text3);font-weight:600;margin-bottom:2px}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.card-hospital{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;line-height:1.2}
+.card-doctor{font-size:12px;color:var(--accent2);margin-top:2px}
+.badges{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0;margin-left:6px}
+.status-badge{padding:3px 8px;border-radius:20px;font-size:10px;font-weight:600;white-space:nowrap}
+.badge-pre{background:rgba(245,158,11,.15);color:var(--yellow)}
+.badge-post{background:rgba(16,185,129,.15);color:var(--green)}
+.badge-anulada{background:rgba(239,68,68,.15);color:var(--red)}
+.badge-singasto{background:rgba(139,92,246,.15);color:var(--purple)}
+.badge-warn{background:rgba(249,115,22,.2);color:var(--orange)}
+.badge-neo{background:rgba(14,165,233,.15);color:var(--accent)}
+.card-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.meta-item{font-size:11px;color:var(--text2)}
+.division-tag{font-size:10px;padding:2px 7px;border-radius:4px;font-weight:600}
+.div-osteo{background:rgba(14,165,233,.15);color:var(--accent)}
+.div-orto{background:rgba(139,92,246,.15);color:var(--purple)}
+.assigned-row{margin-top:8px;padding-top:8px;border-top:1px solid var(--border);display:flex;align-items:center;gap:7px}
+.av{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--purple));flex-shrink:0}
+.assigned-label{font-size:11px;color:var(--text3)}
+
+/* CALENDAR */
+.calendar-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.cal-month{font-family:'Syne',sans-serif;font-weight:700;font-size:17px}
+.cal-nav{width:34px;height:34px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:16px}
+.cal-day-name{text-align:center;font-size:10px;font-weight:600;color:var(--text3);padding:3px 0}
+.cal-day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:12px;cursor:pointer;position:relative;transition:all .2s}
+.cal-day.has-event{font-weight:700;color:var(--accent2)}
+.cal-day.has-event::after{content:'';position:absolute;bottom:2px;width:4px;height:4px;border-radius:50%;background:var(--accent)}
+.cal-day.today{background:var(--accent);color:#fff;font-weight:700}
+.cal-day.today::after{display:none}
+.cal-day:not(.today):hover{background:var(--surface2)}
+.cal-day.empty{cursor:default}
+.cal-events-title{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--text2);margin-bottom:10px}
+
+/* DETAIL */
+.detail-view{display:none;position:fixed;inset:0;background:var(--bg);z-index:200;overflow-y:auto;max-width:430px;margin:0 auto}
+.detail-view.open{display:block}
+.detail-header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10}
+.back-btn{width:34px;height:34px;border-radius:50%;background:var(--surface2);border:none;color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0}
+.detail-title{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;flex:1;line-height:1.2}
+.detail-body{padding:16px;padding-bottom:40px}
+.detail-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:14px}
+.detail-section-title{font-family:'Syne',sans-serif;font-weight:700;font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
+.detail-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border)}
+.detail-row:last-child{border-bottom:none;padding-bottom:0}
+.detail-label{font-size:12px;color:var(--text2)}
+.detail-value{font-size:13px;font-weight:500;text-align:right;max-width:60%}
+
+/* BUTTONS */
+.action-btn{width:100%;padding:13px;border-radius:var(--radius-sm);border:none;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:7px;margin-bottom:8px}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn-success{background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.3)}
+.btn-warning{background:rgba(245,158,11,.15);color:var(--yellow);border:1px solid rgba(245,158,11,.3)}
+.btn-danger{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.btn-purple{background:rgba(139,92,246,.15);color:var(--purple);border:1px solid rgba(139,92,246,.3)}
+.btn-orange{background:rgba(249,115,22,.15);color:var(--orange);border:1px solid rgba(249,115,22,.3)}
+.action-btn:active{transform:scale(.97)}
+
+/* TOGGLES */
+.check-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
+.check-row:last-child{border-bottom:none}
+.check-info{flex:1}
+.check-title{font-size:13px;font-weight:500}
+.check-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.toggle{width:42px;height:23px;border-radius:12px;background:var(--border);position:relative;cursor:pointer;transition:background .3s;flex-shrink:0}
+.toggle.on{background:var(--green)}
+.toggle::after{content:'';position:absolute;width:17px;height:17px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left .3s}
+.toggle.on::after{left:22px}
+
+/* FORMS */
+.comment-box{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:11px;resize:none;min-height:75px;outline:none;transition:border-color .2s}
+.comment-box:focus{border-color:var(--accent)}
+.photo-upload{border:2px dashed var(--border);border-radius:var(--radius-sm);padding:20px;text-align:center;cursor:pointer;background:var(--surface2);transition:border-color .2s}
+.photo-upload:hover{border-color:var(--accent)}
+.photo-upload-icon{font-size:28px;margin-bottom:6px}
+.photo-upload-text{font-size:12px;color:var(--text2)}
+.phase-steps{display:flex;align-items:center;margin-bottom:16px}
+.phase-step{flex:1;text-align:center}
+.phase-dot{width:26px;height:26px;border-radius:50%;margin:0 auto 3px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:var(--surface2);border:2px solid var(--border);color:var(--text3)}
+.phase-dot.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.phase-dot.done{background:var(--green);border-color:var(--green);color:#fff}
+.phase-label{font-size:9px;color:var(--text3)}
+.phase-label.active{color:var(--accent);font-weight:600}
+.phase-line{flex:0 0 20px;height:2px;background:var(--border);margin-bottom:14px}
+.phase-line.done{background:var(--green)}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;align-items:flex-end;max-width:430px;margin:0 auto}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border-radius:var(--radius) var(--radius) 0 0;padding:18px;width:100%;max-height:92vh;overflow-y:auto;animation:slideUp .3s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:34px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 18px}
+.modal-title{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;margin-bottom:18px}
+.form-group{margin-bottom:14px}
+.form-label{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;display:block}
+.form-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:11px 13px;outline:none;transition:border-color .2s;-webkit-appearance:none}
+.form-input:focus{border-color:var(--accent)}
+.form-select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:11px 13px;outline:none;-webkit-appearance:none;cursor:pointer}
+.form-select option{background:var(--surface2)}
+.div-selector{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.div-option{padding:11px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface2);text-align:center;cursor:pointer;transition:all .2s;font-size:12px;font-weight:600;color:var(--text2)}
+.div-option.sel-osteo{border-color:var(--accent);color:var(--accent);background:rgba(14,165,233,.1)}
+.div-option.sel-orto{border-color:var(--purple);color:var(--purple);background:rgba(139,92,246,.1)}
+.chk-row{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--border)}
+.chk-row:last-child{border-bottom:none}
+.chk-row input[type=checkbox]{width:17px;height:17px;accent-color:var(--accent);cursor:pointer;flex-shrink:0}
+.chk-row label{font-size:13px;cursor:pointer}
+.autocomplete-wrap{position:relative}
+.autocomplete-list{position:absolute;top:100%;left:0;right:0;background:var(--surface2);border:1px solid var(--accent);border-top:none;border-radius:0 0 var(--radius-sm) var(--radius-sm);z-index:400;max-height:150px;overflow-y:auto;display:none}
+.autocomplete-list.open{display:block}
+.autocomplete-item{padding:9px 13px;font-size:13px;cursor:pointer;border-bottom:1px solid var(--border)}
+.autocomplete-item:last-child{border-bottom:none}
+.autocomplete-item:hover{background:rgba(14,165,233,.1);color:var(--accent)}
+
+/* FAB */
+.fab{position:fixed;bottom:74px;right:16px;width:52px;height:52px;border-radius:50%;background:var(--accent);border:none;color:#fff;font-size:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 18px rgba(14,165,233,.45);z-index:150;transition:transform .15s}
+.fab:active{transform:scale(.9)}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--surface);border-top:1px solid var(--border);display:flex;padding:7px 0 18px;z-index:100}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:3px 0}
+.nav-icon{font-size:19px}
+.nav-label{font-size:9px;font-weight:600;color:var(--text3)}
+.nav-item.active .nav-label{color:var(--accent)}
+
+/* TOAST */
+.toast{position:fixed;top:74px;left:50%;transform:translateX(-50%) translateY(-20px);background:var(--green);color:#fff;padding:10px 18px;border-radius:30px;font-size:12px;font-weight:600;z-index:500;opacity:0;transition:all .3s;white-space:nowrap;max-width:92%}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* SETTINGS */
+.user-card{background:linear-gradient(135deg,rgba(14,165,233,.2),rgba(139,92,246,.2));border:1px solid rgba(14,165,233,.3);border-radius:var(--radius);padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.user-avatar-big{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:700;font-size:18px;flex-shrink:0}
+.user-name{font-family:'Syne',sans-serif;font-weight:700;font-size:17px}
+.user-role-label{font-size:12px;color:var(--text2);margin-top:2px}
+.settings-section{margin-bottom:20px}
+.settings-title-label{font-family:'Syne',sans-serif;font-weight:700;font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;padding:0 3px}
+.settings-list{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.settings-item{display:flex;align-items:center;justify-content:space-between;padding:13px 14px;border-bottom:1px solid var(--border);cursor:pointer}
+.settings-item:last-child{border-bottom:none}
+.settings-item-left{display:flex;align-items:center;gap:10px}
+.settings-item-icon{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.si-blue{background:rgba(14,165,233,.15)}
+.si-green{background:rgba(16,185,129,.15)}
+.si-purple{background:rgba(139,92,246,.15)}
+.si-yellow{background:rgba(245,158,11,.15)}
+.si-orange{background:rgba(249,115,22,.15)}
+.settings-item-name{font-size:14px;font-weight:500}
+.chevron{color:var(--text3);font-size:13px}
+.empty-state{text-align:center;padding:36px 16px;color:var(--text3)}
+.empty-icon{font-size:44px;margin-bottom:10px;opacity:.5}
+.empty-text{font-size:13px}
+
+/* MENSAJERÍA */
+.msg-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:13px;margin-bottom:9px;cursor:pointer;transition:transform .15s}
+.msg-card:active{transform:scale(.98)}
+.msg-card.unread{border-left:3px solid var(--accent)}
+.msg-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+.msg-from{font-family:'Syne',sans-serif;font-weight:700;font-size:13px}
+.msg-time{font-size:10px;color:var(--text3)}
+.msg-subject{font-size:13px;font-weight:500;margin-bottom:3px}
+.msg-preview{font-size:12px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.msg-tag{font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600}
+.tag-informe{background:rgba(14,165,233,.15);color:var(--accent)}
+.tag-solicitud{background:rgba(245,158,11,.15);color:var(--yellow)}
+.tag-comentario{background:rgba(16,185,129,.15);color:var(--green)}
+.tag-urgente{background:rgba(239,68,68,.15);color:var(--red)}
+
+/* NEO */
+.neo-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:13px;margin-bottom:9px;cursor:pointer;position:relative;overflow:hidden}
+.neo-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent)}
+.neo-card.revisado::before{background:var(--green)}
+.neo-card.pendiente::before{background:var(--yellow)}
+
+/* GASTOS */
+.gasto-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:13px;margin-bottom:9px;cursor:pointer}
+.gasto-importe{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:var(--accent)}
+
+/* KM */
+.km-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:13px;margin-bottom:9px}
+.km-number{font-family:'Syne',sans-serif;font-weight:800;font-size:24px;color:var(--green)}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="screen-login">
+  <div class="login-logo">MG<span>trauma</span></div>
+  <div class="login-sub">DePuy Synthes · Región de Murcia</div>
+  <div class="login-box">
+    <div class="form-group"><label class="form-label">Email</label>
+      <input class="form-input" id="login-email" type="email" placeholder="tu@email.com" autocomplete="email"></div>
+    <div class="form-group"><label class="form-label">Contraseña</label>
+      <input class="form-input" id="login-pass" type="password" placeholder="••••••••"
+        onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <div class="login-error" id="login-error"></div>
+    <button class="action-btn btn-primary" id="login-btn" onclick="doLogin()">Entrar</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="screen-app">
+  <div class="header">
+    <div class="logo">MG<span>trauma</span></div>
+    <div class="header-right">
+      <div class="icon-btn" onclick="focusSearch()">🔍</div>
+      <div class="icon-btn" id="msg-bell" onclick="showPage('mensajes')" style="position:relative">✉️
+        <span id="msg-badge" style="display:none;position:absolute;top:-3px;right:-3px;background:var(--red);color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center"></span>
+      </div>
+      <div class="header-user" id="header-user" onclick="showPage('settings')">JM</div>
+    </div>
+  </div>
+
+  <div class="tabs" id="main-tabs">
+    <div class="tab active" onclick="showPage('cirugias')">Cirugías</div>
+    <div class="tab" onclick="showPage('calendario')">Calendario</div>
+    <div class="tab" onclick="showPage('neo')">NEO</div>
+    <div class="tab" onclick="showPage('mensajes')">Mensajes</div>
+    <div class="tab" onclick="showPage('gastos')">Gastos</div>
+    <div class="tab" onclick="showPage('km')">Kilómetros</div>
+    <div class="tab" id="tab-informes" onclick="showPage('informes')">Informes</div>
+    <div class="tab" onclick="showPage('settings')">Ajustes</div>
+  </div>
+
+  <div class="toast" id="toast">✓</div>
+
+  <!-- ══ CIRUGÍAS ══════════════════════════════ -->
+  <div class="page active" id="page-cirugias">
+    <div class="search-bar">
+      <span>🔍</span>
+      <input id="search-input" type="text" placeholder="Hospital, médico, HC, episodio, NEO…" oninput="renderList()">
+    </div>
+    <div class="stats-bar">
+      <div class="stat-card"><div class="stat-number sn-blue" id="stat-hoy">0</div><div class="stat-label">Hoy</div></div>
+      <div class="stat-card"><div class="stat-number sn-green" id="stat-sem">0</div><div class="stat-label">Semana</div></div>
+      <div class="stat-card"><div class="stat-number sn-yellow" id="stat-mes">0</div><div class="stat-label">Mes</div></div>
+      <div class="stat-card"><div class="stat-number sn-purple" id="stat-anio">0</div><div class="stat-label">Año</div></div>
+    </div>
+    <div class="filter-row">
+      <div class="filter-chip active" onclick="setFilter(this,'all')">Todas</div>
+      <div class="filter-chip" onclick="setFilter(this,'pre')">Pre-cirugía</div>
+      <div class="filter-chip" onclick="setFilter(this,'post')">Post-cirugía</div>
+      <div class="filter-chip" onclick="setFilter(this,'anulada')">Anuladas</div>
+      <div class="filter-chip" onclick="setFilter(this,'osteo')">Osteosíntesis</div>
+      <div class="filter-chip" onclick="setFilter(this,'orto')">Ortopedia</div>
+      <div class="filter-chip" onclick="setFilter(this,'deposito')">Depósito</div>
+      <div class="filter-chip" onclick="setFilter(this,'rotativo')">Rotativo</div>
+    </div>
+    <div id="surgery-list"><div class="empty-state"><div class="empty-icon">🗂️</div><div class="empty-text">Cargando…</div></div></div>
+  </div>
+
+  <!-- ══ CALENDARIO ══════════════════════════ -->
+  <div class="page" id="page-calendario">
+    <div class="calendar-header">
+      <button class="cal-nav" onclick="changeMonth(-1)">‹</button>
+      <div class="cal-month" id="cal-month-label"></div>
+      <button class="cal-nav" onclick="changeMonth(1)">›</button>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+    <div class="cal-events-title" id="cal-events-title"></div>
+    <div id="cal-events-list"></div>
+  </div>
+
+  <!-- ══ NEO ═══════════════════════════════════ -->
+  <div class="page" id="page-neo">
+    <div style="background:rgba(14,165,233,.08);border:1px solid rgba(14,165,233,.2);border-radius:var(--radius);padding:13px;margin-bottom:14px">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;margin-bottom:4px">⏰ Revisión NEO antes de las 16:00h</div>
+      <div style="font-size:12px;color:var(--text2)">Alarma a las 14:00h · Resumen al gerente a las 15:00h</div>
+    </div>
+    <div id="neo-list"><div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">No hay NEOs pendientes hoy</div></div></div>
+  </div>
+
+  <!-- ══ MENSAJES ══════════════════════════════ -->
+  <div class="page" id="page-mensajes">
+    <div class="filter-row">
+      <div class="filter-chip active" onclick="setMsgFilter(this,'todos')">Todos</div>
+      <div class="filter-chip" onclick="setMsgFilter(this,'recibidos')">Recibidos</div>
+      <div class="filter-chip" onclick="setMsgFilter(this,'enviados')">Enviados</div>
+      <div class="filter-chip" onclick="setMsgFilter(this,'informe')">Informes</div>
+      <div class="filter-chip" onclick="setMsgFilter(this,'solicitud')">Solicitudes</div>
+      <div class="filter-chip" onclick="setMsgFilter(this,'urgente')">Urgentes</div>
+    </div>
+    <div id="msg-list"><div class="empty-state"><div class="empty-icon">✉️</div><div class="empty-text">Sin mensajes</div></div></div>
+  </div>
+
+  <!-- ══ GASTOS ════════════════════════════════ -->
+  <div class="page" id="page-gastos">
+    <div class="stats-bar" style="grid-template-columns:repeat(3,1fr)">
+      <div class="stat-card"><div class="stat-number sn-blue" id="gasto-sem">0€</div><div class="stat-label">Semana</div></div>
+      <div class="stat-card"><div class="stat-number sn-yellow" id="gasto-mes">0€</div><div class="stat-label">Mes</div></div>
+      <div class="stat-card"><div class="stat-number sn-purple" id="gasto-anio">0€</div><div class="stat-label">Año</div></div>
+    </div>
+    <div class="filter-row">
+      <div class="filter-chip active" onclick="setGastoFilter(this,'todos')">Todos</div>
+      <div class="filter-chip" onclick="setGastoFilter(this,'combustible')">Combustible</div>
+      <div class="filter-chip" onclick="setGastoFilter(this,'dietas')">Dietas</div>
+      <div class="filter-chip" onclick="setGastoFilter(this,'parking')">Parking</div>
+      <div class="filter-chip" onclick="setGastoFilter(this,'peaje')">Peaje</div>
+      <div class="filter-chip" onclick="setGastoFilter(this,'otros')">Otros</div>
+    </div>
+    <div id="gastos-list"><div class="empty-state"><div class="empty-icon">🧾</div><div class="empty-text">Sin gastos registrados</div></div></div>
+    <button class="action-btn btn-success" style="margin-top:8px" onclick="exportarGastos()">📥 Exportar a Excel</button>
+  </div>
+
+  <!-- ══ KILÓMETROS ════════════════════════════ -->
+  <div class="page" id="page-km">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:14px;text-align:center">
+      <div style="font-size:12px;color:var(--text3);margin-bottom:4px">KM REGISTRADOS HOY</div>
+      <div class="km-number" id="km-hoy-total">— km</div>
+      <div style="font-size:11px;color:var(--text2);margin-top:4px" id="km-hoy-sub">Captura el cuentakilómetros para registrar</div>
+    </div>
+    <button class="action-btn btn-primary" onclick="openKmModal()">📷 Registrar cuentakilómetros</button>
+    <button class="action-btn btn-success" onclick="exportarKm()">📥 Exportar informe Excel</button>
+    <div id="km-list" style="margin-top:8px"><div class="empty-state"><div class="empty-icon">🚗</div><div class="empty-text">Sin registros de kilómetros</div></div></div>
+  </div>
+
+  <!-- ══ INFORMES ══════════════════════════════ -->
+  <div class="page" id="page-informes">
+    <div class="detail-section">
+      <div class="detail-section-title">📊 Generar informe</div>
+      <div class="form-group">
+        <label class="form-label">Tipo</label>
+        <select class="form-select" id="inf-tipo" onchange="switchInformeTipo()">
+          <option value="hospital">Por hospital</option>
+          <option value="medico">Por médico</option>
+          <option value="comercial">Por comercial</option>
+          <option value="clinical">Por clinical</option>
+        </select>
+      </div>
+      <div id="inf-row-hospital" class="form-group">
+        <label class="form-label">Hospital (vacío = todos)</label>
+        <input class="form-input" id="inf-hospital" type="text" placeholder="Nombre del hospital…">
+      </div>
+      <div id="inf-row-medico" class="form-group" style="display:none">
+        <label class="form-label">Médico</label>
+        <input class="form-input" id="inf-medico" type="text" placeholder="Nombre del médico…">
+      </div>
+      <div id="inf-row-comercial" class="form-group" style="display:none">
+        <label class="form-label">Comercial</label>
+        <input class="form-input" id="inf-comercial" type="text" placeholder="Nombre del comercial…">
+      </div>
+      <div id="inf-row-clinical" class="form-group" style="display:none">
+        <label class="form-label">Clinical</label>
+        <input class="form-input" id="inf-clinical-f" type="text" placeholder="Nombre del clinical…">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="form-group"><label class="form-label">Desde</label><input class="form-input" id="inf-desde" type="date"></div>
+        <div class="form-group"><label class="form-label">Hasta</label><input class="form-input" id="inf-hasta" type="date"></div>
+      </div>
+      <button class="action-btn btn-primary" onclick="generarInforme()">📊 Generar informe</button>
+    </div>
+    <div id="informe-resultado"></div>
+  </div>
+
+  <!-- ══ AJUSTES ═══════════════════════════════ -->
+  <div class="page" id="page-settings">
+    <div class="user-card">
+      <div class="user-avatar-big" id="user-avatar-big">JM</div>
+      <div><div class="user-name" id="user-name">Usuario</div><div class="user-role-label" id="user-role-label">Comercial · MGtrauma</div></div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-title-label">Configuración</div>
+      <div class="settings-list">
+        <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon si-blue">🏥</div><div class="settings-item-name">Hospitales</div></div><span class="chevron">›</span></div>
+        <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon si-green">👨‍⚕️</div><div class="settings-item-name">Cirujanos</div></div><span class="chevron">›</span></div>
+        <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon si-purple">👥</div><div class="settings-item-name">Usuarios del equipo</div></div><span class="chevron">›</span></div>
+        <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon si-yellow">🔔</div><div class="settings-item-name">Notificaciones y alarmas</div></div><span class="chevron">›</span></div>
+        <div class="settings-item"><div class="settings-item-left"><div class="settings-item-icon si-orange">⚙️</div><div class="settings-item-name">Roles y permisos</div></div><span class="chevron">›</span></div>
+      </div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-list">
+        <div class="settings-item" onclick="doLogout()">
+          <div class="settings-item-left"><div class="settings-item-icon" style="background:rgba(239,68,68,.15)">🚪</div>
+          <div class="settings-item-name" style="color:var(--red)">Cerrar sesión</div></div>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;padding:16px 0"><div style="font-size:11px;color:var(--text3)">MGtrauma v3.0 · DePuy Synthes Murcia</div></div>
+  </div>
+
+  <!-- FAB contextual -->
+  <button class="fab" id="main-fab" onclick="onFab()">+</button>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <div class="nav-item active" id="nav-cirugias" onclick="showPage('cirugias')"><div class="nav-icon">🗂️</div><div class="nav-label">Cirugías</div></div>
+    <div class="nav-item" id="nav-neo" onclick="showPage('neo')"><div class="nav-icon">📋</div><div class="nav-label">NEO</div></div>
+    <div class="nav-item" id="nav-mensajes" onclick="showPage('mensajes')"><div class="nav-icon">✉️</div><div class="nav-label">Mensajes</div></div>
+    <div class="nav-item" id="nav-gastos" onclick="showPage('gastos')"><div class="nav-icon">🧾</div><div class="nav-label">Gastos</div></div>
+    <div class="nav-item" id="nav-km" onclick="showPage('km')"><div class="nav-icon">🚗</div><div class="nav-label">KM</div></div>
+    <div class="nav-item" id="nav-settings" onclick="showPage('settings')"><div class="nav-icon">⚙️</div><div class="nav-label">Ajustes</div></div>
+  </div>
+
+  <!-- DETAIL CIRUGÍA -->
+  <div class="detail-view" id="detail-view">
+    <div class="detail-header">
+      <button class="back-btn" onclick="closeDetail()">‹</button>
+      <div class="detail-title" id="detail-title">Cirugía</div>
+    </div>
+    <div class="detail-body" id="detail-body"></div>
+  </div>
+
+  <!-- DETAIL MENSAJE -->
+  <div class="detail-view" id="msg-detail-view">
+    <div class="detail-header">
+      <button class="back-btn" onclick="document.getElementById('msg-detail-view').classList.remove('open')">‹</button>
+      <div class="detail-title" id="msg-detail-title">Mensaje</div>
+    </div>
+    <div class="detail-body" id="msg-detail-body"></div>
+  </div>
+
+  <!-- MODAL NUEVA CIRUGÍA -->
+  <div class="modal-overlay" id="modal-nueva">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <div class="modal-title" id="modal-title">Nueva Cirugía</div>
+      <div class="form-group">
+        <label class="form-label">Hospital *</label>
+        <div class="autocomplete-wrap">
+          <input class="form-input" id="inp-hospital" type="text" placeholder="Buscar o escribir hospital…" oninput="autocomplete(this,'hospitals')" autocomplete="off">
+          <div class="autocomplete-list" id="ac-hospital"></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Cirujano *</label>
+        <div class="autocomplete-wrap">
+          <input class="form-input" id="inp-doctor" type="text" placeholder="Buscar o escribir cirujano…" oninput="autocomplete(this,'doctors')" autocomplete="off">
+          <div class="autocomplete-list" id="ac-doctor"></div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="form-group"><label class="form-label">Fecha *</label><input class="form-input" id="inp-fecha" type="date"></div>
+        <div class="form-group"><label class="form-label">Hora aprox.</label><input class="form-input" id="inp-hora" type="time"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">División *</label>
+        <div class="div-selector">
+          <div class="div-option" id="div-osteo" onclick="selectDiv('osteo')">🦴 Osteosíntesis</div>
+          <div class="div-option" id="div-orto" onclick="selectDiv('orto')">🦵 Ortopedia</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tipo de cirugía</label>
+        <div class="autocomplete-wrap">
+          <input class="form-input" id="inp-tipo" type="text" placeholder="Ej: Clavo endomedular tibia…" oninput="autocomplete(this,'tipos')" autocomplete="off">
+          <div class="autocomplete-list" id="ac-tipo"></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tipo de material * (puede ser múltiple)</label>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 12px">
+          <div class="chk-row"><input type="checkbox" id="chk-deposito"><label for="chk-deposito">📁 Depósito</label></div>
+          <div class="chk-row"><input type="checkbox" id="chk-rotativo" onchange="toggleNeoSection()"><label for="chk-rotativo">📦 Rotativo</label></div>
+          <div class="chk-row"><input type="checkbox" id="chk-prestamo" onchange="togglePrestamoSection()"><label for="chk-prestamo">🏥 Préstamo de otro hospital</label></div>
+        </div>
+      </div>
+      <!-- NEO -->
+      <div id="grp-neo" style="display:none">
+        <div class="form-group">
+          <label class="form-label">Número de NEO</label>
+          <input class="form-input" id="inp-neo" type="text" placeholder="Nº NEO en DePuy…">
+          <div style="font-size:11px;color:var(--yellow);margin-top:5px">⏰ Se programará alarma de revisión a las 14:00h</div>
+        </div>
+      </div>
+      <!-- PRÉSTAMOS -->
+      <div id="grp-prestamos" style="display:none">
+        <div class="form-group">
+          <label class="form-label">Materiales en préstamo</label>
+          <div id="prestamos-container"></div>
+          <button type="button" onclick="addPrestamoRow()" style="width:100%;padding:9px;background:rgba(14,165,233,.1);border:1px dashed var(--accent);border-radius:var(--radius-sm);color:var(--accent);font-family:'Syne',sans-serif;font-weight:600;font-size:12px;cursor:pointer;margin-top:3px">+ Añadir material en préstamo</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Comercial asignado</label>
+        <select class="form-select" id="inp-asignado"><option value="">Sin asignar</option></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Clinical</label>
+        <select class="form-select" id="inp-clinical"><option value="">Sin asignar</option></select>
+      </div>
+      <button class="action-btn btn-primary" id="btn-crear" onclick="guardarCirugia()">✓ Crear cirugía y notificar al equipo</button>
+      <button class="action-btn btn-secondary" onclick="closeModal('modal-nueva')">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- MODAL NUEVO MENSAJE -->
+  <div class="modal-overlay" id="modal-mensaje">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <div class="modal-title">Nuevo Mensaje</div>
+      <div class="form-group">
+        <label class="form-label">Destinatario/s</label>
+        <select class="form-select" id="msg-destinatario" multiple style="min-height:90px">
+        </select>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px">Mantén pulsado para seleccionar varios</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Categoría</label>
+        <select class="form-select" id="msg-categoria">
+          <option value="comentario">💬 Comentario</option>
+          <option value="informe">📊 Informe</option>
+          <option value="solicitud">📋 Solicitud</option>
+          <option value="urgente">🚨 Urgente</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Asunto</label>
+        <input class="form-input" id="msg-asunto" type="text" placeholder="Asunto del mensaje…">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Mensaje</label>
+        <textarea class="comment-box" id="msg-cuerpo" style="min-height:100px" placeholder="Escribe tu mensaje…"></textarea>
+      </div>
+      <button class="action-btn btn-primary" onclick="enviarMensaje()">✉️ Enviar mensaje</button>
+      <button class="action-btn btn-secondary" onclick="closeModal('modal-mensaje')">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- MODAL NUEVO GASTO -->
+  <div class="modal-overlay" id="modal-gasto">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <div class="modal-title">Nuevo Gasto</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="form-group"><label class="form-label">Fecha *</label><input class="form-input" id="gasto-fecha" type="date"></div>
+        <div class="form-group"><label class="form-label">Importe * (€)</label><input class="form-input" id="gasto-importe" type="number" step="0.01" placeholder="0.00"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Concepto *</label>
+        <select class="form-select" id="gasto-concepto">
+          <option value="">Seleccionar…</option>
+          <option value="combustible">⛽ Combustible</option>
+          <option value="dietas">🍽️ Dietas</option>
+          <option value="parking">🅿️ Parking</option>
+          <option value="peaje">🛣️ Peaje</option>
+          <option value="hotel">🏨 Hotel</option>
+          <option value="material">📦 Material</option>
+          <option value="otros">📝 Otros</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Motivo (hospital/médico/reunión…)</label>
+        <input class="form-input" id="gasto-motivo" type="text" placeholder="Visita H. Arrixaca, Dr. García…">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Justificación</label>
+        <textarea class="comment-box" id="gasto-justificacion" style="min-height:70px" placeholder="Describe el gasto con detalle…"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Foto del ticket (opcional)</label>
+        <div class="photo-upload" onclick="document.getElementById('gasto-foto-input').click()">
+          <div class="photo-upload-icon">📷</div>
+          <div class="photo-upload-text" id="gasto-foto-label">Tocar para adjuntar ticket</div>
+        </div>
+        <input type="file" id="gasto-foto-input" accept="image/*" capture="environment" style="display:none" onchange="onGastoFoto(this)">
+      </div>
+      <button class="action-btn btn-primary" onclick="guardarGasto()">✓ Guardar gasto</button>
+      <button class="action-btn btn-secondary" onclick="closeModal('modal-gasto')">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- MODAL KILÓMETROS -->
+  <div class="modal-overlay" id="modal-km">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <div class="modal-title">Registrar Kilómetros</div>
+      <div class="form-group">
+        <label class="form-label">Lectura del cuentakilómetros</label>
+        <input class="form-input" id="km-lectura" type="number" placeholder="Ej: 87543">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Fecha y hora</label>
+        <input class="form-input" id="km-fecha" type="datetime-local">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Foto del cuentakilómetros (recomendado)</label>
+        <div class="photo-upload" onclick="document.getElementById('km-foto-input').click()">
+          <div class="photo-upload-icon">📷</div>
+          <div class="photo-upload-text" id="km-foto-label">Tocar para capturar</div>
+        </div>
+        <input type="file" id="km-foto-input" accept="image/*" capture="environment" style="display:none" onchange="onKmFoto(this)">
+      </div>
+      <div style="background:rgba(14,165,233,.08);border:1px solid rgba(14,165,233,.2);border-radius:var(--radius-sm);padding:11px;margin-bottom:14px;font-size:12px;color:var(--text2)">
+        📌 El programa calculará automáticamente los km del día restando la lectura anterior.
+      </div>
+      <button class="action-btn btn-primary" onclick="guardarKm()">✓ Registrar lectura</button>
+      <button class="action-btn btn-secondary" onclick="closeModal('modal-km')">Cancelar</button>
+    </div>
+  </div>
+
+</div><!-- /screen-app -->
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getFirestore, collection, doc, addDoc, updateDoc, onSnapshot,
+  query, orderBy, serverTimestamp, getDoc, setDoc, where, getDocs }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getStorage, ref, uploadBytes, getDownloadURL }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js';
+
+// ── ⚠️ SUSTITUYE POR TUS CREDENCIALES FIREBASE ──
+const firebaseConfig = {
+  apiKey:"AIzaSyB7djS43Yq0QhE6nJfukElchZeo6sVGe88", authDomain:"mgtrauma-e3693.firebaseapp.com",
+  projectId:"mgtrauma-e3693", storageBucket:"mgtrauma-e3693.firebasestorage.app",
+  messagingSenderId:"194653094711", appId:"1:194653094711:web:aa25e01ff7fa2b182c10b2"
+};
+
+const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),storage=getStorage(app);
+
+// Expose Firebase instances globally for other modules
+window._fbApp = app;
+window._fbDb = db;
+window._fbStorage = storage;
+window._fbAuth = auth;
+
+
+// ── Estado ──────────────────────────────────
+let currentUser=null, hospitals=[],doctors=[],tipos=[],users=[],surgeries=[],messages=[],gastos=[],kmRecords=[];
+let surgeryCounter=0, editingId=null, selectedDiv=null, neoAlarmScheduled=false;
+let gastoFotoFile=null, kmFotoFile=null, currentPage='cirugias', activeMsgFilter='todos', activeGastoFilter='todos';
+
+const ROLES_INFORMES=['gerente','gestor'];
+window.canSeeInformes=()=>ROLES_INFORMES.includes(currentUser?.profile?.rol||'comercial');
+
+// ── Auth ─────────────────────────────────────
+onAuthStateChanged(auth, async user=>{
+  if(user){
+    currentUser=user;
+    const snap=await getDoc(doc(db,'users',user.uid));
+    if(snap.exists()) currentUser.profile=snap.data();
+    showApp(); loadCatalogues(); subscribeAll(); setupUI();
+  } else { currentUser=null; showLogin(); }
+});
+
+window.doLogin=async()=>{
+  const e=document.getElementById('login-email').value.trim(), p=document.getElementById('login-pass').value;
+  const btn=document.getElementById('login-btn'); btn.textContent='Entrando…'; btn.disabled=true;
+  try{ await signInWithEmailAndPassword(auth,e,p); }
+  catch(err){ document.getElementById('login-error').textContent='Email o contraseña incorrectos'; document.getElementById('login-error').style.display='block'; btn.textContent='Entrar'; btn.disabled=false; }
+};
+window.doLogout=async()=>{ await signOut(auth); };
+
+function setupUI(){
+  const name=currentUser?.profile?.nombre||currentUser?.email||'U';
+  const ini=initials(name);
+  document.getElementById('header-user').textContent=ini;
+  document.getElementById('user-avatar-big').textContent=ini;
+  document.getElementById('user-name').textContent=name;
+  document.getElementById('user-role-label').textContent=currentUser?.profile?.rolLabel||'Comercial · MGtrauma';
+  if(!canSeeInformes()) document.getElementById('tab-informes').style.display='none';
+  scheduleNeoAlarms();
+}
+
+// ── Catálogos ─────────────────────────────────
+async function loadCatalogues(){
+  const snap=await getDoc(doc(db,'catalogues','main'));
+  if(snap.exists()){const d=snap.data(); hospitals=d.hospitals||[]; doctors=d.doctors||[]; tipos=d.tipos||[]; users=d.users||[]; surgeryCounter=d.counter||0;}
+  const u=users.map(u=>`<option value="${u}">${u}</option>`).join('');
+  document.getElementById('inp-asignado').innerHTML='<option value="">Sin asignar</option>'+u;
+  document.getElementById('inp-clinical').innerHTML='<option value="">Sin asignar</option>'+u;
+  document.getElementById('msg-destinatario').innerHTML=users.map(u=>`<option value="${u}">${u}</option>`).join('');
+}
+async function saveCatalogues(extra={}){
+  await setDoc(doc(db,'catalogues','main'),{hospitals,doctors,tipos,users,counter:surgeryCounter,...extra},{merge:true});
+}
+
+// ── Suscripciones ─────────────────────────────
+function subscribeAll(){
+  // Cirugías
+  onSnapshot(query(collection(db,'surgeries'),orderBy('fechaTimestamp','desc')), snap=>{
+    surgeries=snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderList(); updateStats(); renderNeoList();
+    if(document.getElementById('page-calendario').classList.contains('active')) renderCalendar();
+  });
+  // Mensajes
+  onSnapshot(query(collection(db,'messages'),orderBy('createdAt','desc')), snap=>{
+    messages=snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderMessages(); updateMsgBadge();
+  });
+  // Gastos
+  onSnapshot(query(collection(db,'gastos'),orderBy('fecha','desc')), snap=>{
+    gastos=snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderGastos(); updateGastoStats();
+  });
+  // KM
+  onSnapshot(query(collection(db,'km'),orderBy('fechaTimestamp','desc')), snap=>{
+    kmRecords=snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderKm();
+  });
+}
+
+// ── NEO ALARMS ────────────────────────────────
+function scheduleNeoAlarms(){
+  const now=new Date();
+  const alarm14=new Date(now); alarm14.setHours(14,0,0,0);
+  const alarm15=new Date(now); alarm15.setHours(15,0,0,0);
+  const ms14=alarm14-now, ms15=alarm15-now;
+  if(ms14>0) setTimeout(()=>neoAlarm14h(), ms14);
+  if(ms15>0) setTimeout(()=>neoAlarm15h(), ms15);
+}
+function neoAlarm14h(){
+  const pendientes=getNeosPendientesHoy();
+  if(!pendientes.length) return;
+  const myNeos=pendientes.filter(s=>s.asignado===currentUser?.profile?.nombre||s.altaPor===currentUser?.profile?.nombre);
+  if(myNeos.length) showToast(`⏰ ALARMA NEO: Tienes ${myNeos.length} NEO(s) pendientes de revisar antes de las 16h`,'warn');
+  if(Notification.permission==='granted'){
+    new Notification('MGtrauma — Revisar NEO',{body:`${myNeos.length} NEO(s) pendientes antes de las 16:00h`,icon:'icons/icon-192.png'});
+  }
+}
+function neoAlarm15h(){
+  if(!canSeeInformes()) return;
+  const pendientes=getNeosPendientesHoy();
+  if(!pendientes.length) return;
+  const lista=pendientes.map(s=>`• #${s.numero} ${s.hospital} — NEO ${s.neoNumero||'s/n'}`).join('\n');
+  showToast(`📋 Resumen NEOs pendientes enviado al gerente`,'warn');
+}
+function getNeosPendientesHoy(){
+  const hoy=new Date().toDateString();
+  return surgeries.filter(s=>{
+    if(!s.neoNumero||s.neoRevisado) return false;
+    if(!s.fecha) return false;
+    const [d,m,y]=s.fecha.split('/');
+    return new Date(y,m-1,d).toDateString()===hoy;
+  });
+}
+
+function renderNeoList(){
+  const hoy=new Date();
+  const lista=surgeries.filter(s=>{
+    if(!s.neoNumero) return false;
+    if(!s.fecha) return false;
+    const [d,m,y]=s.fecha.split('/');
+    const diff=(new Date(y,m-1,d)-new Date(hoy.getFullYear(),hoy.getMonth(),hoy.getDate()))/(1000*60*60*24);
+    return diff>=0 && diff<=3;
+  });
+  const el=document.getElementById('neo-list');
+  if(!lista.length){ el.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">No hay NEOs en los próximos 3 días</div></div>'; return; }
+  el.innerHTML=lista.map(s=>`
+    <div class="neo-card ${s.neoRevisado?'revisado':'pendiente'}" onclick="openDetail('${s.id}')">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px">#${s.numero} · ${s.hospital}</div>
+          <div style="font-size:12px;color:var(--text2)">${s.doctor} · ${s.fecha}</div>
+        </div>
+        <span class="status-badge ${s.neoRevisado?'badge-post':'badge-warn'}">${s.neoRevisado?'✓ Revisado':'⚠️ Pendiente'}</span>
+      </div>
+      <div style="font-size:12px;color:var(--accent)">NEO: ${s.neoNumero}</div>
+    </div>`).join('');
+}
+
+// ── CREAR CIRUGÍA ─────────────────────────────
+window.guardarCirugia=async()=>{
+  const hospital=document.getElementById('inp-hospital').value.trim();
+  const doctor=document.getElementById('inp-doctor').value.trim();
+  const fecha=document.getElementById('inp-fecha').value;
+  const hora=document.getElementById('inp-hora').value;
+  const tipo=document.getElementById('inp-tipo').value.trim();
+  const asignado=document.getElementById('inp-asignado').value;
+  const clinical=document.getElementById('inp-clinical').value;
+  const neoNumero=document.getElementById('inp-neo').value.trim();
+  const matD=document.getElementById('chk-deposito').checked;
+  const matR=document.getElementById('chk-rotativo').checked;
+  const matP=document.getElementById('chk-prestamo').checked;
+  if(!hospital||!doctor||!fecha||!selectedDiv||(!matD&&!matR&&!matP)){showToast('⚠️ Rellena los campos obligatorios','warn');return;}
+  const btn=document.getElementById('btn-crear'); btn.textContent='Guardando…'; btn.disabled=true;
+  let changed=false;
+  if(hospital&&!hospitals.includes(hospital)){hospitals.push(hospital);changed=true;}
+  if(doctor&&!doctors.includes(doctor)){doctors.push(doctor);changed=true;}
+  if(tipo&&!tipos.includes(tipo)){tipos.push(tipo);changed=true;}
+  surgeryCounter++;
+  const prestamos=[];
+  if(matP){
+    document.querySelectorAll('.prestamo-row').forEach(row=>{
+      const h=row.querySelector('.inp-prest-hosp').value.trim();
+      const m=row.querySelector('.inp-prest-mat').value.trim();
+      if(h||m) prestamos.push({hospital:h,material:m,revisado:false,retirado:false,ordenRetirada:false});
+    });
+  }
+  const [y,m,d]=fecha.split('-');
+  const materiales=[]; if(matD)materiales.push('Depósito'); if(matR)materiales.push('Rotativo'); if(matP)materiales.push('Préstamo otro H.');
+  try{
+    await addDoc(collection(db,'surgeries'),{
+      numero:surgeryCounter, hospital, doctor, tipo, asignado, clinical, neoNumero, neoRevisado:false,
+      fecha:`${d}/${m}/${y}`, fechaTimestamp:new Date(fecha+'T'+(hora||'00:00')), hora:hora||'--:--',
+      division:selectedDiv==='osteo'?'Osteosíntesis':'Ortopedia', materiales, prestamos,
+      estado:'pre', altaPor:currentUser?.profile?.nombre||currentUser?.email,
+      revisado:false, revisorNombre:'', historiaClinica:'', episodio:'',
+      comentarios:'', adminObservaciones:'', adminVistoBueno:false, sinGasto:false, fotoUrl:'', createdAt:serverTimestamp()
+    });
+    await saveCatalogues({counter:surgeryCounter});
+    closeModal('modal-nueva'); showToast(`✓ Cirugía #${surgeryCounter} creada`);
+    if(matP&&prestamos.length) setTimeout(()=>showToast('📢 Solicitud de préstamo notificada al equipo'),600);
+  }catch(e){showToast('Error: '+e.message,'error');}
+  btn.textContent='✓ Crear cirugía y notificar al equipo'; btn.disabled=false;
+};
+
+window.addPrestamoRow=()=>{
+  const c=document.getElementById('prestamos-container');
+  const r=document.createElement('div'); r.className='prestamo-row';
+  r.style.cssText='display:grid;grid-template-columns:1fr 1fr auto;gap:7px;margin-bottom:7px;align-items:center';
+  r.innerHTML=`<input class="form-input inp-prest-hosp" type="text" placeholder="Hospital origen" style="font-size:12px;padding:8px 10px">
+    <input class="form-input inp-prest-mat" type="text" placeholder="Material solicitado" style="font-size:12px;padding:8px 10px">
+    <button onclick="this.parentElement.remove()" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:var(--red);border-radius:7px;padding:7px;cursor:pointer">✕</button>`;
+  c.appendChild(r);
+};
+
+window.toggleNeoSection=()=>{ document.getElementById('grp-neo').style.display=document.getElementById('chk-rotativo').checked?'block':'none'; };
+window.togglePrestamoSection=()=>{ document.getElementById('grp-prestamos').style.display=document.getElementById('chk-prestamo').checked?'block':'none'; };
+
+// ── UPDATE ────────────────────────────────────
+window.updateField=async(id,f,v)=>await updateDoc(doc(db,'surgeries',id),{[f]:v});
+window.updateMultiple=async(id,o)=>await updateDoc(doc(db,'surgeries',id),o);
+window.pasarAPost=async id=>{await updateDoc(doc(db,'surgeries',id),{estado:'post'}); showToast('✓ Cirugía realizada'); openDetail(id);};
+window.anularCirugia=async id=>{if(!confirm('¿Anular esta cirugía?'))return; await updateDoc(doc(db,'surgeries',id),{estado:'anulada'}); closeDetail(); showToast('❌ Cirugía anulada');};
+
+window.uploadPhoto=async(id,file)=>{
+  showToast('📷 Subiendo foto…');
+  const r2=ref(storage,`partes/${id}_${Date.now()}.jpg`);
+  await uploadBytes(r2,file); const url=await getDownloadURL(r2);
+  await updateDoc(doc(db,'surgeries',id),{fotoUrl:url}); showToast('✓ Foto subida'); openDetail(id);
+};
+window.triggerPhoto=id=>document.getElementById('file-'+id)?.click();
+
+// ── DETAIL ────────────────────────────────────
+window.openDetail=id=>{
+  const s=surgeries.find(x=>x.id===id); if(!s) return;
+  document.getElementById('detail-title').textContent=`#${s.numero||'—'} · ${s.hospital}`;
+  const mats=s.materiales||[], isPost=s.estado==='post', hasP=mats.includes('Préstamo otro H.'), hasR=mats.includes('Rotativo');
+
+  const phaseHtml=`<div class="phase-steps">
+    <div class="phase-step"><div class="phase-dot done">✓</div><div class="phase-label">Creada</div></div>
+    <div class="phase-line done"></div>
+    <div class="phase-step"><div class="phase-dot ${s.revisado?'done':'active'}">${s.revisado?'✓':'2'}</div><div class="phase-label ${s.revisado?'':'active'}">Material</div></div>
+    <div class="phase-line ${isPost?'done':''}"></div>
+    <div class="phase-step"><div class="phase-dot ${isPost?'done':''}">3</div><div class="phase-label ${isPost?'active':''}">Cirugía</div></div>
+    ${hasP?`<div class="phase-line ${(s.prestamos||[]).every(p=>p.retirado)?'done':''}"></div>
+    <div class="phase-step"><div class="phase-dot ${(s.prestamos||[]).every(p=>p.retirado)?'done':''}">4</div><div class="phase-label">Retirada</div></div>`:''}
+  </div>`;
+
+  const infoHtml=`<div class="detail-section">
+    <div class="detail-section-title">📋 Información general</div>
+    <div class="detail-row"><span class="detail-label">Nº</span><span class="detail-value">#${s.numero||'—'}</span></div>
+    <div class="detail-row"><span class="detail-label">Hospital</span><span class="detail-value">${s.hospital}</span></div>
+    <div class="detail-row"><span class="detail-label">Cirujano</span><span class="detail-value">${s.doctor}</span></div>
+    <div class="detail-row"><span class="detail-label">Fecha</span><span class="detail-value">${s.fecha} · ${s.hora}</span></div>
+    <div class="detail-row"><span class="detail-label">División</span><span class="detail-value"><span class="division-tag ${s.division==='Osteosíntesis'?'div-osteo':'div-orto'}">${s.division}</span></span></div>
+    <div class="detail-row"><span class="detail-label">Tipo</span><span class="detail-value">${s.tipo||'—'}</span></div>
+    <div class="detail-row"><span class="detail-label">Material</span><span class="detail-value">${mats.join(' + ')}</span></div>
+    <div class="detail-row"><span class="detail-label">Comercial</span><span class="detail-value">${s.asignado||'—'}</span></div>
+    <div class="detail-row"><span class="detail-label">Clinical</span><span class="detail-value">${s.clinical||'—'}</span></div>
+    <div class="detail-row"><span class="detail-label">Alta por</span><span class="detail-value">${s.altaPor||'—'}</span></div>
+  </div>`;
+
+  const matHtml=`<div class="detail-section">
+    <div class="detail-section-title">📦 Revisión de material</div>
+    ${hasR&&!isPost?`<button class="action-btn btn-warning" onclick="copiarDemandaLogistica('${id}')">📤 Copiar demanda a logística</button>`:''}
+    <div class="check-row">
+      <div class="check-info"><div class="check-title">Material revisado</div><div class="check-sub">${s.revisado?'Por '+s.revisorNombre:'Pendiente'}</div></div>
+      <div class="toggle ${s.revisado?'on':''}" onclick="toggleRevisado('${id}',this)"></div>
+    </div>
+  </div>`;
+
+  let neoHtml='';
+  if(hasR&&s.neoNumero){
+    neoHtml=`<div class="detail-section">
+      <div class="detail-section-title">📋 NEO DePuy Synthes</div>
+      <div class="detail-row"><span class="detail-label">Número NEO</span><span class="detail-value" style="color:var(--accent);font-weight:700">${s.neoNumero}</span></div>
+      <div class="check-row">
+        <div class="check-info"><div class="check-title">NEO revisado</div><div class="check-sub">${s.neoRevisado?'Revisado antes de las 16h':'⚠️ Pendiente de revisión'}</div></div>
+        <div class="toggle ${s.neoRevisado?'on':''}" onclick="toggleNeoRevisado('${id}',this)"></div>
+      </div>
+    </div>`;
+  }
+
+  let prestaHtml='';
+  if(hasP){
+    const rows=(s.prestamos||[]).map((p,i)=>`
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:11px;margin-bottom:7px">
+        <div style="font-size:12px;font-weight:600;margin-bottom:3px">🏥 ${p.hospital||'—'}</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:7px">📦 ${p.material||'—'}</div>
+        ${!p.ordenRetirada&&isPost?`<button class="action-btn btn-purple" style="margin-bottom:5px;padding:9px" onclick="generarRetiradaPrestamo('${id}',${i})">📤 Orden de retirada</button>`:''}
+        ${p.ordenRetirada?`<div style="font-size:11px;color:var(--green);margin-bottom:5px">✓ Orden generada</div>`:''}
+        <div class="check-row" style="padding:5px 0">
+          <div class="check-info"><div class="check-title" style="font-size:12px">Material retirado</div></div>
+          <div class="toggle ${p.retirado?'on':''}" onclick="togglePrestamoRetirado('${id}',${i},this)"></div>
+        </div>
+      </div>`).join('');
+    prestaHtml=`<div class="detail-section">
+      <div class="detail-section-title">🏥 Materiales en préstamo</div>
+      <button class="action-btn btn-warning" onclick="copiarSolicitudPrestamo('${id}')">📤 Copiar solicitud de préstamo</button>
+      ${rows}
+    </div>`;
+  }
+
+  let postHtml='';
+  if(isPost){
+    postHtml=`<div class="detail-section">
+      <div class="detail-section-title">🏥 Post-cirugía</div>
+      <div class="form-group"><label class="form-label">Nº Historia Clínica</label>
+        <input class="form-input" value="${s.historiaClinica||''}" placeholder="Nº HC…" onblur="updateField('${id}','historiaClinica',this.value)"></div>
+      <div class="form-group"><label class="form-label">Nº Episodio</label>
+        <input class="form-input" value="${s.episodio||''}" placeholder="Nº episodio…" onblur="updateField('${id}','episodio',this.value)"></div>
+      ${s.fotoUrl?`<img src="${s.fotoUrl}" style="width:100%;border-radius:9px;margin-bottom:10px">`
+        :`<div class="photo-upload" onclick="triggerPhoto('${id}')"><div class="photo-upload-icon">📷</div><div class="photo-upload-text">Tocar para subir foto del parte</div></div>`}
+      <input type="file" id="file-${id}" accept="image/*" capture="environment" style="display:none" onchange="uploadPhoto('${id}',this.files[0])">
+      <div class="check-row" style="margin-top:10px">
+        <div class="check-info"><div class="check-title">Cirugía sin gasto</div><div class="check-sub">${s.sinGasto?'Sin gasto':'Con gasto'}</div></div>
+        <div class="toggle ${s.sinGasto?'on':''}" onclick="toggleSinGasto('${id}',this)"></div>
+      </div>
+    </div>`;
+  } else if(s.estado==='pre'){
+    postHtml=`<button class="action-btn btn-success" onclick="pasarAPost('${id}')">🏥 Marcar como realizada</button>`;
+  }
+
+  const adminHtml=`<div class="detail-section">
+    <div class="detail-section-title">🗂️ Administración</div>
+    <div class="form-group"><label class="form-label">Observaciones</label>
+      <textarea class="comment-box" onblur="updateField('${id}','adminObservaciones',this.value)">${s.adminObservaciones||''}</textarea></div>
+    <div class="check-row">
+      <div class="check-info"><div class="check-title">Visto bueno administración</div><div class="check-sub">${s.adminVistoBueno?'Validado':'Pendiente'}</div></div>
+      <div class="toggle ${s.adminVistoBueno?'on':''}" onclick="toggleAdminVB('${id}',this)"></div>
+    </div>
+  </div>`;
+
+  const comentariosHtml=`<div class="detail-section">
+    <div class="detail-section-title">💬 Comentarios</div>
+    <textarea class="comment-box" placeholder="Añade un comentario…" onblur="updateField('${id}','comentarios',this.value)">${s.comentarios||''}</textarea>
+  </div>`;
+
+  const actionsHtml=`<div class="detail-section">
+    <div class="detail-section-title">⚙️ Acciones</div>
+    <button class="action-btn btn-secondary" onclick="openEditModal('${id}')">✏️ Editar expediente</button>
+    ${s.estado!=='anulada'?`<button class="action-btn btn-danger" onclick="anularCirugia('${id}')">❌ Anular cirugía</button>`:''}
+  </div>`;
+
+  document.getElementById('detail-body').innerHTML=phaseHtml+infoHtml+matHtml+neoHtml+prestaHtml+postHtml+adminHtml+comentariosHtml+actionsHtml;
+  document.getElementById('detail-view').classList.add('open');
+};
+
+window.closeDetail=()=>document.getElementById('detail-view').classList.remove('open');
+
+window.toggleRevisado=async(id,el)=>{const s=surgeries.find(x=>x.id===id);if(!s)return;const val=!s.revisado;await updateMultiple(id,{revisado:val,revisorNombre:val?currentUser?.profile?.nombre||currentUser?.email:''});showToast(val?'✓ Material revisado':'Pendiente');openDetail(id);};
+window.toggleNeoRevisado=async(id,el)=>{const s=surgeries.find(x=>x.id===id);if(!s)return;await updateField(id,'neoRevisado',!s.neoRevisado);showToast(!s.neoRevisado?'✓ NEO revisado':'NEO marcado como pendiente');openDetail(id);};
+window.toggleSinGasto=async(id,el)=>{const s=surgeries.find(x=>x.id===id);if(!s)return;await updateField(id,'sinGasto',!s.sinGasto);showToast(!s.sinGasto?'⚪ Sin gasto':'Con gasto');openDetail(id);};
+window.toggleAdminVB=async(id,el)=>{const s=surgeries.find(x=>x.id===id);if(!s)return;await updateField(id,'adminVistoBueno',!s.adminVistoBueno);showToast(!s.adminVistoBueno?'✓ Visto bueno dado':'VB retirado');openDetail(id);};
+window.togglePrestamoRetirado=async(id,idx,el)=>{const s=surgeries.find(x=>x.id===id);if(!s)return;const p=[...s.prestamos];p[idx].retirado=!p[idx].retirado;await updateDoc(doc(db,'surgeries',id),{prestamos:p});showToast(p[idx].retirado?'✓ Material retirado':'Pendiente');openDetail(id);};
+window.generarRetiradaPrestamo=async(id,idx)=>{const s=surgeries.find(x=>x.id===id);if(!s)return;const p=[...s.prestamos];const msg=`🚚 ORDEN DE RETIRADA - MGtrauma\n\n🏥 ${s.hospital}\n📦 ${p[idx].material}\n🏠 Devolver a: ${p[idx].hospital}\n📅 ${s.fecha}`;navigator.clipboard.writeText(msg).then(()=>showToast('📋 Orden copiada'));p[idx].ordenRetirada=true;await updateDoc(doc(db,'surgeries',id),{prestamos:p});openDetail(id);};
+window.copiarDemandaLogistica=id=>{const s=surgeries.find(x=>x.id===id);if(!s)return;const msg=`📋 DEMANDA ROTATIVO - MGtrauma\n\n🏥 ${s.hospital}\n👨‍⚕️ ${s.doctor}\n📅 ${s.fecha} ${s.hora}\n🔬 ${s.tipo||'—'}\nNEO: ${s.neoNumero||'pendiente'}`;navigator.clipboard.writeText(msg).then(()=>showToast('📋 Demanda copiada'));};
+window.copiarSolicitudPrestamo=id=>{const s=surgeries.find(x=>x.id===id);if(!s)return;const lista=(s.prestamos||[]).map(p=>`  • ${p.material} ← ${p.hospital}`).join('\n');const msg=`📋 SOLICITUD PRÉSTAMO - MGtrauma\n\n🏥 ${s.hospital}\n👨‍⚕️ ${s.doctor}\n📅 ${s.fecha}\n\n${lista}`;navigator.clipboard.writeText(msg).then(()=>showToast('📋 Solicitud copiada'));};
+
+window.openEditModal=id=>{
+  editingId=id; const s=surgeries.find(x=>x.id===id); if(!s)return;
+  document.getElementById('inp-hospital').value=s.hospital;
+  document.getElementById('inp-doctor').value=s.doctor;
+  const[d2,m2,y2]=s.fecha.split('/');
+  document.getElementById('inp-fecha').value=`${y2}-${m2}-${d2}`;
+  document.getElementById('inp-hora').value=s.hora!=='--:--'?s.hora:'';
+  document.getElementById('inp-tipo').value=s.tipo||'';
+  document.getElementById('inp-asignado').value=s.asignado||'';
+  document.getElementById('inp-clinical').value=s.clinical||'';
+  document.getElementById('inp-neo').value=s.neoNumero||'';
+  selectDiv(s.division==='Osteosíntesis'?'osteo':'orto');
+  document.getElementById('chk-deposito').checked=(s.materiales||[]).includes('Depósito');
+  document.getElementById('chk-rotativo').checked=(s.materiales||[]).includes('Rotativo');
+  document.getElementById('chk-prestamo').checked=(s.materiales||[]).includes('Préstamo otro H.');
+  toggleNeoSection(); togglePrestamoSection();
+  document.getElementById('modal-title').textContent=`Editar #${s.numero}`;
+  document.getElementById('btn-crear').textContent='✓ Guardar cambios';
+  document.getElementById('btn-crear').onclick=saveEdit;
+  document.getElementById('modal-nueva').classList.add('open');
+};
+
+window.saveEdit=async()=>{
+  const hospital=document.getElementById('inp-hospital').value.trim();
+  const doctor=document.getElementById('inp-doctor').value.trim();
+  const fecha=document.getElementById('inp-fecha').value;
+  const hora=document.getElementById('inp-hora').value;
+  const tipo=document.getElementById('inp-tipo').value.trim();
+  const asignado=document.getElementById('inp-asignado').value;
+  const clinical=document.getElementById('inp-clinical').value;
+  const neoNumero=document.getElementById('inp-neo').value.trim();
+  const materiales=[];
+  if(document.getElementById('chk-deposito').checked)materiales.push('Depósito');
+  if(document.getElementById('chk-rotativo').checked)materiales.push('Rotativo');
+  if(document.getElementById('chk-prestamo').checked)materiales.push('Préstamo otro H.');
+  const[y,m,d]=fecha.split('-');
+  await updateMultiple(editingId,{hospital,doctor,tipo,asignado,clinical,neoNumero,materiales,hora:hora||'--:--',fecha:`${d}/${m}/${y}`,fechaTimestamp:new Date(fecha+'T'+(hora||'00:00')),division:selectedDiv==='osteo'?'Osteosíntesis':'Ortopedia'});
+  closeModal('modal-nueva'); showToast('✓ Actualizado'); editingId=null;
+};
+
+// ── RENDER LIST ───────────────────────────────
+let activeFilter='all';
+window.setFilter=(el,f)=>{activeFilter=f;document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');renderList();};
+function renderList(){
+  let list=surgeries;
+  if(activeFilter==='pre') list=list.filter(s=>s.estado==='pre');
+  else if(activeFilter==='post') list=list.filter(s=>s.estado==='post');
+  else if(activeFilter==='anulada') list=list.filter(s=>s.estado==='anulada');
+  else list=list.filter(s=>s.estado!=='anulada');
+  if(activeFilter==='osteo') list=list.filter(s=>s.division==='Osteosíntesis');
+  if(activeFilter==='orto') list=list.filter(s=>s.division==='Ortopedia');
+  if(activeFilter==='deposito') list=list.filter(s=>(s.materiales||[]).includes('Depósito'));
+  if(activeFilter==='rotativo') list=list.filter(s=>(s.materiales||[]).includes('Rotativo'));
+  const q=document.getElementById('search-input')?.value?.toLowerCase();
+  if(q) list=list.filter(s=>s.hospital?.toLowerCase().includes(q)||s.doctor?.toLowerCase().includes(q)||s.tipo?.toLowerCase().includes(q)||s.historiaClinica?.toLowerCase().includes(q)||s.episodio?.toLowerCase().includes(q)||String(s.neoNumero||'').toLowerCase().includes(q)||String(s.numero||'').includes(q));
+  const el=document.getElementById('surgery-list');
+  if(!list.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">🗂️</div><div class="empty-text">Sin resultados</div></div>';return;}
+  el.innerHTML=list.map(s=>cardHTML(s)).join('');
+}
+
+function cardHTML(s){
+  const bc=s.estado==='pre'?'badge-pre':s.estado==='post'?'badge-post':'badge-anulada';
+  const bt=s.estado==='pre'?'Pre-cirugía':s.estado==='post'?'Post-cirugía':'Anulada';
+  const dc=s.division==='Osteosíntesis'?'div-osteo':'div-orto';
+  const mats=(s.materiales||[]).map(m=>m==='Depósito'?'📁':m==='Rotativo'?'📦':'🏥').join(' ');
+  const prestP=(s.prestamos||[]).some(p=>!p.retirado&&s.estado==='post');
+  const neoP=s.neoNumero&&!s.neoRevisado&&s.estado!=='anulada';
+  return `<div class="surgery-card ${s.estado}" onclick="openDetail('${s.id}')">
+    <div class="card-num">#${s.numero||'—'}</div>
+    <div class="card-top">
+      <div><div class="card-hospital">${s.hospital}</div><div class="card-doctor">${s.doctor}</div></div>
+      <div class="badges">
+        <span class="status-badge ${bc}">${bt}</span>
+        ${s.sinGasto?'<span class="status-badge badge-singasto">Sin gasto</span>':''}
+        ${prestP?'<span class="status-badge badge-warn">⚠️ Préstamo</span>':''}
+        ${neoP?'<span class="status-badge badge-neo">📋 NEO</span>':''}
+      </div>
+    </div>
+    <div class="card-meta">
+      <span class="meta-item">📅 ${s.fecha} ${s.hora}</span>
+      <span class="meta-item">${mats}</span>
+      <span class="division-tag ${dc}">${s.division}</span>
+    </div>
+    ${s.asignado||s.clinical?`<div class="assigned-row"><div class="av">${initials(s.asignado||s.clinical||'?')}</div><div class="assigned-label">${s.asignado?'Comercial: '+s.asignado:''}${s.clinical?' · Clinical: '+s.clinical:''}</div></div>`:''}
+  </div>`;
+}
+
+function updateStats(){
+  const now=new Date(), activas=surgeries.filter(s=>s.estado!=='anulada');
+  const startWeek=new Date(now); startWeek.setDate(now.getDate()-now.getDay());
+  const hoy=activas.filter(s=>{if(!s.fecha)return false;const[d,m,y]=s.fecha.split('/');return new Date(y,m-1,d).toDateString()===now.toDateString();}).length;
+  const sem=activas.filter(s=>{if(!s.fecha)return false;const[d,m,y]=s.fecha.split('/');return new Date(y,m-1,d)>=startWeek;}).length;
+  const mes=activas.filter(s=>{if(!s.fecha)return false;const[d,m,y]=s.fecha.split('/');return Number(m)-1===now.getMonth()&&Number(y)===now.getFullYear();}).length;
+  const anio=activas.filter(s=>{if(!s.fecha)return false;const[d,m,y]=s.fecha.split('/');return Number(y)===now.getFullYear();}).length;
+  document.getElementById('stat-hoy').textContent=hoy;
+  document.getElementById('stat-sem').textContent=sem;
+  document.getElementById('stat-mes').textContent=mes;
+  document.getElementById('stat-anio').textContent=anio;
+}
+
+// ── MENSAJERÍA ────────────────────────────────
+window.enviarMensaje=async()=>{
+  const dests=Array.from(document.getElementById('msg-destinatario').selectedOptions).map(o=>o.value);
+  const cat=document.getElementById('msg-categoria').value;
+  const asunto=document.getElementById('msg-asunto').value.trim();
+  const cuerpo=document.getElementById('msg-cuerpo').value.trim();
+  if(!dests.length||!asunto||!cuerpo){showToast('⚠️ Rellena todos los campos','warn');return;}
+  await addDoc(collection(db,'messages'),{
+    de:currentUser?.profile?.nombre||currentUser?.email, destinatarios:dests,
+    categoria:cat, asunto, cuerpo, leido:false, createdAt:serverTimestamp()
+  });
+  closeModal('modal-mensaje'); showToast('✉️ Mensaje enviado');
+};
+
+function renderMessages(){
+  const nombre=currentUser?.profile?.nombre||currentUser?.email||'';
+  let list=messages;
+  if(activeMsgFilter==='recibidos') list=list.filter(m=>(m.destinatarios||[]).includes(nombre));
+  else if(activeMsgFilter==='enviados') list=list.filter(m=>m.de===nombre);
+  else if(['informe','solicitud','comentario','urgente'].includes(activeMsgFilter)) list=list.filter(m=>m.categoria===activeMsgFilter);
+  const el=document.getElementById('msg-list');
+  if(!list.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">✉️</div><div class="empty-text">Sin mensajes</div></div>';return;}
+  el.innerHTML=list.map(m=>{
+    const tagClass={informe:'tag-informe',solicitud:'tag-solicitud',comentario:'tag-comentario',urgente:'tag-urgente'}[m.categoria]||'tag-comentario';
+    const tagLabel={informe:'📊 Informe',solicitud:'📋 Solicitud',comentario:'💬 Comentario',urgente:'🚨 Urgente'}[m.categoria]||m.categoria;
+    const ts=m.createdAt?.toDate?m.createdAt.toDate():new Date();
+    const timeStr=ts.toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'})+' '+ts.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+    const isUnread=(m.destinatarios||[]).includes(nombre)&&!m.leido;
+    return `<div class="msg-card ${isUnread?'unread':''}" onclick="openMensaje('${m.id}')">
+      <div class="msg-top"><div class="msg-from">${m.de}</div><span class="msg-tag ${tagClass}">${tagLabel}</span></div>
+      <div class="msg-subject">${m.asunto}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px">
+        <div class="msg-preview">${m.cuerpo}</div>
+        <span class="msg-time">${timeStr}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.openMensaje=async id=>{
+  const m=messages.find(x=>x.id===id); if(!m)return;
+  if(!m.leido) await updateDoc(doc(db,'messages',id),{leido:true});
+  const tagLabel={informe:'📊 Informe',solicitud:'📋 Solicitud',comentario:'💬 Comentario',urgente:'🚨 Urgente'}[m.categoria]||m.categoria;
+  const ts=m.createdAt?.toDate?m.createdAt.toDate():new Date();
+  document.getElementById('msg-detail-title').textContent=m.asunto;
+  document.getElementById('msg-detail-body').innerHTML=`
+    <div class="detail-section">
+      <div class="detail-row"><span class="detail-label">De</span><span class="detail-value">${m.de}</span></div>
+      <div class="detail-row"><span class="detail-label">Para</span><span class="detail-value">${(m.destinatarios||[]).join(', ')}</span></div>
+      <div class="detail-row"><span class="detail-label">Categoría</span><span class="detail-value">${tagLabel}</span></div>
+      <div class="detail-row"><span class="detail-label">Fecha</span><span class="detail-value">${ts.toLocaleString('es-ES')}</span></div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">${m.asunto}</div>
+      <div style="font-size:14px;line-height:1.6;white-space:pre-wrap">${m.cuerpo}</div>
+    </div>
+    <button class="action-btn btn-secondary" onclick="responderMensaje('${m.id}')">↩️ Responder</button>`;
+  document.getElementById('msg-detail-view').classList.add('open');
+};
+
+window.responderMensaje=id=>{
+  const m=messages.find(x=>x.id===id); if(!m)return;
+  document.getElementById('msg-detail-view').classList.remove('open');
+  document.getElementById('msg-asunto').value='RE: '+m.asunto;
+  const opts=document.getElementById('msg-destinatario').options;
+  for(let o of opts) o.selected=o.value===m.de;
+  document.getElementById('modal-mensaje').classList.add('open');
+};
+
+function updateMsgBadge(){
+  const nombre=currentUser?.profile?.nombre||currentUser?.email||'';
+  const unread=messages.filter(m=>(m.destinatarios||[]).includes(nombre)&&!m.leido).length;
+  const badge=document.getElementById('msg-badge');
+  if(unread>0){badge.textContent=unread;badge.style.display='flex';}else{badge.style.display='none';}
+}
+
+window.setMsgFilter=(el,f)=>{activeMsgFilter=f;document.querySelectorAll('#page-mensajes .filter-chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');renderMessages();};
+
+// ── GASTOS ────────────────────────────────────
+window.onGastoFoto=f=>{gastoFotoFile=f.files[0];document.getElementById('gasto-foto-label').textContent='✓ Ticket seleccionado';};
+
+window.guardarGasto=async()=>{
+  const fecha=document.getElementById('gasto-fecha').value;
+  const importe=parseFloat(document.getElementById('gasto-importe').value);
+  const concepto=document.getElementById('gasto-concepto').value;
+  const motivo=document.getElementById('gasto-motivo').value.trim();
+  const justificacion=document.getElementById('gasto-justificacion').value.trim();
+  if(!fecha||!importe||!concepto){showToast('⚠️ Rellena fecha, importe y concepto','warn');return;}
+  let fotoUrl='';
+  if(gastoFotoFile){
+    showToast('📷 Subiendo ticket…');
+    const r2=ref(storage,`gastos/${currentUser.uid}_${Date.now()}.jpg`);
+    await uploadBytes(r2,gastoFotoFile); fotoUrl=await getDownloadURL(r2);
+  }
+  await addDoc(collection(db,'gastos'),{
+    fecha, importe, concepto, motivo, justificacion, fotoUrl,
+    usuario:currentUser?.profile?.nombre||currentUser?.email,
+    createdAt:serverTimestamp()
+  });
+  gastoFotoFile=null;
+  document.getElementById('gasto-foto-label').textContent='Tocar para adjuntar ticket';
+  closeModal('modal-gasto'); showToast('✓ Gasto guardado');
+};
+
+function renderGastos(){
+  const nombre=currentUser?.profile?.nombre||currentUser?.email||'';
+  let list=gastos.filter(g=>g.usuario===nombre);
+  if(activeGastoFilter!=='todos') list=list.filter(g=>g.concepto===activeGastoFilter);
+  const el=document.getElementById('gastos-list');
+  if(!list.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">🧾</div><div class="empty-text">Sin gastos registrados</div></div>';return;}
+  el.innerHTML=list.map(g=>`
+    <div class="gasto-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+        <div><div style="font-size:11px;color:var(--text3)">${g.fecha}</div><div style="font-size:13px;font-weight:600;margin-top:2px">${g.motivo||g.concepto}</div></div>
+        <div class="gasto-importe">${Number(g.importe).toFixed(2)}€</div>
+      </div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:4px">${g.justificacion||''}</div>
+      ${g.fotoUrl?`<img src="${g.fotoUrl}" style="width:60px;height:60px;object-fit:cover;border-radius:7px;margin-top:4px">`:''}
+    </div>`).join('');
+}
+
+function updateGastoStats(){
+  const nombre=currentUser?.profile?.nombre||currentUser?.email||'';
+  const now=new Date();
+  const mis=gastos.filter(g=>g.usuario===nombre);
+  const startW=new Date(now); startW.setDate(now.getDate()-now.getDay());
+  const sem=mis.filter(g=>new Date(g.fecha)>=startW).reduce((a,g)=>a+Number(g.importe),0);
+  const mes=mis.filter(g=>{const d=new Date(g.fecha);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();}).reduce((a,g)=>a+Number(g.importe),0);
+  const anio=mis.filter(g=>new Date(g.fecha).getFullYear()===now.getFullYear()).reduce((a,g)=>a+Number(g.importe),0);
+  document.getElementById('gasto-sem').textContent=sem.toFixed(0)+'€';
+  document.getElementById('gasto-mes').textContent=mes.toFixed(0)+'€';
+  document.getElementById('gasto-anio').textContent=anio.toFixed(0)+'€';
+}
+
+window.setGastoFilter=(el,f)=>{activeGastoFilter=f;document.querySelectorAll('#page-gastos .filter-chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');renderGastos();};
+
+window.exportarGastos=()=>{
+  const nombre=currentUser?.profile?.nombre||currentUser?.email||'';
+  const list=gastos.filter(g=>g.usuario===nombre);
+  if(!list.length){showToast('Sin gastos para exportar','warn');return;}
+  const data=list.map(g=>({'Fecha':g.fecha,'Importe (€)':Number(g.importe).toFixed(2),'Concepto':g.concepto,'Motivo':g.motivo||'','Justificación':g.justificacion||'','Empleado':g.usuario}));
+  const ws=XLSX.utils.json_to_sheet(data), wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Gastos');
+  XLSX.writeFile(wb,`MGtrauma_gastos_${nombre.replace(' ','_')}_${new Date().toISOString().split('T')[0]}.xlsx`);
+  showToast('📥 Excel de gastos descargado');
+};
+
+// ── KILÓMETROS ────────────────────────────────
+window.onKmFoto=f=>{kmFotoFile=f.files[0];document.getElementById('km-foto-label').textContent='✓ Foto capturada';};
+
+window.openKmModal=()=>{
+  const now=new Date();
+  const local=new Date(now.getTime()-now.getTimezoneOffset()*60000).toISOString().slice(0,16);
+  document.getElementById('km-fecha').value=local;
+  document.getElementById('modal-km').classList.add('open');
+};
+
+window.guardarKm=async()=>{
+  const lectura=parseInt(document.getElementById('km-lectura').value);
+  const fechaStr=document.getElementById('km-fecha').value;
+  if(!lectura||!fechaStr){showToast('⚠️ Rellena lectura y fecha','warn');return;}
+  let fotoUrl='';
+  if(kmFotoFile){
+    const r2=ref(storage,`km/${currentUser.uid}_${Date.now()}.jpg`);
+    await uploadBytes(r2,kmFotoFile); fotoUrl=await getDownloadURL(r2);
+  }
+  const nombre=currentUser?.profile?.nombre||currentUser?.email;
+  await addDoc(collection(db,'km'),{
+    lectura, fotoUrl, usuario:nombre,
+    fechaTimestamp:new Date(fechaStr),
+    fecha:fechaStr.split('T')[0],
+    createdAt:serverTimestamp()
+  });
+  kmFotoFile=null;
+  document.getElementById('km-foto-label').textContent='Tocar para capturar';
+  closeModal('modal-km'); showToast('✓ Lectura registrada');
+};
+
+function renderKm(){
+  const nombre=currentUser?.profile?.nombre||currentUser?.email||'';
+  const mis=kmRecords.filter(k=>k.usuario===nombre).sort((a,b)=>new Date(a.fechaTimestamp?.toDate?a.fechaTimestamp.toDate():a.fecha)-new Date(b.fechaTimestamp?.toDate?b.fechaTimestamp.toDate():b.fecha));
+  const el=document.getElementById('km-list');
+  if(!mis.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">🚗</div><div class="empty-text">Sin registros</div></div>';return;}
+  // Calcular km por día
+  const rows=mis.map((k,i)=>{
+    const prev=mis[i-1];
+    const km=prev?k.lectura-prev.lectura:null;
+    return `<div class="km-card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div><div style="font-size:11px;color:var(--text3)">${k.fecha}</div><div style="font-size:14px;font-weight:600;margin-top:2px">${k.lectura.toLocaleString()} km</div></div>
+        ${km!==null?`<div style="text-align:right"><div style="font-size:10px;color:var(--text3)">Recorridos</div><div class="km-number" style="font-size:20px">+${km} km</div></div>`:'<div style="font-size:12px;color:var(--text3)">Primera lectura</div>'}
+      </div>
+      ${k.fotoUrl?`<img src="${k.fotoUrl}" style="width:100%;border-radius:7px;margin-top:8px;max-height:120px;object-fit:cover">`:''}
+    </div>`;
+  }).reverse().join('');
+  // KM de hoy
+  const hoy=new Date().toISOString().split('T')[0];
+  const hoyRecords=mis.filter(k=>k.fecha===hoy);
+  let kmHoy='— km', subHoy='Captura el cuentakilómetros para registrar';
+  if(hoyRecords.length>=2){
+    const diff=hoyRecords[hoyRecords.length-1].lectura-hoyRecords[0].lectura;
+    kmHoy=diff+' km'; subHoy=`${hoyRecords[0].lectura} → ${hoyRecords[hoyRecords.length-1].lectura}`;
+  } else if(hoyRecords.length===1){
+    kmHoy=hoyRecords[0].lectura.toLocaleString()+' km'; subHoy='Lectura inicial del día';
+  }
+  document.getElementById('km-hoy-total').textContent=kmHoy;
+  document.getElementById('km-hoy-sub').textContent=subHoy;
+  el.innerHTML=rows;
+}
+
+window.exportarKm=()=>{
+  const nombre=currentUser?.profile?.nombre||currentUser?.email||'';
+  const mis=kmRecords.filter(k=>k.usuario===nombre).sort((a,b)=>new Date(a.fecha)-new Date(b.fecha));
+  if(!mis.length){showToast('Sin registros para exportar','warn');return;}
+  const data=mis.map((k,i)=>{const prev=mis[i-1];return{'Fecha':k.fecha,'Lectura km':k.lectura,'Km recorridos':prev?k.lectura-prev.lectura:'—','Empleado':k.usuario};});
+  const ws=XLSX.utils.json_to_sheet(data), wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Kilómetros');
+  XLSX.writeFile(wb,`MGtrauma_km_${nombre.replace(' ','_')}_${new Date().toISOString().split('T')[0]}.xlsx`);
+  showToast('📥 Excel de km descargado');
+};
+
+// ── INFORMES ──────────────────────────────────
+window.switchInformeTipo=()=>{
+  const t=document.getElementById('inf-tipo').value;
+  ['medico','comercial','clinical','hospital'].forEach(x=>{const e=document.getElementById('inf-row-'+x);if(e)e.style.display=x===t?'block':'none';});
+};
+window.generarInforme=()=>{
+  if(!canSeeInformes()){showToast('Sin permisos','warn');return;}
+  const tipo=document.getElementById('inf-tipo').value;
+  const desde=document.getElementById('inf-desde').value;
+  const hasta=document.getElementById('inf-hasta').value;
+  const hosp=document.getElementById('inf-hospital').value.trim().toLowerCase();
+  let list=surgeries.filter(s=>s.estado!=='anulada');
+  if(desde) list=list.filter(s=>{const[d,m,y]=s.fecha.split('/');return new Date(y,m-1,d)>=new Date(desde);});
+  if(hasta) list=list.filter(s=>{const[d,m,y]=s.fecha.split('/');return new Date(y,m-1,d)<=new Date(hasta);});
+  if(hosp) list=list.filter(s=>s.hospital?.toLowerCase().includes(hosp));
+  if(tipo==='medico'){const v=document.getElementById('inf-medico').value.trim().toLowerCase();if(v)list=list.filter(s=>s.doctor?.toLowerCase().includes(v));}
+  if(tipo==='comercial'){const v=document.getElementById('inf-comercial').value.trim().toLowerCase();if(v)list=list.filter(s=>s.asignado?.toLowerCase().includes(v));}
+  if(tipo==='clinical'){const v=document.getElementById('inf-clinical-f').value.trim().toLowerCase();if(v)list=list.filter(s=>s.clinical?.toLowerCase().includes(v));}
+  window._lastInforme=list;
+  const el=document.getElementById('informe-resultado');
+  if(!list.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">📊</div><div class="empty-text">Sin resultados</div></div>';return;}
+  const total=list.length, osteo=list.filter(s=>s.division==='Osteosíntesis').length, orto=list.filter(s=>s.division==='Ortopedia').length;
+  const rows=list.map(s=>`<div style="display:grid;grid-template-columns:36px 1fr 1fr auto;gap:7px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:11px">
+    <div style="color:var(--text3)">#${s.numero||'—'}</div>
+    <div><div style="font-weight:600">${s.hospital}</div><div style="color:var(--text2)">${s.doctor}</div></div>
+    <div><div>${s.fecha}</div><div style="color:var(--text2)">${s.tipo||'—'}</div></div>
+    <span class="status-badge ${s.estado==='post'?'badge-post':'badge-pre'}" style="font-size:9px">${s.estado==='post'?'Post':'Pre'}</span>
+  </div>`).join('');
+  el.innerHTML=`<div class="detail-section">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:14px">
+      <div class="stat-card"><div class="stat-number sn-blue">${total}</div><div class="stat-label">Total</div></div>
+      <div class="stat-card"><div class="stat-number sn-green">${osteo}</div><div class="stat-label">Osteosíntesis</div></div>
+      <div class="stat-card"><div class="stat-number sn-purple">${orto}</div><div class="stat-label">Ortopedia</div></div>
+    </div>
+    ${rows}
+    <button class="action-btn btn-success" style="margin-top:12px" onclick="exportarInforme()">📥 Exportar a Excel</button>
+  </div>`;
+};
+window.exportarInforme=()=>{
+  const list=window._lastInforme||[];if(!list.length)return;
+  const data=list.map(s=>({'Nº':s.numero||'','Hospital':s.hospital||'','Cirujano':s.doctor||'','Fecha':s.fecha||'','Hora':s.hora||'','División':s.division||'','Tipo':s.tipo||'','Material':(s.materiales||[]).join(' + '),'Estado':s.estado||'','Comercial':s.asignado||'','Clinical':s.clinical||'','NEO':s.neoNumero||'','NEO revisado':s.neoRevisado?'Sí':'No','Nº HC':s.historiaClinica||'','Nº Episodio':s.episodio||'','Sin gasto':s.sinGasto?'Sí':'No','Admin VB':s.adminVistoBueno?'Sí':'No','Notas admin':s.adminObservaciones||'','Comentarios':s.comentarios||''}));
+  const ws=XLSX.utils.json_to_sheet(data),wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Cirugías');
+  XLSX.writeFile(wb,`MGtrauma_informe_${new Date().toISOString().split('T')[0]}.xlsx`);
+  showToast('📥 Excel descargado');
+};
+
+// ── CALENDAR ──────────────────────────────────
+let calYear=new Date().getFullYear(),calMonth=new Date().getMonth();
+const monthNames=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+window.changeMonth=d=>{calMonth+=d;if(calMonth>11){calMonth=0;calYear++;}if(calMonth<0){calMonth=11;calYear--;}renderCalendar();};
+window.renderCalendar=()=>{
+  document.getElementById('cal-month-label').textContent=monthNames[calMonth]+' '+calYear;
+  const grid=document.getElementById('cal-grid');
+  const days=['D','L','M','X','J','V','S'];
+  let html=days.map(d=>`<div class="cal-day-name">${d}</div>`).join('');
+  const first=new Date(calYear,calMonth,1).getDay(), dim=new Date(calYear,calMonth+1,0).getDate(), today=new Date();
+  const em={};
+  surgeries.forEach(s=>{if(!s.fecha)return;const[d,m,y]=s.fecha.split('/');if(Number(y)===calYear&&Number(m)-1===calMonth)em[Number(d)]=(em[Number(d)]||0)+1;});
+  for(let i=0;i<first;i++) html+=`<div class="cal-day empty"></div>`;
+  for(let d=1;d<=dim;d++){
+    const isT=today.getDate()===d&&today.getMonth()===calMonth&&today.getFullYear()===calYear;
+    html+=`<div class="cal-day${em[d]?' has-event':''}${isT?' today':''}" onclick="showCalDay(${d})">${d}</div>`;
+  }
+  grid.innerHTML=html; showCalDay(today.getDate());
+};
+window.showCalDay=d=>{
+  const evs=surgeries.filter(s=>{if(!s.fecha)return false;const[dd,mm,yy]=s.fecha.split('/');return Number(dd)===d&&Number(mm)-1===calMonth&&Number(yy)===calYear;});
+  document.getElementById('cal-events-title').textContent=`${d} ${monthNames[calMonth]} — ${evs.length?evs.length+' cirugía'+(evs.length>1?'s':''):'Sin cirugías'}`;
+  document.getElementById('cal-events-list').innerHTML=evs.length?evs.map(s=>cardHTML(s)).join(''):'<div class="empty-state"><div class="empty-icon">📅</div><div class="empty-text">Sin cirugías</div></div>';
+};
+
+// ── HELPERS ───────────────────────────────────
+function initials(n){return(n||'U').split(' ').slice(0,2).map(x=>x[0]).join('').toUpperCase();}
+window.showToast=(msg,type='success')=>{const t=document.getElementById('toast');t.textContent=msg;t.style.background=type==='warn'?'var(--yellow)':type==='error'?'var(--red)':'var(--green)';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);};
+window.selectDiv=d=>{selectedDiv=d;document.getElementById('div-osteo').className='div-option'+(d==='osteo'?' sel-osteo':'');document.getElementById('div-orto').className='div-option'+(d==='orto'?' sel-orto':'');};
+window.closeModal=id=>document.getElementById(id).classList.remove('open');
+window.focusSearch=()=>{showPage('cirugias');setTimeout(()=>document.getElementById('search-input').focus(),100);};
+
+window.showPage=name=>{
+  currentPage=name;
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+name)?.classList.add('active');
+  document.getElementById('nav-'+name)?.classList.add('active');
+  // FAB contextual
+  const fabLabels={cirugias:'+',mensajes:'✉',gastos:'+',km:'📷'};
+  const fab=document.getElementById('main-fab');
+  fab.textContent=fabLabels[name]||'+';
+  fab.style.display=['cirugias','mensajes','gastos','km'].includes(name)?'flex':'none';
+  if(name==='calendario') renderCalendar();
+  if(name==='neo') renderNeoList();
+};
+
+window.onFab=()=>{
+  if(currentPage==='cirugias') openNuevaCirugiaModal();
+  else if(currentPage==='mensajes') document.getElementById('modal-mensaje').classList.add('open');
+  else if(currentPage==='gastos'){document.getElementById('gasto-fecha').value=new Date().toISOString().split('T')[0];document.getElementById('modal-gasto').classList.add('open');}
+  else if(currentPage==='km') openKmModal();
+};
+
+window.openNuevaCirugiaModal=()=>{
+  editingId=null; selectedDiv=null;
+  ['div-osteo','div-orto'].forEach(id=>document.getElementById(id).className='div-option');
+  ['inp-hospital','inp-doctor','inp-tipo','inp-neo'].forEach(id=>document.getElementById(id).value='');
+  ['inp-asignado','inp-clinical'].forEach(id=>document.getElementById(id).value='');
+  ['chk-deposito','chk-rotativo','chk-prestamo'].forEach(id=>document.getElementById(id).checked=false);
+  document.getElementById('grp-neo').style.display='none';
+  document.getElementById('grp-prestamos').style.display='none';
+  document.getElementById('prestamos-container').innerHTML='';
+  document.getElementById('inp-fecha').value=new Date().toISOString().split('T')[0];
+  document.getElementById('inp-hora').value='';
+  document.getElementById('modal-title').textContent='Nueva Cirugía';
+  document.getElementById('btn-crear').textContent='✓ Crear cirugía y notificar al equipo';
+  document.getElementById('btn-crear').onclick=guardarCirugia;
+  document.getElementById('modal-nueva').classList.add('open');
+};
+
+window.autocomplete=(input,listKey)=>{
+  const val=input.value.toLowerCase();
+  const listId='ac-'+input.id.replace('inp-','');
+  const listEl=document.getElementById(listId); if(!listEl)return;
+  const data=listKey==='hospitals'?hospitals:listKey==='doctors'?doctors:tipos;
+  if(!val){listEl.classList.remove('open');return;}
+  const matches=data.filter(x=>x.toLowerCase().includes(val));
+  if(!matches.length){listEl.classList.remove('open');return;}
+  listEl.innerHTML=matches.map(m=>`<div class="autocomplete-item" onclick="selectAC(this,'${input.id}')">${m}</div>`).join('');
+  listEl.classList.add('open');
+};
+window.selectAC=(el,id)=>{document.getElementById(id).value=el.textContent;el.closest('.autocomplete-list').classList.remove('open');};
+document.addEventListener('click',e=>{if(!e.target.closest('.autocomplete-wrap'))document.querySelectorAll('.autocomplete-list').forEach(l=>l.classList.remove('open'));});
+
+function showApp(){document.getElementById('screen-login').style.display='none';document.getElementById('screen-app').style.display='block';}
+function showLogin(){document.getElementById('screen-login').style.display='flex';document.getElementById('screen-app').style.display='none';}
+
+// Solicitar permiso notificaciones
+if('Notification' in window && Notification.permission==='default') Notification.requestPermission();
+</script>
+<script>if('serviceWorker' in navigator) window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js'));</script>
+
+<script>
+// Stub functions - real implementations loaded by ES module above
+function doLogin() { if(window.doLogin) window.doLogin(); }
+function doLogout() { if(window.doLogout) window.doLogout(); }
+function showPage(n) { if(window.showPage) window.showPage(n); }
+function onFab() { if(window.onFab) window.onFab(); }
+function setFilter(el,f) { if(window.setFilter) window.setFilter(el,f); }
+function setMF(el,f) { if(window.setMsgFilter) window.setMsgFilter(el,f); }
+function setGF(el,f) { if(window.setGastoFilter) window.setGastoFilter(el,f); }
+function setIF(el,f) { if(window.setIncFilter) window.setIncFilter(el,f); }
+function openDetail(id) { if(window.openDetail) window.openDetail(id); }
+function closeDetail() { if(window.closeDetail) window.closeDetail(); }
+function closeModal(id) { if(window.closeModal) window.closeModal(id); }
+function focusSearch() { if(window.focusSearch) window.focusSearch(); }
+function guardarCirugia() { if(window.guardarCirugia) window.guardarCirugia(); }
+function selDiv(d) { if(window.selectDiv) window.selectDiv(d); }
+function togNeo() { if(window.toggleNeoSection) window.toggleNeoSection(); }
+function togPre() { if(window.togglePrestamoSection) window.togglePrestamoSection(); }
+function addPreRow() { if(window.addPrestamoRow) window.addPrestamoRow(); }
+function enviarMsg() { if(window.enviarMensaje) window.enviarMensaje(); }
+function guardarGasto() { if(window.guardarGasto) window.guardarGasto(); }
+function onGasFoto(i) { if(window.onGastoFoto) window.onGastoFoto(i); }
+function guardarKm() { if(window.guardarKm) window.guardarKm(); }
+function onKmFoto(i) { if(window.onKmFoto) window.onKmFoto(i); }
+function openKmModal() { if(window.openKmModal) window.openKmModal(); }
+function exportarGastos() { if(window.exportarGastos) window.exportarGastos(); }
+function exportarKm() { if(window.exportarKm) window.exportarKm(); }
+function exportarInforme() { if(window.exportarInforme) window.exportarInforme(); }
+function generarInforme() { if(window.generarInforme) window.generarInforme(); }
+function switchIT() { if(window.switchInformeTipo) window.switchInformeTipo(); }
+function changeMonth(d) { if(window.changeMonth) window.changeMonth(d); }
+function showCalDay(d) { if(window.showCalDay) window.showCalDay(d); }
+function filtrarMedicos(v) { if(window.filtrarMedicos) window.filtrarMedicos(v); }
+function abrirModalMedico(id) { if(window.abrirModalMedico) window.abrirModalMedico(id||''); }
+function guardarMedico(id) { if(window.guardarMedico) window.guardarMedico(id); }
+function borrarMedico(id) { if(window.borrarMedico) window.borrarMedico(id); }
+function abrirShowpad() { if(window.abrirShowpad) window.abrirShowpad(); }
+function buscarDocs() { if(window.buscarDocs) window.buscarDocs(); }
+function cerrarBusquedaDocs() { if(window.cerrarBusquedaDocs) window.cerrarBusquedaDocs(); }
+function abrirCarpeta(i,n,ic) { if(window.abrirCarpeta) window.abrirCarpeta(i,n,ic); }
+function volverACarpetas() { if(window.volverACarpetas) window.volverACarpetas(); }
+function openSubirDocModal() { if(window.openSubirDocModal) window.openSubirDocModal(); }
+function onDocSel(i) { if(window.onDocSel) window.onDocSel(i); }
+function confirmarSubida() { if(window.confirmarSubida) window.confirmarSubida(); }
+function openNuevaCarpetaModal() { if(window.openNuevaCarpetaModal) window.openNuevaCarpetaModal(); }
+function selEmoji(el,e) { if(window.selEmoji) window.selEmoji(el,e); }
+function crearCarpeta() { if(window.crearCarpeta) window.crearCarpeta(); }
+function borrarDoc(id,p) { if(window.borrarDoc) window.borrarDoc(id,p); }
+function abrirNuevaIncidencia(cid,h,t) { if(window.abrirNuevaIncidencia) window.abrirNuevaIncidencia(cid,h,t); }
+function guardarInc(cid,h,t) { if(window.guardarInc) window.guardarInc(cid,h,t); }
+function abrirResolverInc(id) { if(window.abrirResolverInc) window.abrirResolverInc(id); }
+function resolverInc(id) { if(window.resolverInc) window.resolverInc(id); }
+function toggleField(id,f) { if(window.toggleField) window.toggleField(id,f); }
+function togglePrestamo(id,i) { if(window.togglePrestamo) window.togglePrestamo(id,i); }
+function generarRetirada(id,i) { if(window.generarRetirada) window.generarRetirada(id,i); }
+function copiarMensaje(t,id) { if(window.copiarMensaje) window.copiarMensaje(t,id); }
+function pasarAPost(id) { if(window.pasarAPost) window.pasarAPost(id); }
+function anularCirugia(id) { if(window.anularCirugia) window.anularCirugia(id); }
+function triggerPhoto(id) { if(window.triggerPhoto) window.triggerPhoto(id); }
+function uploadPhoto(id,f) { if(window.uploadPhoto) window.uploadPhoto(id,f); }
+function updateField(id,f,v) { if(window.updateField) window.updateField(id,f,v); }
+function openEditCirugia(id) { if(window.openEditCirugia) window.openEditCirugia(id); }
+function openMensaje(id) { if(window.openMensaje) window.openMensaje(id); }
+function responderMensaje(id) { if(window.responderMensaje) window.responderMensaje(id); }
+function openNewUserModal() { if(window.openNewUserModal) window.openNewUserModal(); }
+function crearUsuario() { if(window.crearUsuario) window.crearUsuario(); }
+function openEditUserModal(uid,n,r) { if(window.openEditUserModal) window.openEditUserModal(uid,n,r); }
+function guardarRolUsuario(uid,n) { if(window.guardarRolUsuario) window.guardarRolUsuario(uid,n); }
+function openRespModal() { if(window.openRespHospModal) window.openRespHospModal(); }
+function guardarResponsables() { if(window.guardarResponsables) window.guardarResponsables(); }
+function openResetModal() { if(window.openResetModal) window.openResetModal(); }
+function ejecutarReset() { if(window.ejecutarReset) window.ejecutarReset(); }
+function ac(input,key) { if(window.autocomplete) window.autocomplete(input,key); }
+function selectAC(el,id) { if(window.selectAC) window.selectAC(el,id); }
+function abrirNuevaIncidenciaGlobal() { if(window.abrirNuevaIncidenciaGlobal) window.abrirNuevaIncidenciaGlobal(); }
+function guardarIncGlobal() { if(window.guardarIncGlobal) window.guardarIncGlobal(); }
+</script>
+
+</body>
+</html>
+<!-- ═══════════════════════════════════════════════════════
+     MÓDULOS ADICIONALES — script separado para claridad
+     Se inyecta al final del body, accede a las mismas
+     variables globales (db, auth, currentUser, etc.)
+════════════════════════════════════════════════════════ -->
+<script type="module">
+// Re-import necesario para este bloque
+import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, createUserWithEmailAndPassword }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getFirestore, collection, doc, addDoc, updateDoc, deleteDoc,
+  getDocs, setDoc, serverTimestamp, writeBatch, query, where }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+// Usar instancia global de Firebase
+const auth2 = window._fbAuth;
+const db2   = window._fbDb;
+
+// ─── ROLES DISPONIBLES ────────────────────────────────
+const ROLES = [
+  { id:'gestor',        label:'Gestor',        desc:'Acceso total + reset del sistema' },
+  { id:'gerente',       label:'Gerente',        desc:'Acceso total + informes' },
+// Rol gestion eliminado
+  { id:'comercial',     label:'Comercial',      desc:'Cirugías, gastos y km propios' },
+  { id:'clinical',      label:'Clinical',       desc:'Cubrir cirugías asignadas' },
+  { id:'logistica',     label:'Logística',      desc:'Material y préstamos' },
+  { id:'administracion',label:'Administración', desc:'Validación de expedientes' },
+];
+
+// ─── INYECTAR UI EN AJUSTES ───────────────────────────
+function injectSettingsUI() {
+  const settingsPage = document.getElementById('page-settings');
+  if (!settingsPage || document.getElementById('users-section')) return;
+
+  // Sección usuarios
+  const usersSection = document.createElement('div');
+  usersSection.id = 'users-section';
+  usersSection.className = 'settings-section';
+  usersSection.style.display = 'none'; // se muestra solo a gestor/gerente
+  usersSection.innerHTML = `
+    <div class="settings-title-label">👥 Gestión de usuarios</div>
+    <div class="settings-list" id="users-list-settings">
+      <div style="padding:14px;font-size:13px;color:var(--text3)">Cargando usuarios…</div>
+    </div>
+    <button class="action-btn btn-primary" style="margin-top:10px" onclick="openNewUserModal()">+ Dar de alta nuevo usuario</button>`;
+  settingsPage.insertBefore(usersSection, settingsPage.querySelector('.settings-section:last-child'));
+
+  // Sección reset (solo gestor)
+  const resetSection = document.createElement('div');
+  resetSection.id = 'reset-section';
+  resetSection.className = 'settings-section';
+  resetSection.style.display = 'none';
+  resetSection.innerHTML = `
+    <div class="settings-title-label">⚠️ Zona de administración</div>
+    <div class="settings-list">
+      <div class="settings-item" onclick="openResetModal()" style="color:var(--red)">
+        <div class="settings-item-left">
+          <div class="settings-item-icon" style="background:rgba(239,68,68,.15)">🗑️</div>
+          <div class="settings-item-name" style="color:var(--red)">Resetear sistema a cero</div>
+        </div>
+        <span class="chevron" style="color:var(--red)">›</span>
+      </div>
+      <div class="settings-item" onclick="openModoEntrenamientoInfo()">
+        <div class="settings-item-left">
+          <div class="settings-item-icon si-yellow">🎓</div>
+          <div class="settings-item-name">Modo entrenamiento activo</div>
+        </div>
+        <div id="training-badge" style="font-size:11px;padding:3px 9px;border-radius:10px;background:rgba(245,158,11,.15);color:var(--yellow);font-weight:600">ON</div>
+      </div>
+    </div>`;
+  settingsPage.insertBefore(resetSection, settingsPage.querySelector('.settings-section:last-child'));
+}
+
+// ─── MOSTRAR SECCIONES SEGÚN ROL ──────────────────────
+window.refreshSettingsByRole = () => {
+  const rol = window._currentUserRole?.();
+  const usersSection = document.getElementById('users-section');
+  const resetSection  = document.getElementById('reset-section');
+  if (!usersSection || !resetSection) return;
+  if (['gestor','gerente'].includes(rol)) {
+    usersSection.style.display = 'block';
+    loadUsersList();
+  }
+  if (rol === 'gestor') {
+    resetSection.style.display = 'block';
+  }
+};
+
+// ─── CARGAR LISTA DE USUARIOS ─────────────────────────
+async function loadUsersList() {
+  const snap = await getDocs(collection(db2, 'users'));
+  const el = document.getElementById('users-list-settings');
+  if (!snap.size) { el.innerHTML = '<div style="padding:14px;font-size:13px;color:var(--text3)">Sin usuarios</div>'; return; }
+  el.innerHTML = snap.docs.map(d => {
+    const u = d.data();
+    const rolLabel = ROLES.find(r => r.id === u.rol)?.label || u.rol;
+    return `<div class="settings-item">
+      <div class="settings-item-left">
+        <div class="settings-item-icon" style="background:linear-gradient(135deg,rgba(14,165,233,.2),rgba(139,92,246,.2));font-size:13px;font-weight:700">${(u.nombre||'U').split(' ').slice(0,2).map(x=>x[0]).join('').toUpperCase()}</div>
+        <div>
+          <div class="settings-item-name">${u.nombre||'—'}</div>
+          <div style="font-size:11px;color:var(--text3)">${u.email||''} · ${rolLabel}</div>
+        </div>
+      </div>
+      <button onclick="openEditUserModal('${d.id}','${u.nombre}','${u.rol}')" style="background:none;border:none;color:var(--accent);font-size:13px;cursor:pointer;padding:4px">✏️</button>
+    </div>`;
+  }).join('');
+}
+
+// ─── MODAL NUEVO USUARIO ──────────────────────────────
+window.openNewUserModal = () => {
+  let html = `
+    <div class="modal-handle"></div>
+    <div class="modal-title">Nuevo Usuario</div>
+    <div class="form-group"><label class="form-label">Nombre completo *</label>
+      <input class="form-input" id="nu-nombre" type="text" placeholder="Nombre y apellidos…"></div>
+    <div class="form-group"><label class="form-label">Email *</label>
+      <input class="form-input" id="nu-email" type="email" placeholder="email@mgtrauma.com"></div>
+    <div class="form-group"><label class="form-label">Contraseña inicial *</label>
+      <input class="form-input" id="nu-pass" type="password" placeholder="Mínimo 6 caracteres"></div>
+    <div class="form-group"><label class="form-label">Rol *</label>
+      <select class="form-select" id="nu-rol">
+        ${ROLES.map(r=>`<option value="${r.id}">${r.label} — ${r.desc}</option>`).join('')}
+      </select></div>
+    <button class="action-btn btn-primary" onclick="crearUsuario()">✓ Crear usuario</button>
+    <button class="action-btn btn-secondary" onclick="closeModal('modal-dynamic')">Cancelar</button>`;
+  openDynamicModal(html);
+};
+
+window.crearUsuario = async () => {
+  const nombre = document.getElementById('nu-nombre').value.trim();
+  const email  = document.getElementById('nu-email').value.trim();
+  const pass   = document.getElementById('nu-pass').value;
+  const rol    = document.getElementById('nu-rol').value;
+  if (!nombre || !email || !pass) { window.showToast('⚠️ Rellena todos los campos','warn'); return; }
+  try {
+    // Crear en Firebase Auth
+    const cred = await createUserWithEmailAndPassword(auth2, email, pass);
+    const uid  = cred.user.uid;
+    // Guardar perfil en Firestore
+    await setDoc(doc(db2, 'users', uid), {
+      nombre, email, rol,
+      rolLabel: ROLES.find(r=>r.id===rol)?.label + ' · MGtrauma',
+      createdAt: serverTimestamp()
+    });
+    // Actualizar lista de usuarios en catálogo
+    const catSnap = await getDocs(collection(db2, 'catalogues'));
+    const catDoc  = doc(db2, 'catalogues', 'main');
+    const catData = (await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js')).getDoc ? null : null;
+    // Añadir nombre al array users del catálogo
+    const { getDoc: gd2 } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const mainSnap = await gd2(catDoc);
+    const existingUsers = mainSnap.exists() ? (mainSnap.data().users || []) : [];
+    if (!existingUsers.includes(nombre)) {
+      await updateDoc(catDoc, { users: [...existingUsers, nombre] });
+    }
+    closeModal('modal-dynamic');
+    window.showToast(`✓ Usuario ${nombre} creado`);
+    loadUsersList();
+  } catch(e) {
+    window.showToast('Error: ' + (e.code === 'auth/email-already-in-use' ? 'Email ya registrado' : e.message), 'error');
+  }
+};
+
+// ─── EDITAR ROL DE USUARIO ────────────────────────────
+window.openEditUserModal = (uid, nombre, rolActual) => {
+  const html = `
+    <div class="modal-handle"></div>
+    <div class="modal-title">Editar usuario</div>
+    <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:16px;margin-bottom:16px">${nombre}</div>
+    <div class="form-group"><label class="form-label">Rol</label>
+      <select class="form-select" id="eu-rol">
+        ${ROLES.map(r=>`<option value="${r.id}" ${r.id===rolActual?'selected':''}>${r.label} — ${r.desc}</option>`).join('')}
+      </select></div>
+    <button class="action-btn btn-primary" onclick="guardarRolUsuario('${uid}','${nombre}')">✓ Guardar cambios</button>
+    <button class="action-btn btn-secondary" onclick="closeModal('modal-dynamic')">Cancelar</button>`;
+  openDynamicModal(html);
+};
+
+window.guardarRolUsuario = async (uid, nombre) => {
+  const rol = document.getElementById('eu-rol').value;
+  await updateDoc(doc(db2, 'users', uid), { rol, rolLabel: ROLES.find(r=>r.id===rol)?.label + ' · MGtrauma' });
+  closeModal('modal-dynamic'); window.showToast('✓ Rol actualizado'); loadUsersList();
+};
+
+// ─── RESUMEN DIARIO 19H ───────────────────────────────
+function scheduleResumen19h() {
+  const now = new Date();
+  const alarm = new Date(now); alarm.setHours(19, 0, 0, 0);
+  const ms = alarm - now;
+  if (ms > 0) setTimeout(enviarResumen19h, ms);
+}
+scheduleResumen19h();
+
+async function enviarResumen19h() {
+  // Re-programar para mañana
+  setTimeout(enviarResumen19h, 24 * 60 * 60 * 1000);
+
+  // Calcular fecha de mañana
+  const manana = new Date(); manana.setDate(manana.getDate() + 1);
+  const dd = String(manana.getDate()).padStart(2,'0');
+  const mm = String(manana.getMonth()+1).padStart(2,'0');
+  const yyyy = manana.getFullYear();
+  const fechaManana = `${dd}/${mm}/${yyyy}`;
+
+  // Buscar cirugías de mañana
+  const snap = await getDocs(query(collection(db2,'surgeries'), where('fecha','==',fechaManana)));
+  const cirugiasManana = snap.docs.map(d=>({id:d.id,...d.data()}));
+
+  if (!cirugiasManana.length) return; // Sin cirugías mañana, no enviar
+
+  // Buscar gerentes/gestores
+  const usersSnap = await getDocs(collection(db2,'users'));
+  const gerentes = usersSnap.docs.filter(d=>['gerente','gestor'].includes(d.data().rol)).map(d=>d.data().nombre);
+
+  const lista = cirugiasManana.map(s=>`• #${s.numero} ${s.hospital} — ${s.doctor} (${s.hora})`).join('\n');
+  const cuerpo = `📅 Cirugías del ${fechaManana}:\n\n${lista}\n\nAccede a MGtrauma para asignar coberturas.`;
+
+  // Crear mensaje interno para cada gerente
+  for (const gerente of gerentes) {
+    await addDoc(collection(db2,'messages'), {
+      de: 'Sistema MGtrauma',
+      destinatarios: [gerente],
+      categoria: 'solicitud',
+      asunto: `📅 Cirugías mañana ${fechaManana} — Asignar cobertura`,
+      cuerpo,
+      cirugiasIds: cirugiasManana.map(s=>s.id),
+      esMañana: true,
+      fecha: fechaManana,
+      leido: false,
+      createdAt: serverTimestamp()
+    });
+  }
+
+  window.showToast('📅 Resumen de cirugías de mañana enviado al gerente');
+  if (Notification.permission==='granted') {
+    new Notification('MGtrauma', { body: `${cirugiasManana.length} cirugías mañana pendientes de asignación` });
+  }
+}
+
+// ─── PANTALLA RÁPIDA DE ASIGNACIÓN ───────────────────
+window.openAsignacionRapida = async (fecha) => {
+  const snap = await getDocs(query(collection(db2,'surgeries'), where('fecha','==',fecha)));
+  const cirugias = snap.docs.map(d=>({id:d.id,...d.data()}));
+
+  // Cargar usuarios para los selectores
+  const usersSnap = await getDocs(collection(db2,'users'));
+  const usersData = usersSnap.docs.map(d=>d.data());
+  const comerciales = usersData.filter(u=>['comercial','clinical','gestor','gerente'].includes(u.rol)).map(u=>u.nombre);
+  const optsCom = '<option value="">Sin asignar</option>' + comerciales.map(u=>`<option value="${u}">${u}</option>`).join('');
+
+  const rows = cirugias.map(s=>`
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;margin-bottom:2px">#${s.numero} · ${s.hospital}</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:8px">${s.doctor} · ${s.hora} · ${(s.materiales||[]).join('+')}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div>
+          <div class="form-label" style="margin-bottom:4px">Comercial</div>
+          <select class="form-select" id="asig-com-${s.id}" style="padding:8px 10px;font-size:12px">${optsCom.replace(`value="${s.asignado}"`,`value="${s.asignado}" selected`)}</select>
+        </div>
+        <div>
+          <div class="form-label" style="margin-bottom:4px">Clinical</div>
+          <select class="form-select" id="asig-cli-${s.id}" style="padding:8px 10px;font-size:12px">${optsCom.replace(`value="${s.clinical}"`,`value="${s.clinical}" selected`)}</select>
+        </div>
+      </div>
+    </div>`).join('');
+
+  const html = `
+    <div class="modal-handle"></div>
+    <div class="modal-title">📅 Asignar cobertura</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:16px">${fecha} · ${cirugias.length} cirugía${cirugias.length!==1?'s':''}</div>
+    ${rows}
+    <button class="action-btn btn-primary" onclick="guardarAsignaciones('${fecha}',${JSON.stringify(cirugias.map(s=>s.id))})">✓ Guardar asignaciones y notificar</button>
+    <button class="action-btn btn-secondary" onclick="closeModal('modal-dynamic')">Cancelar</button>`;
+  openDynamicModal(html);
+};
+
+window.guardarAsignaciones = async (fecha, ids) => {
+  const notifs = {}; // usuario -> lista de cirugías
+  for (const id of ids) {
+    const asignado = document.getElementById(`asig-com-${id}`)?.value || '';
+    const clinical = document.getElementById(`asig-cli-${id}`)?.value || '';
+    await updateDoc(doc(db2,'surgeries',id), { asignado, clinical });
+    // Agrupar notificaciones
+    const snap2 = await getDocs(query(collection(db2,'surgeries'), where('__name__','==',id)));
+    if (!snap2.empty) {
+      const s = {id,...snap2.docs[0].data()};
+      const info = `• #${s.numero} ${s.hospital} — ${s.doctor} (${s.hora})`;
+      if (asignado) { notifs[asignado] = notifs[asignado] || []; notifs[asignado].push(info); }
+      if (clinical && clinical !== asignado) { notifs[clinical] = notifs[clinical] || []; notifs[clinical].push(info); }
+    }
+  }
+  // Enviar mensaje a cada persona asignada
+  for (const [usuario, lista] of Object.entries(notifs)) {
+    await addDoc(collection(db2,'messages'), {
+      de: 'Gerente · MGtrauma',
+      destinatarios: [usuario],
+      categoria: 'solicitud',
+      asunto: `📅 Tus cirugías para mañana ${fecha}`,
+      cuerpo: `Hola ${usuario},\n\nTienes las siguientes cirugías asignadas para mañana ${fecha}:\n\n${lista.join('\n')}\n\nSi tienes algún problema para cubrirlas, contacta con el gerente.`,
+      leido: false,
+      createdAt: serverTimestamp()
+    });
+  }
+  closeModal('modal-dynamic');
+  window.showToast(`✓ Asignaciones guardadas. ${Object.keys(notifs).length} personas notificadas`);
+};
+
+// ─── RESET DEL SISTEMA ────────────────────────────────
+window.openResetModal = () => {
+  const html = `
+    <div class="modal-handle"></div>
+    <div class="modal-title" style="color:var(--red)">⚠️ Resetear sistema</div>
+    <div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:14px;margin-bottom:16px;font-size:13px;line-height:1.6">
+      Esta acción borrará <strong>permanentemente</strong>:<br>
+      🗑️ Todas las cirugías<br>
+      🗑️ Todos los mensajes<br>
+      🗑️ Todos los gastos<br>
+      🗑️ Todos los registros de km<br>
+      🗑️ Los catálogos (hospitales, médicos, tipos)<br><br>
+      <strong>Se conservarán:</strong><br>
+      ✅ Usuarios y sus roles
+    </div>
+    <div class="form-group">
+      <label class="form-label">Escribe CONFIRMAR para continuar</label>
+      <input class="form-input" id="reset-confirm" type="text" placeholder="CONFIRMAR">
+    </div>
+    <button class="action-btn btn-danger" onclick="ejecutarReset()">🗑️ Resetear ahora</button>
+    <button class="action-btn btn-secondary" onclick="closeModal('modal-dynamic')">Cancelar</button>`;
+  openDynamicModal(html);
+};
+
+window.openModoEntrenamientoInfo = () => {
+  const html = `
+    <div class="modal-handle"></div>
+    <div class="modal-title">🎓 Modo entrenamiento</div>
+    <div style="font-size:13px;line-height:1.7;color:var(--text2);margin-bottom:16px">
+      El modo entrenamiento está <strong style="color:var(--yellow)">activo</strong>.<br><br>
+      Usa el programa con libertad para aprender. Cuando el equipo esté listo para empezar en real, usa la opción <strong>Resetear sistema</strong> para borrar todos los datos de prueba y comenzar desde cero.<br><br>
+      Los usuarios y roles se conservarán intactos.
+    </div>
+    <button class="action-btn btn-secondary" onclick="closeModal('modal-dynamic')">Entendido</button>`;
+  openDynamicModal(html);
+};
+
+window.ejecutarReset = async () => {
+  const confirmTxt = document.getElementById('reset-confirm')?.value;
+  if (confirmTxt !== 'CONFIRMAR') { window.showToast('⚠️ Escribe CONFIRMAR exactamente','warn'); return; }
+
+  const btn = document.querySelector('#modal-dynamic .btn-danger');
+  if (btn) { btn.textContent = 'Borrando…'; btn.disabled = true; }
+
+  try {
+    // Borrar colecciones en lotes
+    const colecciones = ['surgeries','messages','gastos','km'];
+    for (const col of colecciones) {
+      const snap = await getDocs(collection(db2, col));
+      const batch = writeBatch(db2);
+      snap.docs.forEach(d => batch.delete(d.ref));
+      await batch.commit();
+    }
+    // Resetear catálogo (conservar users)
+    await setDoc(doc(db2,'catalogues','main'), {
+      hospitals:[], doctors:[], tipos:[], counter:0,
+      users: (await getDocs(collection(db2,'users'))).docs.map(d=>d.data().nombre)
+    });
+
+    closeModal('modal-dynamic');
+    window.showToast('✅ Sistema reseteado. ¡Listos para empezar!');
+  } catch(e) {
+    window.showToast('Error al resetear: '+e.message,'error');
+    if (btn) { btn.textContent = '🗑️ Resetear ahora'; btn.disabled = false; }
+  }
+};
+
+// ─── HELPER: MODAL DINÁMICO ───────────────────────────
+function openDynamicModal(html) {
+  let overlay = document.getElementById('modal-dynamic');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'modal-dynamic';
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `<div class="modal" id="modal-dynamic-inner"></div>`;
+    document.getElementById('screen-app').appendChild(overlay);
+  }
+  document.getElementById('modal-dynamic-inner').innerHTML = html;
+  overlay.classList.add('open');
+}
+
+// Añadir cierre al hacer click fuera
+document.addEventListener('click', e => {
+  const overlay = document.getElementById('modal-dynamic');
+  if (overlay && e.target === overlay) overlay.classList.remove('open');
+});
+
+// ─── HOOK: extender showPage para asignación ─────────
+const _origOpenMensaje = window.openMensaje;
+window.openMensaje = async id => {
+  // Si el mensaje es del resumen de mañana, añadir botón de asignación rápida
+  if (_origOpenMensaje) await _origOpenMensaje(id);
+  const messages = window._messages || [];
+  // Buscar en el DOM si el mensaje tiene fecha de mañana
+  setTimeout(() => {
+    const body = document.getElementById('msg-detail-body');
+    if (!body) return;
+    // Detectar si es mensaje de resumen (contiene "Asignar cobertura")
+    if (body.innerHTML.includes('Asignar cobertura') || body.innerHTML.includes('Cirugías mañana')) {
+      const fecha = body.innerHTML.match(/(\d{2}\/\d{2}\/\d{4})/)?.[1];
+      if (fecha) {
+        const btn = document.createElement('button');
+        btn.className = 'action-btn btn-primary';
+        btn.innerHTML = '📅 Abrir pantalla de asignación rápida';
+        btn.onclick = () => { document.getElementById('msg-detail-view').classList.remove('open'); openAsignacionRapida(fecha); };
+        body.appendChild(btn);
+      }
+    }
+  }, 100);
+};
+
+// ─── INICIALIZACIÓN ───────────────────────────────────
+// Esperar a que el DOM esté listo y el usuario logueado
+const checkReady = setInterval(() => {
+  if (document.getElementById('page-settings') && document.getElementById('users-section') === null) {
+    injectSettingsUI();
+  }
+  // Hook al rol actual
+  window._currentUserRole = () => window.currentUser?.profile?.rol || 'comercial';
+  if (window.currentUser) {
+    clearInterval(checkReady);
+    refreshSettingsByRole();
+  }
+}, 800);
+
+// Extender setupUI para llamar refreshSettingsByRole
+const _origSetupUI = window.setupUI;
+window.setupUI = () => { if(_origSetupUI) _origSetupUI(); injectSettingsUI(); refreshSettingsByRole(); };
+
+</script>
+<!-- ═══════════════════════════════════════════════
+     MÓDULO DOCUMENTOS — Biblioteca de recursos
+════════════════════════════════════════════════ -->
+<script type="module">
+import { getApps } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, collection, doc, addDoc, updateDoc, deleteDoc,
+  onSnapshot, query, orderBy, serverTimestamp, getDocs, setDoc, getDoc }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js';
+
+const db3 = window._fbDb; const st3 = window._fbStorage;
+
+// ── Estado docs ───────────────────────────────
+let carpetas = [], documentos = [], carpetaActual = null;
+
+// ── Carpetas por defecto ──────────────────────
+const CARPETAS_DEFAULT = [
+  { id:'presentaciones',  nombre:'Presentaciones de productos', icono:'📊' },
+  { id:'tecnicas',        nombre:'Técnicas quirúrgicas',        icono:'🔬' },
+  { id:'comunicados',     nombre:'Comunicados',                 icono:'📢' },
+  { id:'formularios',     nombre:'Formularios',                 icono:'📝' },
+  { id:'logistica',       nombre:'Logística — Instrumental',        icono:'🔧' },
+];
+
+// ── Inyectar tab y página ─────────────────────
+function injectDocsUI() {
+  if (document.getElementById('page-docs')) return;
+
+  // Tab
+  const tabs = document.getElementById('main-tabs');
+  if (tabs) {
+    const tab = document.createElement('div');
+    tab.className = 'tab';
+    tab.textContent = 'Documentos';
+    tab.onclick = () => window.showPage('docs');
+    tabs.appendChild(tab);
+  }
+
+  // Nav item
+  const nav = document.querySelector('.bottom-nav');
+  if (nav) {
+    const ni = document.createElement('div');
+    ni.className = 'nav-item';
+    ni.id = 'nav-docs';
+    ni.innerHTML = '<div class="nav-icon">📁</div><div class="nav-label">Docs</div>';
+    ni.onclick = () => window.showPage('docs');
+    nav.insertBefore(ni, nav.querySelector('#nav-settings'));
+  }
+
+  // Página
+  const app = document.getElementById('screen-app');
+  const page = document.createElement('div');
+  page.className = 'page';
+  page.id = 'page-docs';
+  page.innerHTML = `
+    <!-- Vista carpetas -->
+    <div id="docs-carpetas-view">
+      <div class="search-bar" style="margin-bottom:14px">
+        <span>🔍</span>
+        <input id="docs-search" type="text" placeholder="Buscar documentos…" oninput="buscarDocs()">
+      </div>
+      <div id="docs-carpetas-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div>
+      <div id="btn-nueva-carpeta-wrap" style="display:none;margin-top:10px">
+        <button class="action-btn btn-secondary" onclick="openNuevaCarpetaModal()">📁 Nueva carpeta</button>
+      </div>
+    </div>
+
+    <!-- Vista documentos de una carpeta -->
+    <div id="docs-files-view" style="display:none">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <button onclick="volverACarpetas()" style="background:var(--surface2);border:1px solid var(--border);border-radius:50%;width:34px;height:34px;color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">‹</button>
+        <div id="docs-carpeta-titulo" style="font-family:'Syne',sans-serif;font-weight:700;font-size:16px;flex:1"></div>
+        <div id="btn-subir-doc-wrap" style="display:none">
+          <button onclick="openSubirDocModal()" style="background:var(--accent);border:none;border-radius:8px;color:#fff;padding:7px 12px;font-family:'Syne',sans-serif;font-weight:600;font-size:12px;cursor:pointer">⬆️ Subir</button>
+        </div>
+      </div>
+      <div id="docs-files-list"></div>
+    </div>
+
+    <!-- Resultados búsqueda -->
+    <div id="docs-search-view" style="display:none">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <button onclick="cerrarBusqueda()" style="background:var(--surface2);border:1px solid var(--border);border-radius:50%;width:34px;height:34px;color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">‹</button>
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px">Resultados de búsqueda</div>
+      </div>
+      <div id="docs-search-results"></div>
+    </div>`;
+  app.insertBefore(page, app.querySelector('.bottom-nav'));
+
+  // Extender showPage
+  const _orig = window.showPage;
+  window.showPage = name => {
+    _orig(name);
+    if (name === 'docs') {
+      document.getElementById('page-docs').classList.add('active');
+      document.getElementById('main-fab').style.display = 'none';
+      renderCarpetas();
+    }
+  };
+}
+
+// ── Suscripción docs ──────────────────────────
+function subscribeDocumentos() {
+  onSnapshot(query(collection(db3,'documentos'), orderBy('createdAt','desc')), snap => {
+    documentos = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+    if (carpetaActual) renderDocumentos(carpetaActual);
+  });
+  onSnapshot(collection(db3,'carpetas'), snap => {
+    carpetas = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+    renderCarpetas();
+  });
+}
+
+async function initCarpetasDefault() {
+  for (const c of CARPETAS_DEFAULT) {
+    const snap = await getDoc(doc(db3,'carpetas',c.id));
+    if (!snap.exists()) await setDoc(doc(db3,'carpetas',c.id), { nombre:c.nombre, icono:c.icono, createdAt:serverTimestamp() });
+  }
+}
+
+// ── Render carpetas ───────────────────────────
+function renderCarpetas() {
+  const grid = document.getElementById('docs-carpetas-grid');
+  if (!grid) return;
+  const todas = [...CARPETAS_DEFAULT.map(c => ({ id:c.id, nombre:c.nombre, icono:c.icono })),
+                 ...carpetas.filter(c => !CARPETAS_DEFAULT.find(d=>d.id===c.id))];
+  grid.innerHTML = todas.map(c => {
+    const count = documentos.filter(d => d.carpetaId === c.id).length;
+    return `<div onclick="abrirCarpeta('${c.id}','${c.nombre}','${c.icono||'📁'}')"
+      style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;cursor:pointer;transition:transform .15s;text-align:center"
+      onmousedown="this.style.transform='scale(.97)'" onmouseup="this.style.transform=''">
+      <div style="font-size:32px;margin-bottom:8px">${c.icono||'📁'}</div>
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;line-height:1.3;margin-bottom:4px">${c.nombre}</div>
+      <div style="font-size:11px;color:var(--text3)">${count} archivo${count!==1?'s':''}</div>
+    </div>`;
+  }).join('');
+
+  // Mostrar botón nueva carpeta solo a gestor/gerente
+  const rol = window._currentUserRole?.() || 'comercial';
+  const btnWrap = document.getElementById('btn-nueva-carpeta-wrap');
+  if (btnWrap) btnWrap.style.display = (['gestor','gerente'].includes(rol) || (rol==='logistica' && window.carpetaActual==='logistica')) ? 'block' : 'none';
+}
+
+// ── Abrir carpeta ─────────────────────────────
+window.abrirCarpeta = (id, nombre, icono) => {
+  carpetaActual = id;
+  document.getElementById('docs-carpetas-view').style.display = 'none';
+  document.getElementById('docs-files-view').style.display = 'block';
+  document.getElementById('docs-carpeta-titulo').textContent = (icono||'📁') + ' ' + nombre;
+  const rol = window._currentUserRole?.() || 'comercial';
+  const btnSubir = document.getElementById('btn-subir-doc-wrap');
+  if (btnSubir) btnSubir.style.display = (['gestor','gerente'].includes(rol) || (rol==='logistica' && window.carpetaActual==='logistica')) ? 'block' : 'none';
+  renderDocumentos(id);
+};
+
+window.volverACarpetas = () => {
+  carpetaActual = null;
+  document.getElementById('docs-files-view').style.display = 'none';
+  document.getElementById('docs-carpetas-view').style.display = 'block';
+  document.getElementById('docs-search').value = '';
+};
+
+// ── Render documentos ─────────────────────────
+function renderDocumentos(carpetaId) {
+  const list = documentos.filter(d => d.carpetaId === carpetaId);
+  const el = document.getElementById('docs-files-list');
+  if (!el) return;
+  if (!list.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">📄</div><div class="empty-text">Sin documentos en esta carpeta</div></div>';
+    return;
+  }
+  el.innerHTML = list.map(d => docCardHTML(d)).join('');
+}
+
+function docCardHTML(d) {
+  const ext = (d.nombre||'').split('.').pop().toLowerCase();
+  const icono = ext==='pdf'?'📕':ext==='mp4'||ext==='mov'||ext==='avi'?'🎬':ext==='doc'||ext==='docx'?'📘':'📄';
+  const sizeStr = d.size ? (d.size > 1048576 ? (d.size/1048576).toFixed(1)+' MB' : (d.size/1024).toFixed(0)+' KB') : '';
+  const rol = window._currentUserRole?.() || 'comercial';
+  const canDelete = ['gestor','gerente'].includes(rol);
+  return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:13px;margin-bottom:9px;display:flex;align-items:center;gap:12px">
+    <div style="font-size:28px;flex-shrink:0">${icono}</div>
+    <div style="flex:1;min-width:0">
+      <div style="font-family:'Syne',sans-serif;font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${d.nombre}</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:2px">${sizeStr} ${d.descripcion?'· '+d.descripcion:''}</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
+      <a href="${d.url}" target="_blank" download="${d.nombre}"
+        style="background:rgba(14,165,233,.15);border:1px solid rgba(14,165,233,.3);color:var(--accent);border-radius:7px;padding:6px 10px;font-size:11px;font-weight:600;text-decoration:none;text-align:center">⬇️ Ver</a>
+      ${canDelete?`<button onclick="borrarDocumento('${d.id}','${d.storagePath||''}')"
+        style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:var(--red);border-radius:7px;padding:6px 10px;font-size:11px;font-weight:600;cursor:pointer">🗑️</button>`:''}
+    </div>
+  </div>`;
+}
+
+// ── Subir documento ───────────────────────────
+window.openSubirDocModal = () => {
+  const html = `
+    <div class="modal-handle"></div>
+    <div class="modal-title">⬆️ Subir documento</div>
+    <div class="form-group">
+      <label class="form-label">Archivo (PDF, Word, vídeo) *</label>
+      <div class="photo-upload" onclick="document.getElementById('doc-file-input').click()">
+        <div class="photo-upload-icon">📎</div>
+        <div class="photo-upload-text" id="doc-file-label">Tocar para seleccionar archivo</div>
+      </div>
+      <input type="file" id="doc-file-input" accept=".pdf,.doc,.docx,.mp4,.mov,.avi,.ppt,.pptx" style="display:none" onchange="onDocFileSelected(this)">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Descripción (opcional)</label>
+      <input class="form-input" id="doc-descripcion" type="text" placeholder="Breve descripción del documento…">
+    </div>
+    <div id="doc-progress-wrap" style="display:none;margin-bottom:14px">
+      <div style="font-size:12px;color:var(--text2);margin-bottom:6px">Subiendo…</div>
+      <div style="background:var(--border);border-radius:4px;height:6px;overflow:hidden">
+        <div id="doc-progress-bar" style="background:var(--accent);height:100%;width:0%;transition:width .3s"></div>
+      </div>
+    </div>
+    <button class="action-btn btn-primary" id="btn-subir-doc" onclick="subirDocumento()">⬆️ Subir archivo</button>
+    <button class="action-btn btn-secondary" onclick="closeModal('modal-dynamic')">Cancelar</button>`;
+  openDynamicModal(html);
+};
+
+let docFileSelected = null;
+window.onDocFileSelected = input => {
+  docFileSelected = input.files[0];
+  document.getElementById('doc-file-label').textContent = '✓ ' + docFileSelected.name;
+};
+
+window.subirDocumento = async () => {
+  if (!docFileSelected) { window.showToast('⚠️ Selecciona un archivo','warn'); return; }
+  if (!carpetaActual) { window.showToast('⚠️ Abre una carpeta primero','warn'); return; }
+  const descripcion = document.getElementById('doc-descripcion')?.value.trim() || '';
+  const btn = document.getElementById('btn-subir-doc');
+  if (btn) { btn.disabled = true; btn.textContent = 'Subiendo…'; }
+  document.getElementById('doc-progress-wrap').style.display = 'block';
+
+  const path = `documentos/${carpetaActual}/${Date.now()}_${docFileSelected.name}`;
+  const storageRef = ref(st3, path);
+  const uploadTask = uploadBytesResumable(storageRef, docFileSelected);
+
+  uploadTask.on('state_changed',
+    snap => {
+      const pct = Math.round(snap.bytesTransferred / snap.totalBytes * 100);
+      document.getElementById('doc-progress-bar').style.width = pct + '%';
+    },
+    err => { window.showToast('Error al subir: '+err.message,'error'); },
+    async () => {
+      const url = await getDownloadURL(uploadTask.snapshot.ref);
+      await addDoc(collection(db3,'documentos'), {
+        nombre: docFileSelected.name, descripcion, url,
+        carpetaId: carpetaActual, storagePath: path,
+        size: docFileSelected.size,
+        subidoPor: window.currentUser?.profile?.nombre || window.currentUser?.email,
+        createdAt: serverTimestamp()
+      });
+      docFileSelected = null;
+      closeModal('modal-dynamic');
+      window.showToast('✓ Documento subido correctamente');
+    }
+  );
+};
+
+// ── Borrar documento ──────────────────────────
+window.borrarDocumento = async (id, storagePath) => {
+  if (!confirm('¿Borrar este documento?')) return;
+  await deleteDoc(doc(db3,'documentos',id));
+  if (storagePath) {
+    try { await deleteObject(ref(st3, storagePath)); } catch(e) {}
+  }
+  window.showToast('🗑️ Documento eliminado');
+};
+
+// ── Nueva carpeta ─────────────────────────────
+window.openNuevaCarpetaModal = () => {
+  const emojiOpts = ['📁','📊','🔬','📢','📝','📋','🎓','💊','🏥','🔧','📌','⭐'];
+  const html = `
+    <div class="modal-handle"></div>
+    <div class="modal-title">📁 Nueva carpeta</div>
+    <div class="form-group">
+      <label class="form-label">Nombre de la carpeta *</label>
+      <input class="form-input" id="nc-nombre" type="text" placeholder="Nombre de la carpeta…">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Icono</label>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        ${emojiOpts.map((e,i) => `<div onclick="selectEmoji(this,'${e}')" data-emoji="${e}"
+          style="width:40px;height:40px;border-radius:8px;border:2px solid var(--border);background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;transition:all .15s">${e}</div>`).join('')}
+      </div>
+      <input type="hidden" id="nc-icono" value="📁">
+    </div>
+    <button class="action-btn btn-primary" onclick="crearCarpeta()">✓ Crear carpeta</button>
+    <button class="action-btn btn-secondary" onclick="closeModal('modal-dynamic')">Cancelar</button>`;
+  openDynamicModal(html);
+};
+
+window.selectEmoji = (el, emoji) => {
+  document.querySelectorAll('[data-emoji]').forEach(e => e.style.borderColor = 'var(--border)');
+  el.style.borderColor = 'var(--accent)';
+  document.getElementById('nc-icono').value = emoji;
+};
+
+window.crearCarpeta = async () => {
+  const nombre = document.getElementById('nc-nombre')?.value.trim();
+  const icono  = document.getElementById('nc-icono')?.value || '📁';
+  if (!nombre) { window.showToast('⚠️ Escribe un nombre','warn'); return; }
+  const id = nombre.toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'');
+  await setDoc(doc(db3,'carpetas',id), { nombre, icono, createdAt: serverTimestamp() });
+  closeModal('modal-dynamic'); window.showToast('✓ Carpeta creada');
+};
+
+// ── Búsqueda global de docs ───────────────────
+window.buscarDocs = () => {
+  const q = document.getElementById('docs-search')?.value.toLowerCase();
+  if (!q) { cerrarBusqueda(); return; }
+  document.getElementById('docs-carpetas-grid').style.display = 'none';
+  document.getElementById('btn-nueva-carpeta-wrap').style.display = 'none';
+  document.getElementById('docs-search-view').style.display = 'block';
+  const results = documentos.filter(d =>
+    d.nombre?.toLowerCase().includes(q) || d.descripcion?.toLowerCase().includes(q)
+  );
+  const el = document.getElementById('docs-search-results');
+  el.innerHTML = results.length
+    ? results.map(d => docCardHTML(d)).join('')
+    : '<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-text">Sin resultados</div></div>';
+};
+
+window.cerrarBusqueda = () => {
+  document.getElementById('docs-search-view').style.display = 'none';
+  document.getElementById('docs-carpetas-grid').style.display = 'grid';
+  const rol = window._currentUserRole?.() || 'comercial';
+  const btnWrap = document.getElementById('btn-nueva-carpeta-wrap');
+  if (btnWrap) btnWrap.style.display = ['gestor','gerente'].includes(rol) ? 'block' : 'none';
+  document.getElementById('docs-search').value = '';
+};
+
+// Helper openDynamicModal (por si no está disponible aún)
+function openDynamicModal(html) {
+  let overlay = document.getElementById('modal-dynamic');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'modal-dynamic';
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `<div class="modal" id="modal-dynamic-inner"></div>`;
+    document.getElementById('screen-app').appendChild(overlay);
+  }
+  document.getElementById('modal-dynamic-inner').innerHTML = html;
+  overlay.classList.add('open');
+}
+
+// ── Inicialización ────────────────────────────
+const checkDocs = setInterval(async () => {
+  if (document.getElementById('screen-app') && window.currentUser) {
+    clearInterval(checkDocs);
+    injectDocsUI();
+    await initCarpetasDefault();
+    subscribeDocumentos();
+  }
+}, 800);
+</script>
+<!-- ═══════════════════════════════════════════════════
+     MÓDULO NOTIFICACIÓN COMUNICADOS
+════════════════════════════════════════════════════ -->
+<script type="module">
+import { getApps } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, collection, addDoc, getDocs, serverTimestamp }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const db4 = window._fbDb;
+
+// Sobreescribir subirDocumento para detectar carpeta "comunicados"
+const _origSubir = window.subirDocumento;
+window.subirDocumento = async () => {
+  // Llamar al original primero
+  if (_origSubir) await _origSubir();
+  // Si la carpeta actual es "comunicados", notificar a todos
+  if (window.carpetaActual === 'comunicados') {
+    await notificarComunicado();
+  }
+};
+
+async function notificarComunicado() {
+  // Obtener todos los usuarios
+  const snap = await getDocs(collection(db4, 'users'));
+  const todos = snap.docs.map(d => d.data().nombre).filter(Boolean);
+  const subioPor = window.currentUser?.profile?.nombre || window.currentUser?.email || 'El equipo';
+  const docNombre = window.docFileSelected?.name || 'Nuevo comunicado';
+
+  // Crear mensaje interno para todos
+  await addDoc(collection(db4, 'messages'), {
+    de: 'Sistema MGtrauma',
+    destinatarios: todos,
+    categoria: 'informe',
+    asunto: `📢 Nuevo comunicado: ${docNombre}`,
+    cuerpo: `${subioPor} ha publicado un nuevo comunicado en la biblioteca de documentos.\n\n📄 ${docNombre}\n\nAccede a la sección Documentos → Comunicados para verlo.`,
+    leido: false,
+    createdAt: serverTimestamp()
+  });
+
+  // Notificación push si está permitida
+  if (Notification.permission === 'granted') {
+    new Notification('MGtrauma — Nuevo comunicado', {
+      body: `${subioPor} ha publicado: ${docNombre}`,
+      icon: 'icons/icon-192.png'
+    });
+  }
+
+  window.showToast('📢 Comunicado publicado y equipo notificado');
+}
+</script>
+<!-- ═══════════════════════════════════════════════════
+     MEJORA FORMULARIO SUBIDA DOCUMENTOS
+════════════════════════════════════════════════════ -->
+<script type="module">
+import { getApps } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, collection, addDoc, serverTimestamp }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getStorage, ref, uploadBytesResumable, getDownloadURL }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js';
+
+const db5 = window._fbDb; const st5 = window._fbStorage;
+
+const TIPOS_ACEPTADOS = {
+  'application/pdf':                          { label:'PDF',        icono:'📕', ext:'pdf' },
+  'application/msword':                       { label:'Word',       icono:'📘', ext:'doc' },
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': { label:'Word', icono:'📘', ext:'docx' },
+  'application/vnd.ms-powerpoint':            { label:'PowerPoint', icono:'📙', ext:'ppt' },
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation': { label:'PowerPoint', icono:'📙', ext:'pptx' },
+  'video/mp4':  { label:'Vídeo MP4', icono:'🎬', ext:'mp4' },
+  'video/quicktime': { label:'Vídeo MOV', icono:'🎬', ext:'mov' },
+  'video/x-msvideo': { label:'Vídeo AVI', icono:'🎬', ext:'avi' },
+};
+
+// Sobreescribir openSubirDocModal con versión mejorada
+window.openSubirDocModal = () => {
+  const carpetaNombre = document.getElementById('docs-carpeta-titulo')?.textContent || 'esta carpeta';
+  const esComunicado  = window.carpetaActual === 'comunicados';
+
+  const html = `
+    <div class="modal-handle"></div>
+    <div class="modal-title">📎 Subir documento</div>
+    <div style="font-size:12px;color:var(--text2);margin-top:-12px;margin-bottom:18px">${carpetaNombre}</div>
+
+    <!-- ZONA DE SELECCIÓN DE ARCHIVO -->
+    <div id="upload-drop-zone"
+      style="border:2px dashed var(--border);border-radius:12px;padding:28px 20px;text-align:center;cursor:pointer;background:var(--surface2);transition:all .2s;margin-bottom:16px"
+      onclick="document.getElementById('upload-file-input').click()"
+      ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
+      ondragleave="this.style.borderColor='var(--border)'"
+      ondrop="onUploadDrop(event)">
+      <div id="upload-drop-icon" style="font-size:36px;margin-bottom:10px">📎</div>
+      <div id="upload-drop-title" style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;margin-bottom:4px">
+        Toca para seleccionar archivo
+      </div>
+      <div id="upload-drop-sub" style="font-size:11px;color:var(--text3)">
+        PDF · Word · PowerPoint · Vídeo
+      </div>
+    </div>
+    <input type="file" id="upload-file-input"
+      accept=".pdf,.doc,.docx,.ppt,.pptx,.mp4,.mov,.avi"
+      style="display:none" onchange="onUploadFileSelected(this)">
+
+    <!-- PREVIEW DEL ARCHIVO (oculto hasta seleccionar) -->
+    <div id="upload-preview" style="display:none;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:13px;display:none;align-items:center;gap:12px;margin-bottom:16px">
+      <div id="upload-preview-icon" style="font-size:28px;flex-shrink:0">📄</div>
+      <div style="flex:1;min-width:0">
+        <div id="upload-preview-name" style="font-family:'Syne',sans-serif;font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+        <div id="upload-preview-meta" style="font-size:11px;color:var(--text3);margin-top:2px"></div>
+      </div>
+      <button onclick="limpiarArchivo()" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:var(--red);border-radius:7px;padding:5px 9px;font-size:12px;cursor:pointer;flex-shrink:0">✕</button>
+    </div>
+
+    <!-- DESCRIPCIÓN -->
+    <div class="form-group">
+      <label class="form-label">Descripción breve (opcional)</label>
+      <input class="form-input" id="upload-descripcion" type="text"
+        placeholder="Ej: Catálogo 2024 · Técnica placa DHS · Formulario devolución…"
+        maxlength="120">
+      <div style="font-size:10px;color:var(--text3);margin-top:4px;text-align:right">
+        <span id="desc-counter">0</span>/120
+      </div>
+    </div>
+
+    ${esComunicado ? `
+    <div style="background:rgba(14,165,233,.08);border:1px solid rgba(14,165,233,.2);border-radius:9px;padding:11px;margin-bottom:14px;font-size:12px;color:var(--text2);display:flex;gap:8px;align-items:flex-start">
+      <span style="font-size:16px;flex-shrink:0">📢</span>
+      <span>Al subir este comunicado, <strong>todos los usuarios recibirán una notificación</strong> automáticamente.</span>
+    </div>` : ''}
+
+    <!-- BARRA DE PROGRESO (oculta hasta subir) -->
+    <div id="upload-progress-wrap" style="display:none;margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:6px">
+        <span>Subiendo archivo…</span>
+        <span id="upload-pct">0%</span>
+      </div>
+      <div style="background:var(--border);border-radius:4px;height:8px;overflow:hidden">
+        <div id="upload-progress-bar" style="background:linear-gradient(90deg,var(--accent),var(--purple));height:100%;width:0%;transition:width .2s;border-radius:4px"></div>
+      </div>
+      <div id="upload-speed" style="font-size:10px;color:var(--text3);margin-top:4px"></div>
+    </div>
+
+    <button class="action-btn btn-primary" id="btn-confirmar-subida" onclick="confirmarSubida()" disabled
+      style="opacity:0.5;cursor:not-allowed">
+      ⬆️ Subir documento
+    </button>
+    <button class="action-btn btn-secondary" onclick="closeModal('modal-dynamic')">Cancelar</button>`;
+
+  // Abrir modal dinámico
+  let overlay = document.getElementById('modal-dynamic');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'modal-dynamic';
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `<div class="modal" id="modal-dynamic-inner"></div>`;
+    document.getElementById('screen-app').appendChild(overlay);
+  }
+  document.getElementById('modal-dynamic-inner').innerHTML = html;
+  overlay.classList.add('open');
+
+  // Contador descripción
+  document.getElementById('upload-descripcion').addEventListener('input', function() {
+    document.getElementById('desc-counter').textContent = this.value.length;
+  });
+};
+
+// ── Selección de archivo ──────────────────────
+let _uploadFile = null;
+let _uploadStartTime = null;
+
+window.onUploadFileSelected = input => {
+  if (input.files[0]) procesarArchivo(input.files[0]);
+};
+
+window.onUploadDrop = event => {
+  event.preventDefault();
+  document.getElementById('upload-drop-zone').style.borderColor = 'var(--border)';
+  if (event.dataTransfer.files[0]) procesarArchivo(event.dataTransfer.files[0]);
+};
+
+function procesarArchivo(file) {
+  const tipo = TIPOS_ACEPTADOS[file.type];
+  if (!tipo) {
+    window.showToast('⚠️ Tipo de archivo no permitido. Usa PDF, Word, PowerPoint o vídeo.', 'warn');
+    return;
+  }
+  _uploadFile = file;
+
+  // Actualizar zona de drop
+  const zone = document.getElementById('upload-drop-zone');
+  zone.style.borderColor = 'var(--green)';
+  zone.style.background = 'rgba(16,185,129,0.05)';
+  document.getElementById('upload-drop-icon').textContent = '✅';
+  document.getElementById('upload-drop-title').textContent = 'Archivo seleccionado';
+  document.getElementById('upload-drop-sub').textContent = 'Toca para cambiar';
+
+  // Preview
+  const preview = document.getElementById('upload-preview');
+  preview.style.display = 'flex';
+  document.getElementById('upload-preview-icon').textContent = tipo.icono;
+  document.getElementById('upload-preview-name').textContent = file.name;
+  const sizeMB = file.size > 1048576
+    ? (file.size/1048576).toFixed(1) + ' MB'
+    : (file.size/1024).toFixed(0) + ' KB';
+  document.getElementById('upload-preview-meta').textContent = `${tipo.label} · ${sizeMB}`;
+
+  // Activar botón
+  const btn = document.getElementById('btn-confirmar-subida');
+  if (btn) { btn.disabled = false; btn.style.opacity = '1'; btn.style.cursor = 'pointer'; }
+}
+
+window.limpiarArchivo = () => {
+  _uploadFile = null;
+  document.getElementById('upload-file-input').value = '';
+  const zone = document.getElementById('upload-drop-zone');
+  zone.style.borderColor = 'var(--border)';
+  zone.style.background = 'var(--surface2)';
+  document.getElementById('upload-drop-icon').textContent = '📎';
+  document.getElementById('upload-drop-title').textContent = 'Toca para seleccionar archivo';
+  document.getElementById('upload-drop-sub').textContent = 'PDF · Word · PowerPoint · Vídeo';
+  document.getElementById('upload-preview').style.display = 'none';
+  const btn = document.getElementById('btn-confirmar-subida');
+  if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; btn.style.cursor = 'not-allowed'; }
+};
+
+// ── Subida ─────────────────────────────────────
+window.confirmarSubida = async () => {
+  if (!_uploadFile) { window.showToast('⚠️ Selecciona un archivo primero', 'warn'); return; }
+  if (!window.carpetaActual) { window.showToast('⚠️ No hay carpeta seleccionada', 'warn'); return; }
+
+  const descripcion = document.getElementById('upload-descripcion')?.value.trim() || '';
+  const btn = document.getElementById('btn-confirmar-subida');
+  if (btn) { btn.disabled = true; btn.textContent = 'Subiendo…'; btn.style.opacity = '0.7'; }
+  document.getElementById('upload-progress-wrap').style.display = 'block';
+  _uploadStartTime = Date.now();
+
+  const path = `documentos/${window.carpetaActual}/${Date.now()}_${_uploadFile.name}`;
+  const storageRef = ref(st5, path);
+  const uploadTask = uploadBytesResumable(storageRef, _uploadFile);
+
+  uploadTask.on('state_changed',
+    snap => {
+      const pct = Math.round(snap.bytesTransferred / snap.totalBytes * 100);
+      document.getElementById('upload-progress-bar').style.width = pct + '%';
+      document.getElementById('upload-pct').textContent = pct + '%';
+      // Velocidad estimada
+      const elapsed = (Date.now() - _uploadStartTime) / 1000;
+      if (elapsed > 0.5) {
+        const kbps = Math.round(snap.bytesTransferred / 1024 / elapsed);
+        const restante = Math.round((snap.totalBytes - snap.bytesTransferred) / 1024 / kbps);
+        document.getElementById('upload-speed').textContent =
+          kbps > 1000 ? `${(kbps/1024).toFixed(1)} MB/s` : `${kbps} KB/s` +
+          (restante > 0 ? ` · ${restante}s restantes` : '');
+      }
+    },
+    err => {
+      window.showToast('Error al subir: ' + err.message, 'error');
+      if (btn) { btn.disabled = false; btn.textContent = '⬆️ Subir documento'; btn.style.opacity = '1'; }
+    },
+    async () => {
+      const url = await getDownloadURL(uploadTask.snapshot.ref);
+      await addDoc(collection(db5, 'documentos'), {
+        nombre:     _uploadFile.name,
+        descripcion,
+        url,
+        carpetaId:  window.carpetaActual,
+        storagePath: path,
+        size:       _uploadFile.size,
+        tipo:       TIPOS_ACEPTADOS[_uploadFile.type]?.label || 'Archivo',
+        subidoPor:  window.currentUser?.profile?.nombre || window.currentUser?.email,
+        createdAt:  serverTimestamp()
+      });
+
+      // Notificación si es comunicado
+      if (window.carpetaActual === 'comunicados') {
+        const { getDocs, collection: col2 } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+        const usersSnap = await getDocs(col2(db5, 'users'));
+        const todos = usersSnap.docs.map(d => d.data().nombre).filter(Boolean);
+        const subioPor = window.currentUser?.profile?.nombre || 'El equipo';
+        await addDoc(col2(db5, 'messages'), {
+          de: 'Sistema MGtrauma',
+          destinatarios: todos,
+          categoria: 'informe',
+          asunto: `📢 Nuevo comunicado: ${_uploadFile.name}`,
+          cuerpo: `${subioPor} ha publicado un nuevo comunicado.\n\n📄 ${_uploadFile.name}${descripcion ? '\n📝 ' + descripcion : ''}\n\nAccede a Documentos → Comunicados para verlo.`,
+          leido: false,
+          createdAt: serverTimestamp()
+        });
+        if (Notification.permission === 'granted') {
+          new Notification('MGtrauma — Nuevo comunicado', {
+            body: `${subioPor}: ${_uploadFile.name}`,
+            icon: 'icons/icon-192.png'
+          });
+        }
+      }
+
+      _uploadFile = null;
+      window.closeModal('modal-dynamic');
+      window.showToast('✓ Documento subido correctamente');
+    }
+  );
+};
+</script>
+<!-- ═══════════════════════════════════════════════════
+     MÓDULO FICHAS MÉDICOS + ACCESOS RÁPIDOS
+════════════════════════════════════════════════════ -->
+<script type="module">
+import { getApps } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, collection, doc, addDoc, updateDoc, deleteDoc,
+  onSnapshot, query, orderBy, serverTimestamp, setDoc, getDoc }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const db6 = window._fbDb;
+
+let medicos = [];
+let medicosFilter = '';
+
+// ── APPS EXTERNAS ─────────────────────────────
+const APPS_EXTERNAS = [
+  {
+    nombre: 'NEO',
+    descripcion: 'Gestión de episodios DePuy',
+    icono: '📋',
+    color: '#0ea5e9',
+    url: 'https://neogestionepisodios.es',
+    appScheme: 'https://neogestionepisodios.es'
+  },
+  {
+    nombre: 'OrthoCatalog',
+    descripcion: 'Fichas técnicas J&J MedTech',
+    icono: '🔬',
+    color: '#10b981',
+    url: 'https://orthocatalog.jnjmedtech.com/',
+    appScheme: 'https://orthocatalog.jnjmedtech.com/'
+  },
+  {
+    nombre: 'Showpad',
+    descripcion: 'Presentaciones y contenido',
+    icono: '📊',
+    color: '#8b5cf6',
+    url: 'https://www.showpad.com',
+    appScheme: 'showpad://'
+  }
+];
+
+// ── INYECTAR UI ───────────────────────────────
+function injectMedicosUI() {
+  if (document.getElementById('page-medicos')) return;
+
+  // Tab
+  const tabs = document.getElementById('main-tabs');
+  if (tabs) {
+    const tab = document.createElement('div');
+    tab.className = 'tab';
+    tab.textContent = 'Médicos';
+    tab.onclick = () => window.showPage('medicos');
+    tabs.appendChild(tab);
+  }
+
+  // Nav item
+  const nav = document.querySelector('.bottom-nav');
+  if (nav) {
+    const ni = document.createElement('div');
+    ni.className = 'nav-item';
+    ni.id = 'nav-medicos';
+    ni.innerHTML = '<div class="nav-icon">👨‍⚕️</div><div class="nav-label">Médicos</div>';
+    ni.onclick = () => window.showPage('medicos');
+    nav.insertBefore(ni, nav.querySelector('#nav-settings'));
+  }
+
+  // Página médicos
+  const appEl = document.getElementById('screen-app');
+  const page = document.createElement('div');
+  page.className = 'page';
+  page.id = 'page-medicos';
+  page.innerHTML = `
+    <!-- Accesos rápidos -->
+    <div style="margin-bottom:18px">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">🔗 Accesos rápidos</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px" id="apps-grid"></div>
+    </div>
+
+    <!-- Buscador médicos -->
+    <div class="search-bar" style="margin-bottom:12px">
+      <span>🔍</span>
+      <input type="text" placeholder="Buscar médico, hospital, especialidad…"
+        oninput="filtrarMedicos(this.value)" style="background:none;border:none;outline:none;color:var(--text);font-size:14px;flex:1">
+    </div>
+
+    <!-- Lista médicos -->
+    <div id="medicos-list"></div>`;
+  appEl.insertBefore(page, appEl.querySelector('.bottom-nav'));
+
+  // Renderizar apps
+  const grid = document.getElementById('apps-grid');
+  if (grid) {
+    grid.innerHTML = APPS_EXTERNAS.map(a => `
+      <div onclick="abrirApp('${a.appScheme}','${a.url}')"
+        style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;cursor:pointer;transition:transform .15s"
+        onmousedown="this.style.transform='scale(.95)'" onmouseup="this.style.transform=''">
+        <div style="font-size:26px;margin-bottom:6px">${a.icono}</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:12px;color:${a.color};margin-bottom:2px">${a.nombre}</div>
+        <div style="font-size:10px;color:var(--text3);line-height:1.3">${a.descripcion}</div>
+      </div>`).join('');
+  }
+
+  // Extender showPage
+  const _orig = window.showPage;
+  window.showPage = name => {
+    _orig(name);
+    if (name === 'medicos') {
+      document.getElementById('page-medicos').classList.add('active');
+      const rol = window._currentUserRole?.() || 'comercial';
+      const fab = document.getElementById('main-fab');
+      if (fab) {
+        fab.style.display = ['gestor','gerente','comercial'].includes(rol) ? 'flex' : 'none';
+        fab.textContent = '+';
+        fab.onclick = () => abrirModalMedico();
+      }
+    }
+  };
+}
+
+// ── Abrir app externa ─────────────────────────
+window.abrirApp = (scheme, fallbackUrl) => {
+  // Intentar abrir app nativa, si falla abrir web
+  if (scheme.startsWith('http')) {
+    window.open(fallbackUrl, '_blank');
+    return;
+  }
+  const start = Date.now();
+  window.location = scheme;
+  setTimeout(() => {
+    if (Date.now() - start < 1500) window.open(fallbackUrl, '_blank');
+  }, 800);
+};
+
+// ── Suscripción médicos ───────────────────────
+function subscribeMedicos() {
+  onSnapshot(query(collection(db6,'medicos'), orderBy('apellidos')), snap => {
+    medicos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderMedicos();
+    // Actualizar autocompletado de cirujanos en formulario de cirugía
+    window.doctors = medicos.map(m => `${m.nombre} ${m.apellidos}`);
+  });
+}
+
+// ── Render lista médicos ──────────────────────
+window.filtrarMedicos = val => {
+  medicosFilter = val.toLowerCase();
+  renderMedicos();
+};
+
+function renderMedicos() {
+  const el = document.getElementById('medicos-list');
+  if (!el) return;
+  let lista = medicos;
+  if (medicosFilter) {
+    lista = lista.filter(m =>
+      `${m.nombre} ${m.apellidos}`.toLowerCase().includes(medicosFilter) ||
+      m.especialidad?.toLowerCase().includes(medicosFilter) ||
+      m.hospital?.toLowerCase().includes(medicosFilter)
+    );
+  }
+  if (!lista.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">👨‍⚕️</div><div class="empty-text">No hay médicos registrados</div></div>';
+    return;
+  }
+  el.innerHTML = lista.map(m => medicoCardHTML(m)).join('');
+}
+
+function medicoCardHTML(m) {
+  const ini = (`${m.nombre||''}${m.apellidos||''}`).slice(0,2).toUpperCase();
+  const rol = window._currentUserRole?.() || 'comercial';
+  const canEdit = ['gestor','gerente','comercial'].includes(rol);
+  return `
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px">
+    <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px">
+      <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;flex-shrink:0">${ini}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px">${m.nombre} ${m.apellidos}</div>
+        <div style="font-size:12px;color:var(--accent);margin-top:2px">${m.especialidad||'Sin especialidad'}</div>
+        ${m.hospital?`<div style="font-size:11px;color:var(--text3);margin-top:2px">🏥 ${m.hospital}</div>`:''}
+      </div>
+      ${canEdit ? `<button onclick="abrirModalMedico('${m.id}')"
+        style="background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text2);font-size:12px;cursor:pointer;flex-shrink:0">✏️</button>` : ''}
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      ${m.telefono ? `
+        <a href="tel:${m.telefono}"
+          style="flex:1;min-width:120px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:8px 12px;color:var(--green);font-size:12px;font-weight:600;text-decoration:none;text-align:center;display:flex;align-items:center;justify-content:center;gap:5px">
+          📞 ${m.telefono}
+        </a>` : ''}
+      ${m.email ? `
+        <a href="mailto:${m.email}"
+          style="flex:1;min-width:120px;background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.2);border-radius:8px;padding:8px 12px;color:var(--accent);font-size:12px;font-weight:600;text-decoration:none;text-align:center;display:flex;align-items:center;justify-content:center;gap:5px">
+          ✉️ Email
+        </a>` : ''}
+    </div>
+  </div>`;
+}
+
+// ── Modal médico ──────────────────────────────
+window.abrirModalMedico = async (id) => {
+  let medico = null;
+  if (id) medico = medicos.find(m => m.id === id);
+
+  const titulo = medico ? `Editar médico` : 'Nuevo médico';
+  const especialidades = [
+    'Traumatología','Cirugía Ortopédica','Neurocirugía','Cirugía de Columna',
+    'Cirugía de Rodilla','Cirugía de Cadera','Cirugía de Hombro','Cirugía de Mano',
+    'Cirugía de Pie y Tobillo','Cirugía Pediátrica Ortopédica','Otra'
+  ];
+
+  const html = `
+    <div class="modal-handle"></div>
+    <div class="modal-title">${titulo}</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="form-group">
+        <label class="form-label">Nombre *</label>
+        <input class="form-input" id="med-nombre" type="text" placeholder="Nombre…" value="${medico?.nombre||''}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Apellidos *</label>
+        <input class="form-input" id="med-apellidos" type="text" placeholder="Apellidos…" value="${medico?.apellidos||''}">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Especialidad</label>
+      <select class="form-select" id="med-especialidad">
+        <option value="">Seleccionar…</option>
+        ${especialidades.map(e => `<option value="${e}" ${medico?.especialidad===e?'selected':''}>${e}</option>`).join('')}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Teléfono</label>
+      <input class="form-input" id="med-telefono" type="tel" placeholder="6XX XXX XXX…" value="${medico?.telefono||''}">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input class="form-input" id="med-email" type="email" placeholder="doctor@hospital.es…" value="${medico?.email||''}">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Hospital principal</label>
+      <input class="form-input" id="med-hospital" type="text" placeholder="Hospital…" value="${medico?.hospital||''}">
+    </div>
+
+    <button class="action-btn btn-primary" onclick="guardarMedico('${id||''}')">
+      ${medico ? '✓ Guardar cambios' : '✓ Crear ficha médico'}
+    </button>
+    ${medico ? `<button class="action-btn btn-danger" onclick="borrarMedico('${id}')">🗑️ Eliminar ficha</button>` : ''}
+    <button class="action-btn btn-secondary" onclick="closeModal('modal-dynamic')">Cancelar</button>`;
+
+  let overlay = document.getElementById('modal-dynamic');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'modal-dynamic';
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `<div class="modal" id="modal-dynamic-inner"></div>`;
+    document.getElementById('screen-app').appendChild(overlay);
+  }
+  document.getElementById('modal-dynamic-inner').innerHTML = html;
+  overlay.classList.add('open');
+};
+
+window.guardarMedico = async (id) => {
+  const nombre      = document.getElementById('med-nombre')?.value.trim();
+  const apellidos   = document.getElementById('med-apellidos')?.value.trim();
+  const especialidad= document.getElementById('med-especialidad')?.value;
+  const telefono    = document.getElementById('med-telefono')?.value.trim();
+  const email       = document.getElementById('med-email')?.value.trim();
+  const hospital    = document.getElementById('med-hospital')?.value.trim();
+
+  if (!nombre || !apellidos) { window.showToast('⚠️ Nombre y apellidos son obligatorios','warn'); return; }
+
+  const data = { nombre, apellidos, especialidad, telefono, email, hospital, updatedAt: serverTimestamp() };
+
+  if (id) {
+    await updateDoc(doc(db6,'medicos',id), data);
+    window.showToast('✓ Ficha actualizada');
+  } else {
+    await addDoc(collection(db6,'medicos'), { ...data, createdAt: serverTimestamp() });
+    window.showToast('✓ Médico añadido');
+  }
+  window.closeModal('modal-dynamic');
+};
+
+window.borrarMedico = async (id) => {
+  if (!confirm('¿Eliminar esta ficha?')) return;
+  await deleteDoc(doc(db6,'medicos',id));
+  window.closeModal('modal-dynamic');
+  window.showToast('🗑️ Ficha eliminada');
+};
+
+// ── Init ──────────────────────────────────────
+const checkMed = setInterval(() => {
+  if (document.getElementById('screen-app') && window.currentUser) {
+    clearInterval(checkMed);
+    injectMedicosUI();
+    subscribeMedicos();
+  }
+}, 800);
+</script>
+<!-- ═══════════════════════════════════════════════════
+     MÓDULO RESPONSABLES DE HOSPITAL + INCIDENCIAS
+     + ALERTAS CIRUGÍA SIN PARTE
+════════════════════════════════════════════════════ -->
+<script type="module">
+import { getApps } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, collection, doc, addDoc, updateDoc, onSnapshot,
+  query, orderBy, serverTimestamp, getDocs, setDoc, getDoc, where }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const db7 = window._fbDb;
+
+// ── Estado ────────────────────────────────────
+let responsablesHospital = {}; // { hospitalNombre: usuarioNombre }
+let incidencias = [];
+
+// ── INICIALIZACIÓN ────────────────────────────
+const checkInit = setInterval(() => {
+  if (window.currentUser && document.getElementById('screen-app')) {
+    clearInterval(checkInit);
+    loadResponsables();
+    subscribeIncidencias();
+    injectIncidenciasUI();
+    scheduleAlertas();
+    injectResponsablesEnSettings();
+  }
+}, 900);
+
+// ── RESPONSABLES DE HOSPITAL ──────────────────
+async function loadResponsables() {
+  const snap = await getDoc(doc(db7, 'catalogues', 'main'));
+  if (snap.exists()) responsablesHospital = snap.data().responsablesHospital || {};
+}
+
+async function saveResponsables() {
+  await setDoc(doc(db7, 'catalogues', 'main'), { responsablesHospital }, { merge: true });
+}
+
+function injectResponsablesEnSettings() {
+  const rol = window._currentUserRole?.() || 'comercial';
+  if (!['gestor','gerente'].includes(rol)) return;
+  const settingsPage = document.getElementById('page-settings');
+  if (!settingsPage || document.getElementById('resp-hospital-section')) return;
+
+  const sec = document.createElement('div');
+  sec.id = 'resp-hospital-section';
+  sec.className = 'settings-section';
+  sec.innerHTML = `
+    <div class="settings-title-label">🏥 Responsables de hospital</div>
+    <div class="settings-list" id="resp-hosp-list">
+      <div style="padding:13px;font-size:13px;color:var(--text3)">Cargando…</div>
+    </div>
+    <button class="action-btn btn-secondary" style="margin-top:8px" onclick="openRespHospModal()">✏️ Editar responsables</button>`;
+  settingsPage.insertBefore(sec, settingsPage.querySelector('.settings-section:last-child'));
+  renderResponsablesSettings();
+}
+
+function renderResponsablesSettings() {
+  const el = document.getElementById('resp-hosp-list');
+  if (!el) return;
+  const hospitals = window.hospitals || [];
+  if (!hospitals.length) { el.innerHTML = '<div style="padding:13px;font-size:13px;color:var(--text3)">Sin hospitales registrados aún</div>'; return; }
+  el.innerHTML = hospitals.map(h => `
+    <div class="settings-item">
+      <div class="settings-item-left">
+        <div class="settings-item-icon si-blue">🏥</div>
+        <div>
+          <div class="settings-item-name" style="font-size:13px">${h}</div>
+          <div style="font-size:11px;color:var(--text3)">${responsablesHospital[h] || 'Sin responsable asignado'}</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+window.openRespHospModal = () => {
+  const hospitals = window.hospitals || [];
+  const users = window.users || [];
+  if (!hospitals.length) { window.showToast('⚠️ No hay hospitales registrados','warn'); return; }
+
+  const rows = hospitals.map(h => `
+    <div class="form-group">
+      <label class="form-label" style="font-size:11px">${h}</label>
+      <select class="form-select" id="resp-${btoa(h).replace(/=/g,'')}" style="padding:9px 12px;font-size:13px">
+        <option value="">Sin responsable</option>
+        ${users.map(u => `<option value="${u}" ${responsablesHospital[h]===u?'selected':''}>${u}</option>`).join('')}
+      </select>
+    </div>`).join('');
+
+  const html = `
+    <div class="modal-handle"></div>
+    <div class="modal-title">🏥 Responsables de hospital</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:16px">Asigna un comercial responsable a cada hospital</div>
+    ${rows}
+    <button class="action-btn btn-primary" onclick="guardarResponsables()">✓ Guardar responsables</button>
+    <button class="action-btn btn-secondary" onclick="closeModal('modal-dynamic')">Cancelar</button>`;
+
+  openDynamicModal(html);
+};
+
+window.guardarResponsables = async () => {
+  const hospitals = window.hospitals || [];
+  hospitals.forEach(h => {
+    const key = `resp-${btoa(h).replace(/=/g,'')}`;
+    const el = document.getElementById(key);
+    if (el) responsablesHospital[h] = el.value;
+  });
+  await saveResponsables();
+  closeModal('modal-dynamic');
+  renderResponsablesSettings();
+  window.showToast('✓ Responsables guardados');
+};
+
+// ── ALERTAS PROGRAMADAS ───────────────────────
+function scheduleAlertas() {
+  const now = new Date();
+
+  // Alerta 09:00h — cirugías sin parte del día anterior
+  const alarm9 = new Date(now); alarm9.setHours(9, 0, 0, 0);
+  const ms9 = alarm9 - now;
+  if (ms9 > 0) setTimeout(checkCirugiasSinParte, ms9);
+  else setTimeout(checkCirugiasSinParte, 24*60*60*1000 + ms9); // mañana
+
+  // Resumen viernes 12:00h
+  const alarm12v = proximoViernes12h(now);
+  setTimeout(enviarResumenSemanal, alarm12v - now);
+}
+
+function proximoViernes12h(now) {
+  const d = new Date(now);
+  const diasHastaViernes = (5 - d.getDay() + 7) % 7 || 7;
+  d.setDate(d.getDate() + diasHastaViernes);
+  d.setHours(12, 0, 0, 0);
+  return d;
+}
+
+async function checkCirugiasSinParte() {
+  // Re-programar para mañana
+  setTimeout(checkCirugiasSinParte, 24*60*60*1000);
+
+  const ayer = new Date(); ayer.setDate(ayer.getDate() - 1);
+  const dd = String(ayer.getDate()).padStart(2,'0');
+  const mm = String(ayer.getMonth()+1).padStart(2,'0');
+  const yyyy = ayer.getFullYear();
+  const fechaAyer = `${dd}/${mm}/${yyyy}`;
+
+  const snap = await getDocs(query(collection(db7,'surgeries'), where('fecha','==',fechaAyer)));
+  const sinParte = snap.docs.map(d=>({id:d.id,...d.data()})).filter(s =>
+    s.estado === 'post' && !s.fotoUrl && !s.sinGasto && s.estado !== 'anulada'
+  );
+
+  for (const s of sinParte) {
+    const destinatario = s.asignado || s.clinical || responsablesHospital[s.hospital] || '';
+    if (!destinatario) continue;
+
+    await addDoc(collection(db7,'messages'), {
+      de: 'Sistema MGtrauma',
+      destinatarios: [destinatario],
+      categoria: 'urgente',
+      asunto: `⚠️ Cirugía sin parte — #${s.numero} ${s.hospital}`,
+      cuerpo: `La cirugía del ${s.fecha} en ${s.hospital} con ${s.doctor} no tiene parte de quirófano subido ni está cerrada sin gasto.\n\nPor favor sube el parte o marca la cirugía como sin gasto.`,
+      leido: false,
+      createdAt: serverTimestamp()
+    });
+  }
+
+  if (sinParte.length) window.showToast(`⚠️ ${sinParte.length} cirugía(s) sin parte notificadas`);
+}
+
+async function enviarResumenSemanal() {
+  // Re-programar para próximo viernes
+  setTimeout(enviarResumenSemanal, 7*24*60*60*1000);
+
+  const usersSnap = await getDocs(collection(db7,'users'));
+  const gerentes = usersSnap.docs.filter(d=>['gerente','gestor'].includes(d.data().rol)).map(d=>d.data().nombre);
+  const admins   = usersSnap.docs.filter(d=>d.data().rol==='administracion').map(d=>d.data().nombre);
+
+  // Incidencias no resueltas
+  const incSnap = await getDocs(query(collection(db7,'incidencias'), where('resuelta','==',false)));
+  const pendientes = incSnap.docs.map(d=>({id:d.id,...d.data()}));
+
+  if (!pendientes.length) return;
+
+  // Agrupar por hospital
+  const porHospital = {};
+  pendientes.forEach(i => {
+    if (!porHospital[i.hospital]) porHospital[i.hospital] = [];
+    porHospital[i.hospital].push(i);
+  });
+
+  // Enviar a cada responsable de hospital sus incidencias
+  for (const [hospital, lista] of Object.entries(porHospital)) {
+    const resp = responsablesHospital[hospital];
+    if (!resp) continue;
+    const texto = lista.map(i=>`• [${i.tipo}] ${i.descripcion}`).join('\n');
+    await addDoc(collection(db7,'messages'), {
+      de: 'Sistema MGtrauma',
+      destinatarios: [resp],
+      categoria: 'informe',
+      asunto: `📊 Resumen semanal incidencias — ${hospital}`,
+      cuerpo: `Tienes ${lista.length} incidencia(s) pendiente(s) en ${hospital}:\n\n${texto}`,
+      leido: false,
+      createdAt: serverTimestamp()
+    });
+  }
+
+  // Enviar resumen global a gerente y administración
+  const totalTexto = Object.entries(porHospital)
+    .map(([h,l])=>`• ${h}: ${l.length} incidencia(s)`)
+    .join('\n');
+  const destinatariosGlobal = [...new Set([...gerentes,...admins])];
+  if (destinatariosGlobal.length) {
+    await addDoc(collection(db7,'messages'), {
+      de: 'Sistema MGtrauma',
+      destinatarios: destinatariosGlobal,
+      categoria: 'informe',
+      asunto: `📊 Resumen semanal incidencias — Todos los hospitales`,
+      cuerpo: `Resumen de incidencias pendientes esta semana:\n\n${totalTexto}\n\nTotal: ${pendientes.length} incidencia(s) sin resolver.`,
+      leido: false,
+      createdAt: serverTimestamp()
+    });
+  }
+  window.showToast('📊 Resumen semanal enviado');
+}
+
+// ── SUSCRIPCIÓN INCIDENCIAS ───────────────────
+function subscribeIncidencias() {
+  onSnapshot(query(collection(db7,'incidencias'), orderBy('createdAt','desc')), snap => {
+    incidencias = snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderIncidenciasBadge();
+  });
+}
+
+function renderIncidenciasBadge() {
+  const pendientes = incidencias.filter(i => !i.resuelta).length;
+  const badge = document.getElementById('incidencias-badge');
+  if (badge) { badge.textContent = pendientes; badge.style.display = pendientes ? 'flex' : 'none'; }
+}
+
+// ── UI INCIDENCIAS ────────────────────────────
+function injectIncidenciasUI() {
+  // Inyectar en detail de cirugía — hook sobre openDetail
+  const _origOpenDetail = window.openDetail;
+  window.openDetail = id => {
+    _origOpenDetail(id);
+    setTimeout(() => {
+      const body = document.getElementById('detail-body');
+      if (!body) return;
+      const s = (window.surgeries||[]).find(x=>x.id===id);
+      if (!s) return;
+
+      // Sección incidencias
+      const secInc = document.createElement('div');
+      secInc.className = 'detail-section';
+      secInc.id = 'sec-incidencias-' + id;
+
+      const incsCirugia = incidencias.filter(i => i.cirugiaId === id);
+      const admin = incsCirugia.filter(i=>i.tipo==='administracion');
+      const logis = incsCirugia.filter(i=>i.tipo==='logistica');
+
+      secInc.innerHTML = `
+        <div class="detail-section-title">⚠️ Incidencias</div>
+
+        <div style="margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <div style="font-size:12px;font-weight:600;color:var(--text2)">🗂️ Administración (${admin.length})</div>
+            <button onclick="abrirNuevaIncidencia('${id}','${s.hospital}','administracion')"
+              style="background:rgba(14,165,233,.15);border:1px solid rgba(14,165,233,.3);color:var(--accent);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer">+ Nueva</button>
+          </div>
+          ${admin.length ? admin.map(i => incidenciaCardHTML(i)).join('') : '<div style="font-size:12px;color:var(--text3);padding:6px 0">Sin incidencias</div>'}
+        </div>
+
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <div style="font-size:12px;font-weight:600;color:var(--text2)">🔧 Logística (${logis.length})</div>
+            <button onclick="abrirNuevaIncidencia('${id}','${s.hospital}','logistica')"
+              style="background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.3);color:var(--purple);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer">+ Nueva</button>
+          </div>
+          ${logis.length ? logis.map(i => incidenciaCardHTML(i)).join('') : '<div style="font-size:12px;color:var(--text3);padding:6px 0">Sin incidencias</div>'}
+        </div>`;
+
+      // Insertar antes de los comentarios
+      const comentSection = body.querySelector('.detail-section:last-child');
+      if (comentSection) body.insertBefore(secInc, comentSection);
+      else body.appendChild(secInc);
+    }, 150);
+  };
+
+  // Tab de incidencias global
+  const tabs = document.getElementById('main-tabs');
+  if (tabs && !document.getElementById('tab-incidencias-global')) {
+    const tab = document.createElement('div');
+    tab.className = 'tab';
+    tab.id = 'tab-incidencias-global';
+    tab.innerHTML = `Incidencias <span id="incidencias-badge" style="display:none;background:var(--red);color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;font-weight:700;align-items:center;justify-content:center;margin-left:4px;vertical-align:middle"></span>`;
+    tab.onclick = () => window.showPage('incidencias-global');
+    tabs.appendChild(tab);
+  }
+
+  // Nav item
+  const nav = document.querySelector('.bottom-nav');
+  if (nav && !document.getElementById('nav-incidencias-global')) {
+    const ni = document.createElement('div');
+    ni.className = 'nav-item';
+    ni.id = 'nav-incidencias-global';
+    ni.innerHTML = '<div class="nav-icon">⚠️</div><div class="nav-label">Incidencias</div>';
+    ni.onclick = () => window.showPage('incidencias-global');
+    nav.insertBefore(ni, nav.querySelector('#nav-settings'));
+  }
+
+  // Página global de incidencias
+  const appEl = document.getElementById('screen-app');
+  if (!document.getElementById('page-incidencias-global')) {
+    const page = document.createElement('div');
+    page.className = 'page';
+    page.id = 'page-incidencias-global';
+    page.innerHTML = `
+      <div class="filter-row">
+        <div class="filter-chip active" onclick="setIncFilter(this,'todas')">Todas</div>
+        <div class="filter-chip" onclick="setIncFilter(this,'administracion')">Administración</div>
+        <div class="filter-chip" onclick="setIncFilter(this,'logistica')">Logística</div>
+        <div class="filter-chip" onclick="setIncFilter(this,'pendientes')">Pendientes</div>
+        <div class="filter-chip" onclick="setIncFilter(this,'resueltas')">Resueltas</div>
+      </div>
+      <div id="incidencias-global-list"></div>`;
+    appEl.insertBefore(page, appEl.querySelector('.bottom-nav'));
+  }
+
+  // Extender showPage
+  const _orig = window.showPage;
+  window.showPage = name => {
+    _orig(name);
+    if (name === 'incidencias-global') {
+      document.getElementById('page-incidencias-global').classList.add('active');
+      document.getElementById('main-fab').style.display = 'none';
+      renderIncidenciasGlobal('todas');
+    }
+  };
+}
+
+function incidenciaCardHTML(i) {
+  const color = i.tipo === 'administracion' ? 'var(--accent)' : 'var(--purple)';
+  const bgColor = i.tipo === 'administracion' ? 'rgba(14,165,233,.08)' : 'rgba(139,92,246,.08)';
+  return `
+  <div style="background:${bgColor};border:1px solid ${color}33;border-radius:9px;padding:11px;margin-bottom:8px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px">
+      <div style="font-size:12px;font-weight:600;color:${color}">${i.tipo==='administracion'?'🗂️ Administración':'🔧 Logística'}</div>
+      <span style="font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600;background:${i.resuelta?'rgba(16,185,129,.15)':'rgba(239,68,68,.15)'};color:${i.resuelta?'var(--green)':'var(--red)'}">
+        ${i.resuelta?'✓ Resuelta':'Pendiente'}
+      </span>
+    </div>
+    <div style="font-size:13px;margin-bottom:4px">${i.descripcion}</div>
+    <div style="font-size:10px;color:var(--text3)">Abierta por ${i.abiertaPor||'—'}</div>
+    ${i.resuelta && i.comentarioResolucion ? `<div style="font-size:11px;color:var(--green);margin-top:4px">✓ ${i.comentarioResolucion}</div>` : ''}
+    ${!i.resuelta ? `<button onclick="abrirResolverIncidencia('${i.id}')"
+      style="margin-top:8px;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:var(--green);border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;width:100%">
+      ✓ Marcar como resuelta</button>` : ''}
+  </div>`;
+}
+
+// ── NUEVA INCIDENCIA ──────────────────────────
+window.abrirNuevaIncidencia = (cirugiaId, hospital, tipo) => {
+  const color = tipo === 'administracion' ? 'var(--accent)' : 'var(--purple)';
+  const label = tipo === 'administracion' ? '🗂️ Incidencia de administración' : '🔧 Incidencia de logística';
+
+  const html = `
+    <div class="modal-handle"></div>
+    <div class="modal-title" style="color:${color}">${label}</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:16px">Hospital: ${hospital}</div>
+    <div class="form-group">
+      <label class="form-label">Descripción de la incidencia *</label>
+      <textarea class="comment-box" id="inc-descripcion" style="min-height:100px"
+        placeholder="${tipo==='administracion'?'Ej: El consumo no cuadra con el gasto facturado…':'Ej: Falta un destornillador del set de cadera…'}"></textarea>
+    </div>
+    <button class="action-btn btn-primary" onclick="guardarIncidencia('${cirugiaId}','${hospital}','${tipo}')">⚠️ Abrir incidencia</button>
+    <button class="action-btn btn-secondary" onclick="closeModal('modal-dynamic')">Cancelar</button>`;
+  openDynamicModal(html);
+};
+
+window.guardarIncidencia = async (cirugiaId, hospital, tipo) => {
+  const descripcion = document.getElementById('inc-descripcion')?.value.trim();
+  if (!descripcion) { window.showToast('⚠️ Escribe la descripción','warn'); return; }
+
+  const abiertaPor = window.currentUser?.profile?.nombre || window.currentUser?.email;
+  await addDoc(collection(db7,'incidencias'), {
+    cirugiaId, hospital, tipo, descripcion, abiertaPor,
+    resuelta: false, comentarioResolucion: '',
+    createdAt: serverTimestamp()
+  });
+
+  // Notificar al responsable del hospital
+  const resp = responsablesHospital[hospital];
+  const usersSnap = await getDocs(collection(db7,'users'));
+  const admins = usersSnap.docs.filter(d=>d.data().rol==='administracion').map(d=>d.data().nombre);
+  const gerentes = usersSnap.docs.filter(d=>['gerente','gestor'].includes(d.data().rol)).map(d=>d.data().nombre);
+
+  const destinatarios = [...new Set([
+    resp,
+    ...(tipo==='administracion' ? admins : []),
+    ...gerentes
+  ].filter(Boolean))];
+
+  if (destinatarios.length) {
+    await addDoc(collection(db7,'messages'), {
+      de: abiertaPor,
+      destinatarios,
+      categoria: 'urgente',
+      asunto: `⚠️ Nueva incidencia ${tipo==='administracion'?'de administración':'de logística'} — ${hospital}`,
+      cuerpo: `${abiertaPor} ha abierto una incidencia en ${hospital}:\n\n"${descripcion}"\n\nAccede a MGtrauma para gestionarla.`,
+      leido: false,
+      createdAt: serverTimestamp()
+    });
+  }
+
+  closeModal('modal-dynamic');
+  window.showToast('⚠️ Incidencia abierta y equipo notificado');
+  // Recargar detalle
+  const s = (window.surgeries||[]).find(x=>x.id===cirugiaId);
+  if (s) window.openDetail(cirugiaId);
+};
+
+// ── RESOLVER INCIDENCIA ───────────────────────
+window.abrirResolverIncidencia = id => {
+  const html = `
+    <div class="modal-handle"></div>
+    <div class="modal-title" style="color:var(--green)">✓ Resolver incidencia</div>
+    <div class="form-group">
+      <label class="form-label">Comentario de resolución *</label>
+      <textarea class="comment-box" id="res-comentario" style="min-height:80px"
+        placeholder="Explica cómo se ha resuelto la incidencia…"></textarea>
+    </div>
+    <button class="action-btn btn-success" onclick="resolverIncidencia('${id}')">✓ Marcar como resuelta</button>
+    <button class="action-btn btn-secondary" onclick="closeModal('modal-dynamic')">Cancelar</button>`;
+  openDynamicModal(html);
+};
+
+window.resolverIncidencia = async id => {
+  const comentario = document.getElementById('res-comentario')?.value.trim();
+  if (!comentario) { window.showToast('⚠️ Añade un comentario de resolución','warn'); return; }
+  await updateDoc(doc(db7,'incidencias',id), {
+    resuelta: true,
+    comentarioResolucion: comentario,
+    resueltaPor: window.currentUser?.profile?.nombre || window.currentUser?.email,
+    resueltaAt: serverTimestamp()
+  });
+  closeModal('modal-dynamic');
+  window.showToast('✓ Incidencia resuelta');
+};
+
+// ── RENDER GLOBAL ─────────────────────────────
+let activeIncFilter = 'todas';
+window.setIncFilter = (el, f) => {
+  activeIncFilter = f;
+  document.querySelectorAll('#page-incidencias-global .filter-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderIncidenciasGlobal(f);
+};
+
+function renderIncidenciasGlobal(f) {
+  let lista = [...incidencias];
+  if (f==='administracion') lista = lista.filter(i=>i.tipo==='administracion');
+  else if (f==='logistica')  lista = lista.filter(i=>i.tipo==='logistica');
+  else if (f==='pendientes') lista = lista.filter(i=>!i.resuelta);
+  else if (f==='resueltas')  lista = lista.filter(i=>i.resuelta);
+
+  const el = document.getElementById('incidencias-global-list');
+  if (!el) return;
+  if (!lista.length) { el.innerHTML='<div class="empty-state"><div class="empty-icon">✅</div><div class="empty-text">Sin incidencias</div></div>'; return; }
+
+  // Agrupar por hospital
+  const porH = {};
+  lista.forEach(i => { if(!porH[i.hospital])porH[i.hospital]=[]; porH[i.hospital].push(i); });
+
+  el.innerHTML = Object.entries(porH).map(([h, items]) => `
+    <div style="margin-bottom:16px">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--text2);margin-bottom:8px;display:flex;justify-content:space-between">
+        <span>🏥 ${h}</span>
+        <span style="font-size:11px;color:var(--text3)">${items.filter(i=>!i.resuelta).length} pendiente(s)</span>
+      </div>
+      ${items.map(i => incidenciaCardHTML(i)).join('')}
+    </div>`).join('');
+}
+
+// Helper openDynamicModal
+function openDynamicModal(html) {
+  let overlay = document.getElementById('modal-dynamic');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'modal-dynamic';
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `<div class="modal" id="modal-dynamic-inner"></div>`;
+    document.getElementById('screen-app').appendChild(overlay);
+  }
+  document.getElementById('modal-dynamic-inner').innerHTML = html;
+  overlay.classList.add('open');
+}
+function closeModal(id) { document.getElementById(id)?.classList.remove('open'); }
+</script>
