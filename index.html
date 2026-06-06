@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MGtrauma</title>
+<style>
+body{margin:0;background:#0a0f1e;color:#f0f4f8;font-family:sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column}
+.logo{font-size:40px;font-weight:800;margin-bottom:8px}
+.logo span{color:#0ea5e9}
+input{width:280px;padding:12px;margin:6px 0;border-radius:8px;border:1px solid #1e2d45;background:#1a2236;color:#f0f4f8;font-size:14px;outline:none}
+button{width:280px;padding:14px;margin-top:8px;border-radius:8px;border:none;background:#0ea5e9;color:white;font-size:16px;font-weight:700;cursor:pointer}
+.err{color:#ef4444;font-size:13px;margin:4px 0;display:none}
+</style>
+</head>
+<body>
+<div class="logo">MG<span>trauma</span></div>
+<p style="color:#8899aa;margin-bottom:24px">DePuy Synthes · Región de Murcia</p>
+<input id="email" type="email" placeholder="Email">
+<input id="pass" type="password" placeholder="Contraseña">
+<div class="err" id="err">Email o contraseña incorrectos</div>
+<button id="btn">Entrar</button>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyB7djS43Yq0QhE6nJfukElchZeo6sVGe88",
+  authDomain:"mgtrauma-e3693.firebaseapp.com",
+  projectId:"mgtrauma-e3693",
+  storageBucket:"mgtrauma-e3693.firebasestorage.app",
+  messagingSenderId:"194653094711",
+  appId:"1:194653094711:web:aa25e01ff7fa2b182c10b2"
+});
+
+document.getElementById('btn').onclick = async function() {
+  var email = document.getElementById('email').value.trim();
+  var pass = document.getElementById('pass').value;
+  var err = document.getElementById('err');
+  var btn = document.getElementById('btn');
+  err.style.display = 'none';
+  btn.textContent = 'Entrando...';
+  try {
+    await firebase.auth().signInWithEmailAndPassword(email, pass);
+    window.location.href = 'app.html';
+  } catch(e) {
+    err.style.display = 'block';
+    btn.textContent = 'Entrar';
+  }
+};
+</script>
+</body>
+</html>
