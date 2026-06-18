@@ -1,0 +1,1768 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="MGtrauma">
+<meta name="theme-color" content="#0ea5e9">
+<title>MGtrauma</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',sans-serif;background:#0a0f1e;color:#f0f4f8;min-height:100vh;max-width:430px;margin:0 auto}
+input,textarea,select{width:100%;padding:11px 13px;border-radius:10px;border:1px solid #1e2d45;background:#1a2236;color:#f0f4f8;font-size:14px;outline:none;font-family:inherit;-webkit-appearance:none}
+input:focus,textarea:focus,select:focus{border-color:#0ea5e9}
+textarea{resize:none}
+button{cursor:pointer;font-family:inherit}
+a{text-decoration:none}
+#login{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px 24px}
+.ll{font-weight:800;font-size:38px}.ll span{color:#0ea5e9}
+.ls{color:#8899aa;font-size:13px;margin:6px 0 28px}
+.lbox{width:100%;background:#111827;border:1px solid #1e2d45;border-radius:16px;padding:24px}
+.lerr{color:#ef4444;font-size:13px;margin:6px 0;display:none}
+.lbtn{width:100%;padding:14px;border-radius:10px;border:none;background:#0ea5e9;color:#fff;font-size:16px;font-weight:700;margin-top:8px}
+#app{display:none}
+.hd{background:#111827;border-bottom:1px solid #1e2d45;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{font-weight:800;font-size:20px}.logo span{color:#0ea5e9}
+.hdr{display:flex;gap:8px}
+.ib{width:34px;height:34px;border-radius:50%;background:#1a2236;border:1px solid #1e2d45;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;position:relative}
+.av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#0ea5e9,#8b5cf6);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;cursor:pointer}
+.tabs{display:flex;background:#111827;border-bottom:1px solid #1e2d45;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;padding:11px 13px;font-weight:600;font-size:12px;color:#4a6080;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
+.tab.active{color:#0ea5e9;border-bottom-color:#0ea5e9}
+.pg{display:none;padding:16px;padding-bottom:84px}
+.pg.active{display:block}
+.card{background:#111827;border:1px solid #1e2d45;border-radius:12px;padding:14px;margin-bottom:10px;cursor:pointer}
+.card:active{opacity:.9}
+.bdg{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600}
+.bp{background:rgba(245,158,11,.15);color:#f59e0b}
+.bo{background:rgba(16,185,129,.15);color:#10b981}
+.ba{background:rgba(239,68,68,.15);color:#ef4444}
+.fab{position:fixed;bottom:74px;right:16px;width:52px;height:52px;border-radius:50%;background:#0ea5e9;border:none;color:#fff;font-size:26px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(14,165,233,.4);z-index:150}
+.fab:active{transform:scale(.9)}
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:#111827;border-top:1px solid #1e2d45;display:flex;padding:7px 0 16px;z-index:100}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer}
+.ni-i{font-size:19px}.ni-l{font-size:9px;font-weight:600;color:#4a6080}
+.ni.active .ni-l{color:#0ea5e9}
+.toast{position:fixed;top:70px;left:50%;transform:translateX(-50%) translateY(-20px);background:#10b981;color:#fff;padding:10px 18px;border-radius:30px;font-size:12px;font-weight:600;z-index:500;opacity:0;transition:all .3s;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.mob{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;align-items:flex-end;max-width:430px;margin:0 auto}
+.mob.open{display:flex}
+.mod{background:#111827;border-radius:16px 16px 0 0;padding:18px;width:100%;max-height:92vh;overflow-y:auto}
+.mh{width:34px;height:4px;border-radius:2px;background:#1e2d45;margin:0 auto 16px}
+.mt{font-weight:800;font-size:18px;margin-bottom:16px}
+.fg{margin-bottom:12px}
+.fl{font-size:11px;font-weight:600;color:#8899aa;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:block}
+.ds{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.do{padding:11px;border-radius:10px;border:1px solid #1e2d45;background:#1a2236;text-align:center;cursor:pointer;font-size:12px;font-weight:600;color:#8899aa}
+.do.ao{border-color:#0ea5e9;color:#0ea5e9;background:rgba(14,165,233,.1)}
+.do.ar{border-color:#8b5cf6;color:#8b5cf6;background:rgba(139,92,246,.1)}
+.chk{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid #1e2d45}
+.chk:last-child{border-bottom:none}
+.chk input[type=checkbox]{width:17px;height:17px;accent-color:#0ea5e9;flex-shrink:0}
+.abtn{width:100%;padding:13px;border-radius:10px;border:none;font-weight:700;font-size:13px;margin-bottom:8px}
+.ap{background:#0ea5e9;color:#fff}
+.as{background:#1a2236;color:#f0f4f8;border:1px solid #1e2d45}
+.ag{background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.3)}
+.aw{background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3)}
+.ad{background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.3)}
+.apu{background:rgba(139,92,246,.15);color:#8b5cf6;border:1px solid rgba(139,92,246,.3)}
+.dv{display:none;position:fixed;inset:0;background:#0a0f1e;z-index:200;overflow-y:auto;max-width:430px;margin:0 auto}
+.dv.open{display:block}
+.dvh{background:#111827;border-bottom:1px solid #1e2d45;padding:14px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10}
+.bb{width:34px;height:34px;border-radius:50%;background:#1a2236;border:none;color:#f0f4f8;font-size:18px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.dvt{font-weight:700;font-size:14px;flex:1;line-height:1.2}
+.ds2{background:#111827;border:1px solid #1e2d45;border-radius:12px;padding:14px;margin-bottom:12px}
+.dst{font-weight:700;font-size:12px;color:#8899aa;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
+.dr{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #1e2d45;font-size:13px}
+.dr:last-child{border-bottom:none}
+.dl{color:#8899aa}
+.tg{width:42px;height:23px;border-radius:12px;background:#1e2d45;position:relative;cursor:pointer;flex-shrink:0;transition:background .3s}
+.tg.on{background:#10b981}
+.tg::after{content:'';position:absolute;width:17px;height:17px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left .2s}
+.tg.on::after{left:22px}
+.cr{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #1e2d45}
+.cr:last-child{border-bottom:none}
+.pu{border:2px dashed #1e2d45;border-radius:10px;padding:20px;text-align:center;cursor:pointer;background:#1a2236}
+.empty{text-align:center;padding:40px 16px;color:#4a6080}
+.ei{font-size:44px;margin-bottom:10px;opacity:.5}
+.stb{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px}
+.sc{background:#111827;border:1px solid #1e2d45;border-radius:10px;padding:10px 6px;text-align:center}
+.sn{font-weight:800;font-size:20px}.sl{font-size:9px;color:#4a6080;margin-top:1px}
+.fr{display:flex;gap:7px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.fr::-webkit-scrollbar{display:none}
+.fc{flex-shrink:0;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:500;background:#1a2236;color:#8899aa;border:1px solid #1e2d45;cursor:pointer}
+.fc.active{background:#0ea5e9;color:#fff;border-color:#0ea5e9}
+.sb{background:#1a2236;border:1px solid #1e2d45;border-radius:10px;display:flex;align-items:center;gap:8px;padding:10px 14px;margin-bottom:12px}
+.sb input{flex:1;background:none;border:none;outline:none;color:#f0f4f8;font-size:14px;padding:0}
+.ic{border-radius:9px;padding:11px;margin-bottom:8px}
+.acl{background:#1a2236;border:1px solid #0ea5e9;border-top:none;border-radius:0 0 10px 10px;max-height:140px;overflow-y:auto;display:none}
+.acl.open{display:block}
+.aci{padding:9px 13px;font-size:13px;cursor:pointer;border-bottom:1px solid #1e2d45}
+.aci:last-child{border-bottom:none}
+.aci:hover{background:rgba(14,165,233,.1);color:#0ea5e9}
+</style>
+</head>
+<body>
+<!-- LOGIN -->
+<div id="login">
+  <div class="ll">MG<span>trauma</span></div>
+  <div class="ls">DePuy Synthes · Región de Murcia</div>
+  <div class="lbox">
+    <div class="fg"><label class="fl">Email</label><input id="li-e" type="email" placeholder="tu@email.com" autocomplete="email"></div>
+    <div class="fg"><label class="fl">Contraseña</label><input id="li-p" type="password" placeholder="••••••••"></div>
+    <div class="lerr" id="li-err">Email o contraseña incorrectos</div>
+    <button class="lbtn" id="li-btn">Entrar</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="hd">
+    <div class="logo">MG<span>trauma</span></div>
+    <div class="hdr">
+      <div class="ib" onclick="focusSearch()">🔍</div>
+      <div class="ib" id="msg-bell" onclick="showPage('mensajes')">✉️<span id="msg-badge" style="display:none;position:absolute;top:-3px;right:-3px;background:#ef4444;color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;font-weight:700;align-items:center;justify-content:center"></span></div>
+      <div class="av" id="hav" onclick="showPage('settings')">CG</div>
+    </div>
+  </div>
+  <div class="tabs">
+    <div class="tab" onclick="showPage('gastos')" id="tab-gastos">Gastos</div>
+    <div class="tab" onclick="showPage('km')" id="tab-km">Km</div>
+    <div class="tab" onclick="showPage('docs')" id="tab-docs">Docs</div>
+    <div class="tab" onclick="showPage('accesos')" id="tab-accesos">Accesos directos</div>
+    <div class="tab" onclick="showPage('medicos')" id="tab-medicos">Médicos</div>
+    <div class="tab" onclick="showPage('hospitales')" id="tab-hospitales">Hospitales</div>
+    <div class="tab" onclick="showPage('clinicas')" id="tab-clinicas">Clínicas</div>
+    <div class="tab" onclick="showPage('incidencias')" id="tab-incidencias">Incidencias</div>
+    <div class="tab" onclick="showPage('almacen')" id="tab-almacen">Almacén</div>
+    <div class="tab" id="tab-inf" style="display:none" onclick="showPage('informes')">Informes</div>
+    <div class="tab" id="tab-settings" style="display:none" onclick="showPage('settings')">Ajustes</div>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <div class="pg active" id="pg-cirugias">
+    <div class="sb"><span>🔍</span><input id="srch" type="text" placeholder="Hospital, médico, HC, NEO…" oninput="renderList()"></div>
+    <div class="stb">
+      <div class="sc"><div class="sn" style="color:#0ea5e9" id="st-h">0</div><div class="sl">Hoy</div></div>
+      <div class="sc"><div class="sn" style="color:#10b981" id="st-s">0</div><div class="sl">Semana</div></div>
+      <div class="sc"><div class="sn" style="color:#f59e0b" id="st-m">0</div><div class="sl">Mes</div></div>
+      <div class="sc"><div class="sn" style="color:#8b5cf6" id="st-a">0</div><div class="sl">Año</div></div>
+    </div>
+    <div class="fr" id="fr-div">
+      <div class="fc active" onclick="setFDiv(this,'all')">Todas</div>
+      <div class="fc" onclick="setFDiv(this,'trauma')">🦴 Trauma</div>
+      <div class="fc" onclick="setFDiv(this,'joint')">🦵 Joint</div>
+      <div class="fc" onclick="setFDiv(this,'mitek')">🔗 Mitek</div>
+    </div>
+    <div class="fr" id="fr-estado">
+      <div class="fc active" onclick="setFEstado(this,'all')">Todas</div>
+      <div class="fc" onclick="setFEstado(this,'pre')">Pre</div>
+      <div class="fc" onclick="setFEstado(this,'post')">Post</div>
+      <div class="fc" onclick="setFEstado(this,'anulada')">Anuladas</div>
+    </div>
+    <div id="list"><div class="empty"><div class="ei">🗂️</div>Cargando…</div></div>
+  </div>
+
+  <div class="pg" id="pg-calendario">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <button onclick="chMonth(-1)" style="width:34px;height:34px;border-radius:50%;background:#1a2236;border:1px solid #1e2d45;color:#f0f4f8;font-size:16px">‹</button>
+      <div style="font-weight:700;font-size:17px" id="cal-lbl"></div>
+      <button onclick="chMonth(1)" style="width:34px;height:34px;border-radius:50%;background:#1a2236;border:1px solid #1e2d45;color:#f0f4f8;font-size:16px">›</button>
+    </div>
+    <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:14px"></div>
+    <div id="cal-ttl" style="font-weight:700;font-size:13px;color:#8899aa;margin-bottom:10px"></div>
+    <div id="cal-list"></div>
+  </div>
+
+  <div class="pg" id="pg-neo">
+    <div style="background:rgba(14,165,233,.08);border:1px solid rgba(14,165,233,.2);border-radius:12px;padding:13px;margin-bottom:14px">
+      <div style="font-weight:700;font-size:13px;margin-bottom:4px">⏰ Revisión NEO antes de las 16:00h</div>
+      <div style="font-size:12px;color:#8899aa">Alarma 14:00h · Resumen gerente 15:00h</div>
+    </div>
+    <div id="neo-list"><div class="empty"><div class="ei">📋</div>Sin NEOs próximos</div></div>
+  </div>
+
+  <div class="pg" id="pg-mensajes">
+    <div class="fr">
+      <div class="fc active" onclick="setMF(this,'todos')">Todos</div>
+      <div class="fc" onclick="setMF(this,'recibidos')">Recibidos</div>
+      <div class="fc" onclick="setMF(this,'urgente')">Urgentes</div>
+      <div class="fc" onclick="setMF(this,'informe')">Informes</div>
+    </div>
+    <div id="msg-list"><div class="empty"><div class="ei">✉️</div>Sin mensajes</div></div>
+  </div>
+
+  <div class="pg" id="pg-gastos">
+    <div class="stb" style="grid-template-columns:repeat(3,1fr)">
+      <div class="sc"><div class="sn" style="color:#0ea5e9" id="g-s">0€</div><div class="sl">Semana</div></div>
+      <div class="sc"><div class="sn" style="color:#f59e0b" id="g-m">0€</div><div class="sl">Mes</div></div>
+      <div class="sc"><div class="sn" style="color:#8b5cf6" id="g-a">0€</div><div class="sl">Año</div></div>
+    </div>
+    <div id="gastos-list"><div class="empty"><div class="ei">🧾</div>Sin gastos</div></div>
+    <button class="abtn ag" style="margin-top:8px" onclick="expGastos()">📥 Exportar Excel</button>
+  </div>
+
+  <div class="pg" id="pg-km">
+    <div class="fr">
+      <div class="fc active" id="km-tab-emp" onclick="setKmTab('empresa')">🏢 Km empresa</div>
+      <div class="fc" id="km-tab-par" onclick="setKmTab('particulares')">🚗 Km particulares</div>
+    </div>
+    <div style="background:#111827;border:1px solid #1e2d45;border-radius:12px;padding:16px;margin-bottom:14px;text-align:center">
+      <div style="font-size:12px;color:#4a6080;margin-bottom:4px">KM HOY</div>
+      <div style="font-weight:800;font-size:28px;color:#10b981" id="km-hoy">— km</div>
+    </div>
+    <div id="km-adm-note" style="display:none;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:11px;margin-bottom:12px;font-size:12px;color:#f59e0b">
+      ℹ️ Solo administración puede registrar lecturas de cuentakilómetros
+    </div>
+    <button class="abtn ap" id="btn-km-add" onclick="openKmMod()">📷 Registrar cuentakilómetros</button>
+    <button class="abtn ag" onclick="expKm()">📥 Exportar Excel</button>
+    <div id="km-list"><div class="empty"><div class="ei">🚗</div>Sin registros</div></div>
+  </div>
+
+  <div class="pg" id="pg-medicos">
+    <div style="margin-bottom:16px">
+      <div style="font-weight:700;font-size:12px;color:#4a6080;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">🔗 Accesos rápidos</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+        <div onclick="window.open('https://neogestionepisodios.es','_blank')" style="background:#111827;border:1px solid #1e2d45;border-radius:12px;padding:14px;text-align:center;cursor:pointer"><div style="font-size:26px;margin-bottom:6px">📋</div><div style="font-weight:700;font-size:11px;color:#0ea5e9">NEO</div></div>
+        <div onclick="window.open('https://orthocatalog.jnjmedtech.com/','_blank')" style="background:#111827;border:1px solid #1e2d45;border-radius:12px;padding:14px;text-align:center;cursor:pointer"><div style="font-size:26px;margin-bottom:6px">🔬</div><div style="font-weight:700;font-size:11px;color:#10b981">OrthoCatalog</div></div>
+        <div onclick="window.open('https://www.showpad.com','_blank')" style="background:#111827;border:1px solid #1e2d45;border-radius:12px;padding:14px;text-align:center;cursor:pointer"><div style="font-size:26px;margin-bottom:6px">📊</div><div style="font-weight:700;font-size:11px;color:#8b5cf6">Showpad</div></div>
+      </div>
+    </div>
+    <div class="sb"><span>🔍</span><input type="text" placeholder="Buscar médico…" oninput="filterMed(this.value)" style="padding:0;border:none;background:none"></div>
+    <div id="med-list"><div class="empty"><div class="ei">👨‍⚕️</div>Sin médicos</div></div>
+  </div>
+
+  <div class="pg" id="pg-docs">
+    <div id="docs-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div>
+  </div>
+
+  <div class="pg" id="pg-incidencias">
+    <div class="fr">
+      <div class="fc active" onclick="setIF(this,'todas')">Todas</div>
+      <div class="fc" onclick="setIF(this,'administracion')">Admin</div>
+      <div class="fc" onclick="setIF(this,'logistica')">Logística</div>
+      <div class="fc" onclick="setIF(this,'pendientes')">Pendientes</div>
+    </div>
+    <div id="inc-list"><div class="empty"><div class="ei">✅</div>Sin incidencias</div></div>
+  </div>
+
+  <div class="pg" id="pg-informes">
+    <div class="ds2">
+      <div class="dst">📊 Generar informe</div>
+      <div class="fg"><label class="fl">Tipo</label>
+        <select id="inf-t" onchange="switchIT()"><option value="hospital">Por hospital</option><option value="medico">Por médico</option><option value="comercial">Por comercial</option><option value="clinical">Por clinical</option></select></div>
+      <div class="fg" id="if-h"><label class="fl">Hospital</label><input id="inf-h" type="text" placeholder="Vacío = todos"></div>
+      <div class="fg" id="if-m" style="display:none"><label class="fl">Médico</label><input id="inf-m" type="text"></div>
+      <div class="fg" id="if-c" style="display:none"><label class="fl">Comercial</label><input id="inf-c" type="text"></div>
+      <div class="fg" id="if-cl" style="display:none"><label class="fl">Clinical</label><input id="inf-cl" type="text"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="fg"><label class="fl">Desde</label><input id="inf-d" type="date"></div>
+        <div class="fg"><label class="fl">Hasta</label><input id="inf-h2" type="date"></div>
+      </div>
+      <button class="abtn ap" onclick="genInf()">📊 Generar</button>
+    </div>
+    <div id="inf-res"></div>
+  </div>
+
+  <div class="pg" id="pg-settings">
+    <div style="background:linear-gradient(135deg,rgba(14,165,233,.2),rgba(139,92,246,.2));border:1px solid rgba(14,165,233,.3);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:20px">
+      <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#0ea5e9,#8b5cf6);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px" id="s-av">CG</div>
+      <div><div style="font-weight:700;font-size:17px" id="s-name">Carlos Gómez</div><div style="font-size:12px;color:#8899aa;margin-top:2px" id="s-role">Gestor · MGtrauma</div></div>
+    </div>
+    <div id="sw-users" style="display:none;margin-bottom:20px">
+      <div style="font-weight:700;font-size:12px;color:#4a6080;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">👥 Usuarios</div>
+      <div style="background:#111827;border:1px solid #1e2d45;border-radius:12px;overflow:hidden" id="users-list"></div>
+      <button class="abtn ap" style="margin-top:8px" onclick="openNewUser()">+ Nuevo usuario</button>
+    </div>
+    <div id="sw-resp" style="display:none;margin-bottom:20px">
+      <div style="font-weight:700;font-size:12px;color:#4a6080;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">🏥 Responsables hospital</div>
+      <div style="background:#111827;border:1px solid #1e2d45;border-radius:12px;overflow:hidden" id="resp-list"></div>
+      <button class="abtn as" style="margin-top:8px" onclick="openRespMod()">✏️ Editar responsables</button>
+    </div>
+    <div id="sw-reset" style="display:none;margin-bottom:20px">
+      <button class="abtn ad" onclick="openReset()">🗑️ Resetear sistema</button>
+    </div>
+    <button class="abtn ad" onclick="doLogout()">🚪 Cerrar sesión</button>
+    <div style="text-align:center;padding:16px 0;font-size:11px;color:#4a6080">MGtrauma v3.0 · DePuy Synthes Murcia</div>
+  </div>
+
+  <!-- ACCESOS DIRECTOS -->
+  <div class="pg" id="pg-accesos">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;padding-top:8px">
+      <div onclick="window.open('https://neogestionepisodios.es','_blank')" style="background:#111827;border:1px solid #1e2d45;border-radius:14px;padding:20px;text-align:center;cursor:pointer">
+        <div style="font-size:36px;margin-bottom:10px">📋</div>
+        <div style="font-weight:700;font-size:14px;color:#0ea5e9;margin-bottom:4px">NEO</div>
+        <div style="font-size:11px;color:#4a6080">Gestión episodios</div>
+      </div>
+      <div onclick="window.open('https://orthocatalog.jnjmedtech.com/','_blank')" style="background:#111827;border:1px solid #1e2d45;border-radius:14px;padding:20px;text-align:center;cursor:pointer">
+        <div style="font-size:36px;margin-bottom:10px">🔬</div>
+        <div style="font-weight:700;font-size:14px;color:#10b981;margin-bottom:4px">Catálogo Synthes</div>
+        <div style="font-size:11px;color:#4a6080">Fichas técnicas</div>
+      </div>
+      <div onclick="window.open('https://jnj.showpad.biz/login?redirect=https%3A%2F%2Fjnj.showpad.biz%2Fwebapp2%2Fhome','_blank')" style="background:#111827;border:1px solid #1e2d45;border-radius:14px;padding:20px;text-align:center;cursor:pointer">
+        <div style="font-size:36px;margin-bottom:10px">📊</div>
+        <div style="font-weight:700;font-size:14px;color:#8b5cf6;margin-bottom:4px">Showpad</div>
+        <div style="font-size:11px;color:#4a6080">Presentaciones</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALMACÉN -->
+  <div class="pg" id="pg-almacen">
+    <div class="fr">
+      <div class="fc active" id="alm-tab-imp" onclick="setAlmTab('implantes')">🦴 Implantes</div>
+      <div class="fc" id="alm-tab-ins" onclick="setAlmTab('instrumental')">🔧 Instrumental</div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <div class="sb" style="flex:1;margin-bottom:0"><span>🔍</span><input type="text" id="alm-search" placeholder="Buscar material…" oninput="filterAlm(this.value)" style="padding:0;border:none;background:none;color:#f0f4f8;font-size:14px;flex:1;outline:none"></div>
+    </div>
+    <div id="alm-stats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px">
+      <div class="sc"><div class="sn" style="color:#0ea5e9" id="alm-total">0</div><div class="sl">Total refs</div></div>
+      <div class="sc"><div class="sn" style="color:#f59e0b" id="alm-bajo">0</div><div class="sl">Stock bajo</div></div>
+      <div class="sc"><div class="sn" style="color:#ef4444" id="alm-cero">0</div><div class="sl">Sin stock</div></div>
+    </div>
+    <div id="alm-list"><div class="empty"><div class="ei">📦</div>Sin materiales</div></div>
+  </div>
+
+    <!-- HOSPITALES -->
+  <div class="pg" id="pg-hospitales">
+    <div class="sb"><span>🔍</span><input type="text" placeholder="Buscar hospital…" oninput="filterHosp(this.value)" style="padding:0;border:none;background:none;color:#f0f4f8;font-size:14px;flex:1;outline:none"></div>
+    <div id="hosp-list"><div class="empty"><div class="ei">🏥</div>Sin hospitales</div></div>
+  </div>
+
+  <!-- CLÍNICAS -->
+  <div class="pg" id="pg-clinicas">
+    <div class="sb"><span>🔍</span><input type="text" placeholder="Buscar clínica…" oninput="filterClin(this.value)" style="padding:0;border:none;background:none;color:#f0f4f8;font-size:14px;flex:1;outline:none"></div>
+    <div id="clin-list"><div class="empty"><div class="ei">🏨</div>Sin clínicas</div></div>
+  </div>
+
+  <button class="fab" id="fab" onclick="onFab()">+</button>
+  <div class="nav">
+    <div class="ni active" id="ni-c" onclick="showPage('cirugias')"><div class="ni-i">🗂️</div><div class="ni-l">Cirugías</div></div>
+    <div class="ni" id="ni-cal" onclick="showPage('calendario')"><div class="ni-i">📅</div><div class="ni-l">Calendario</div></div>
+    <div class="ni" id="ni-n" onclick="showPage('neo')"><div class="ni-i">📋</div><div class="ni-l">Episodios</div></div>
+    <div class="ni" id="ni-m" onclick="showPage('mensajes')"><div class="ni-i">✉️</div><div class="ni-l">Mensajes</div></div>
+    <div class="ni" id="ni-i" onclick="showPage('incidencias')"><div class="ni-i">⚠️</div><div class="ni-l">Incidencias</div></div>
+  </div>
+
+  <div class="dv" id="dv-cir"><div class="dvh"><button class="bb" onclick="closeDv('dv-cir')">‹</button><div class="dvt" id="dv-cir-t">Cirugía</div></div><div style="padding:16px;padding-bottom:40px" id="dv-cir-b"></div></div>
+  <div class="dv" id="dv-msg"><div class="dvh"><button class="bb" onclick="closeDv('dv-msg')">‹</button><div class="dvt" id="dv-msg-t">Mensaje</div></div><div style="padding:16px" id="dv-msg-b"></div></div>
+
+  <div class="mob" id="mo-dyn" onclick="if(event.target===this)this.classList.remove('open')"><div class="mod" id="mo-dyn-i"></div></div>
+
+  <!-- MODAL CIRUGÍA -->
+  <div class="mob" id="mo-cir" onclick="if(event.target===this)closeM('mo-cir')">
+    <div class="mod">
+      <div class="mh"></div><div class="mt" id="mo-cir-t">Nueva Cirugía</div>
+      <div class="fg"><label class="fl">Hospital *</label><input id="c-h" type="text" placeholder="Hospital…" oninput="acS(this,'hospitals','ac-h')" autocomplete="off"><div class="acl" id="ac-h"></div></div>
+      <div class="fg"><label class="fl">Cirujano *</label><input id="c-d" type="text" placeholder="Cirujano…" oninput="acS(this,'doctors','ac-d')" autocomplete="off"><div class="acl" id="ac-d"></div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="fg"><label class="fl">Fecha *</label><input id="c-f" type="date"></div>
+        <div class="fg"><label class="fl">Hora</label><input id="c-hr" type="time"></div>
+      </div>
+
+      <div class="fg"><label class="fl">División *</label>
+        <div style="background:#1a2236;border:1px solid #1e2d45;border-radius:10px;padding:4px 12px">
+          <div class="chk"><input type="checkbox" id="div-trauma" onchange="updSubtipo()"><label for="div-trauma">🦴 Trauma</label></div>
+          <div class="chk"><input type="checkbox" id="div-joint" onchange="updSubtipo()"><label for="div-joint">🦵 Joint</label></div>
+          <div class="chk"><input type="checkbox" id="div-mitek" onchange="updSubtipo()"><label for="div-mitek">🔗 Mitek</label></div>
+        </div></div>
+      <div id="grp-trauma" style="display:none" class="fg"><label class="fl">Trauma — Zona anatómica</label>
+        <div style="display:flex;flex-wrap:wrap;gap:6px" id="trauma-zonas">
+          <label style="font-size:12px;background:#1a2236;padding:4px 8px;border-radius:6px;border:1px solid #1e2d45;cursor:pointer"><input type="checkbox" style="margin-right:4px">Clavícula</label>
+          <label style="font-size:12px;background:#1a2236;padding:4px 8px;border-radius:6px;border:1px solid #1e2d45;cursor:pointer"><input type="checkbox" style="margin-right:4px">Húmero</label>
+          <label style="font-size:12px;background:#1a2236;padding:4px 8px;border-radius:6px;border:1px solid #1e2d45;cursor:pointer"><input type="checkbox" style="margin-right:4px">Codo</label>
+          <label style="font-size:12px;background:#1a2236;padding:4px 8px;border-radius:6px;border:1px solid #1e2d45;cursor:pointer"><input type="checkbox" style="margin-right:4px">Radio</label>
+          <label style="font-size:12px;background:#1a2236;padding:4px 8px;border-radius:6px;border:1px solid #1e2d45;cursor:pointer"><input type="checkbox" style="margin-right:4px">Cúbito</label>
+          <label style="font-size:12px;background:#1a2236;padding:4px 8px;border-radius:6px;border:1px solid #1e2d45;cursor:pointer"><input type="checkbox" style="margin-right:4px">Muñeca</label>
+          <label style="font-size:12px;background:#1a2236;padding:4px 8px;border-radius:6px;border:1px solid #1e2d45;cursor:pointer"><input type="checkbox" style="margin-right:4px">Mano</label>
+          <label style="font-size:12px;background:#1a2236;padding:4px 8px;border-radius:6px;border:1px solid #1e2d45;cursor:pointer"><input type="checkbox" style="margin-right:4px">Pelvis</label>
+          <label style="font-size:12px;background:#1a2236;padding:4px 8px;border-radius:6px;border:1px solid #1e2d45;cursor:pointer"><input type="checkbox" style="margin-right:4px">Cadera</label>
+          <label style="font-size:12px;background:#1a2236;padding:4px 8px;border-radius:6px;border:1px solid #1e2d45;cursor:pointer"><input type="checkbox" style="margin-right:4px">Fémur</label>
+          <label style="font-size:12px;background:#1a2236;padding:4px 8px;border-radius:6px;border:1px solid #1e2d45;cursor:pointer"><input type="checkbox" style="margin-right:4px">Rodilla</label>
+          <label style="font-size:12px;background:#1a2236;padding:4px 8px;border-radius:6px;border:1px solid #1e2d45;cursor:pointer"><input type="checkbox" style="margin-right:4px">Tibia</label>
+          <label style="font-size:12px;background:#1a2236;padding:4px 8px;border-radius:6px;border:1px solid #1e2d45;cursor:pointer"><input type="checkbox" style="margin-right:4px">Peroné</label>
+          <label style="font-size:12px;background:#1a2236;padding:4px 8px;border-radius:6px;border:1px solid #1e2d45;cursor:pointer"><input type="checkbox" style="margin-right:4px">Tobillo</label>
+          <label style="font-size:12px;background:#1a2236;padding:4px 8px;border-radius:6px;border:1px solid #1e2d45;cursor:pointer"><input type="checkbox" style="margin-right:4px">Pie</label>
+        </div></div>
+      <div id="grp-joint" style="display:none" class="fg"><label class="fl">Joint — Zona anatómica</label>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <label style="font-size:12px;background:#1a2236;padding:4px 8px;border-radius:6px;border:1px solid #1e2d45;cursor:pointer"><input type="checkbox" style="margin-right:4px">Hombro</label>
+          <label style="font-size:12px;background:#1a2236;padding:4px 8px;border-radius:6px;border:1px solid #1e2d45;cursor:pointer"><input type="checkbox" style="margin-right:4px">Cadera</label>
+          <label style="font-size:12px;background:#1a2236;padding:4px 8px;border-radius:6px;border:1px solid #1e2d45;cursor:pointer"><input type="checkbox" style="margin-right:4px">Rodilla</label>
+        </div></div>
+      <div id="grp-mitek" style="display:none" class="fg"><label class="fl">Mitek — Zona anatómica</label>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <label style="font-size:12px;background:#1a2236;padding:4px 8px;border-radius:6px;border:1px solid #1e2d45;cursor:pointer"><input type="checkbox" style="margin-right:4px">Hombro</label>
+          <label style="font-size:12px;background:#1a2236;padding:4px 8px;border-radius:6px;border:1px solid #1e2d45;cursor:pointer"><input type="checkbox" style="margin-right:4px">Rodilla</label>
+          <label style="font-size:12px;background:#1a2236;padding:4px 8px;border-radius:6px;border:1px solid #1e2d45;cursor:pointer"><input type="checkbox" style="margin-right:4px">Pequeñas articulaciones</label>
+        </div></div>
+      <div class="fg"><label class="fl">Material *</label>
+        <div style="background:#1a2236;border:1px solid #1e2d45;border-radius:10px;padding:4px 12px">
+          <div class="chk"><input type="checkbox" id="ck-dep"><label for="ck-dep">📁 Depósito</label></div>
+          <div class="chk"><input type="checkbox" id="ck-rot" onchange="togNeo()"><label for="ck-rot">📦 Rotativo</label></div>
+          <div class="chk"><input type="checkbox" id="ck-pre" onchange="togPre()"><label for="ck-pre">🏥 Préstamo otro hospital</label></div>
+        </div></div>
+      <div id="grp-neo" style="display:none" class="fg"><label class="fl">Número NEO</label><input id="c-neo" type="text" placeholder="Nº NEO…"><div style="font-size:11px;color:#f59e0b;margin-top:4px">⏰ Alarma revisión 14:00h</div></div>
+      <div id="grp-pre" style="display:none" class="fg"><label class="fl">Materiales en préstamo</label><div id="pre-c"></div><button type="button" onclick="addPre()" style="width:100%;padding:9px;background:rgba(14,165,233,.1);border:1px dashed #0ea5e9;border-radius:10px;color:#0ea5e9;font-weight:600;font-size:12px">+ Añadir material</button></div>
+      <div class="fg"><label class="fl">Clinical (usuario del sistema)</label><select id="c-com" multiple style="min-height:70px"><option value="">Sin asignar</option></select></div>
+      <div class="fg"><label class="fl">Enfermero externo (texto libre)</label><input id="c-enf" type="text" placeholder="Nombre del enfermero externo…"></div>
+      <div class="fg"><label class="fl">Nº Historia Clínica</label><input id="c-hc" type="text" placeholder="Nº HC del paciente…"></div>
+      <button class="abtn ap" id="btn-cir" onclick="saveCir()">✓ Crear cirugía</button>
+      <button class="abtn as" onclick="closeM('mo-cir')">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- MODAL MENSAJE -->
+  <div class="mob" id="mo-msg" onclick="if(event.target===this)closeM('mo-msg')">
+    <div class="mod"><div class="mh"></div><div class="mt">Nuevo Mensaje</div>
+      <div class="fg"><label class="fl">Para</label><select id="msg-dest" multiple style="min-height:90px"></select></div>
+      <div class="fg"><label class="fl">Categoría</label><select id="msg-cat"><option value="comentario">💬 Comentario</option><option value="informe">📊 Informe</option><option value="solicitud">📋 Solicitud</option><option value="urgente">🚨 Urgente</option></select></div>
+      <div class="fg"><label class="fl">Asunto</label><input id="msg-as" type="text" placeholder="Asunto…"></div>
+      <div class="fg"><label class="fl">Mensaje</label><textarea id="msg-cu" style="min-height:100px" placeholder="Escribe tu mensaje…"></textarea></div>
+      <button class="abtn ap" onclick="sendMsg()">✉️ Enviar</button>
+      <button class="abtn as" onclick="closeM('mo-msg')">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- MODAL GASTO -->
+  <div class="mob" id="mo-gas" onclick="if(event.target===this)closeM('mo-gas')">
+    <div class="mod"><div class="mh"></div><div class="mt">Nuevo Gasto</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="fg"><label class="fl">Fecha *</label><input id="g-f" type="date"></div>
+        <div class="fg"><label class="fl">Importe € *</label><input id="g-i" type="number" step="0.01" placeholder="0.00"></div>
+      </div>
+      <div class="fg"><label class="fl">Concepto *</label><select id="g-c"><option value="">Seleccionar…</option><option value="combustible">⛽ Combustible</option><option value="dietas">🍽️ Dietas</option><option value="parking">🅿️ Parking</option><option value="peaje">🛣️ Peaje</option><option value="hotel">🏨 Hotel</option><option value="material">📦 Material</option><option value="otros">📝 Otros</option></select></div>
+      <div class="fg"><label class="fl">Motivo</label><input id="g-m" type="text" placeholder="Hospital, médico, reunión…"></div>
+      <div class="fg"><label class="fl">Justificación</label><textarea id="g-j" style="min-height:70px"></textarea></div>
+      <div class="fg"><label class="fl">Foto ticket</label>
+        <div class="pu" onclick="document.getElementById('g-foto').click()"><div style="font-size:28px;margin-bottom:6px">📷</div><div style="font-size:12px;color:#8899aa" id="g-flbl">Tocar para adjuntar</div></div>
+        <input type="file" id="g-foto" accept="image/*" capture="environment" style="display:none" onchange="onGF(this)"></div>
+      <button class="abtn ap" onclick="saveGasto()">✓ Guardar gasto</button>
+      <button class="abtn as" onclick="closeM('mo-gas')">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- MODAL KM -->
+  <div class="mob" id="mo-km" onclick="if(event.target===this)closeM('mo-km')">
+    <div class="mod"><div class="mh"></div><div class="mt" id="km-mod-t">Registrar Kilómetros</div>
+      <div class="fg"><label class="fl">Lectura cuentakilómetros</label><input id="km-l" type="number" placeholder="Ej: 87543"></div>
+      <div class="fg"><label class="fl">Fecha y hora</label><input id="km-f" type="datetime-local"></div>
+      <div class="fg"><label class="fl">Foto (recomendado)</label>
+        <div class="pu" onclick="document.getElementById('km-foto').click()"><div style="font-size:28px;margin-bottom:6px">📷</div><div style="font-size:12px;color:#8899aa" id="km-flbl">Tocar para capturar</div></div>
+        <input type="file" id="km-foto" accept="image/*" capture="environment" style="display:none" onchange="onKF(this)"></div>
+      <button class="abtn ap" onclick="saveKm()">✓ Registrar</button>
+      <button class="abtn as" onclick="closeM('mo-km')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- FIREBASE COMPAT - Un solo bloque, sin módulos -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyDRDsBxKFryq2of2m7ah8Pv3sT8Wp7jdV8",
+  authDomain:"mgtrauma-e3693.firebaseapp.com",
+  projectId:"mgtrauma-e3693",
+  storageBucket:"mgtrauma-e3693.firebasestorage.app",
+  messagingSenderId:"194653094711",
+  appId:"1:194653094711:web:aa25e01ff7fa2b182c10b2"
+});
+var db=firebase.firestore(), auth=firebase.auth(), st=firebase.storage();
+
+// ── ESTADO ────────────────────────────────
+var CU=null, hospitals=[], doctors=[], tipos=[], users=[], respH={};
+var surgeries=[], messages=[], gastos=[], kmRec=[], medicos=[], docs=[], incs=[];
+var surgCnt=0, editId=null, selDivVal=null, curPage='cirugias';
+var gFoto=null, kFoto=null, mff='todos', iff='todas', carpetaActual=null;
+var ROLES=[{id:'gestor',l:'Gestor'},{id:'gerente',l:'Gerente'},{id:'comercial',l:'Comercial'},
+           {id:'clinical',l:'Clinical'},{id:'logistica',l:'Logística'},{id:'administracion',l:'Administración'}];
+var CARPETAS=[{id:'presentaciones',n:'Presentaciones',i:'📊'},{id:'tecnicas',n:'Técnicas quirúrgicas',i:'🔬'},
+              {id:'comunicados',n:'Comunicados',i:'📢'},{id:'formularios',n:'Formularios',i:'📝'},
+              {id:'logistica-doc',n:'Logística — Instrumental',i:'🔧'}];
+
+function rol(){return CU&&CU.p?CU.p.rol:'comercial';}
+function canInf(){return['gestor','gerente'].includes(rol());}
+function ini(n){return(n||'U').split(' ').slice(0,2).map(function(x){return x[0];}).join('').toUpperCase();}
+function toast(msg,t){var el=document.getElementById('toast');el.textContent=msg;el.style.background=t==='w'?'#f59e0b':t==='e'?'#ef4444':'#10b981';el.classList.add('show');setTimeout(function(){el.classList.remove('show');},3000);}
+function closeM(id){document.getElementById(id).classList.remove('open');}
+function closeDv(id){document.getElementById(id).classList.remove('open');}
+function openDyn(html){document.getElementById('mo-dyn-i').innerHTML=html;document.getElementById('mo-dyn').classList.add('open');}
+
+// ── AUTH ──────────────────────────────────
+auth.onAuthStateChanged(function(user){
+  if(user){
+    CU=user;
+    db.collection('users').doc(user.uid).get().then(function(s){
+      if(s.exists) CU.p=s.data();
+      showApp(); loadCat(); subscribeAll(); setupUI(); schedAlerts();
+    });
+  } else { CU=null; showLogin(); }
+});
+
+document.getElementById('li-btn').addEventListener('click',function(){
+  var e=document.getElementById('li-e').value.trim(), p=document.getElementById('li-p').value;
+  var err=document.getElementById('li-err'), btn=document.getElementById('li-btn');
+  err.style.display='none'; btn.textContent='Entrando…'; btn.disabled=true;
+  auth.signInWithEmailAndPassword(e,p).catch(function(){
+    err.style.display='block'; btn.textContent='Entrar'; btn.disabled=false;
+  });
+});
+document.getElementById('li-p').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('li-btn').click();});
+function doLogout(){auth.signOut();}
+function showApp(){document.getElementById('login').style.display='none';document.getElementById('app').style.display='block';}
+function showLogin(){document.getElementById('login').style.display='flex';document.getElementById('app').style.display='none';}
+
+// ── SETUP ─────────────────────────────────
+function setupUI(){
+  var name=CU.p?CU.p.nombre:CU.email;
+  var r=rol();
+  document.getElementById('hav').textContent=ini(name);
+  document.getElementById('s-av').textContent=ini(name);
+  document.getElementById('s-name').textContent=name||'—';
+  document.getElementById('s-role').textContent=r+' · MGtrauma';
+  // Ocultar/mostrar pestañas según rol
+  var tabs=document.querySelectorAll('.tab');
+  // Informes solo gestor y gerente
+  document.getElementById('tab-inf').style.display=canInf()?'':'none';
+  // Ocultar pestaña Ajustes a comercial, clinical, logística
+  var tabSettings=tabs[10];
+  if(tabSettings){tabSettings.style.display=['gestor','gerente','administracion'].includes(r)?'':'none';}
+  // Gastos y Km visibles para todos
+  var tabGastos=tabs[4];
+  if(tabGastos){tabGastos.style.display='';}
+  var tabKm=tabs[5];
+  if(tabKm){tabKm.style.display='';}
+  // Ocultar pestaña Informes a todos menos gestor/gerente (ya manejado)
+  // Nav items
+  document.getElementById('ni-s').style.display=['gestor','gerente','administracion'].includes(r)?'':'none';
+  // Ajustes: usuarios y responsables para gestor y gerente
+  if(['gestor','gerente'].includes(r)){
+    document.getElementById('sw-users').style.display='block';
+    document.getElementById('sw-resp').style.display='block';
+    loadUsers();
+    renderRespList();
+  }
+  // Reset solo para gestor
+  if(r==='gestor') document.getElementById('sw-reset').style.display='block';
+}
+
+// ── CATALOGUES ────────────────────────────
+function loadCat(){
+  db.collection('catalogues').doc('main').get().then(function(s){
+    if(s.exists){var d=s.data();hospitals=d.hospitals||[];doctors=d.doctors||[];tipos=d.tipos||[];users=d.users||[];surgCnt=d.counter||0;respH=d.responsablesHospital||{};}
+    var u=users.map(function(u){return'<option value="'+u+'">'+u+'</option>';}).join('');
+    document.getElementById('c-com').innerHTML='<option value="">Sin asignar</option>'+u;
+    document.getElementById('c-cli').innerHTML='<option value="">Sin asignar</option>'+u;
+    document.getElementById('msg-dest').innerHTML=users.map(function(u){return'<option value="'+u+'">'+u+'</option>';}).join('');
+    renderDocs(); renderRespList();
+  });
+}
+function saveCat(x){
+  var data=Object.assign({hospitals:hospitals,doctors:doctors,tipos:tipos,users:users,counter:surgCnt,responsablesHospital:respH},x||{});
+  db.collection('catalogues').doc('main').set(data,{merge:true}).catch(function(e){console.error('saveCat error:',e);});
+}
+
+// ── SUBSCRIPTIONS ─────────────────────────
+function subscribeAll(){
+  db.collection('surgeries').orderBy('fechaTimestamp','desc').onSnapshot(function(s){
+    surgeries=s.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    renderList();updateStats();renderNeo();if(curPage==='calendario')renderCal();
+  });
+  db.collection('messages').orderBy('createdAt','desc').onSnapshot(function(s){
+    messages=s.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    renderMsgs();updateMsgBadge();
+  });
+  db.collection('gastos').orderBy('fecha','desc').onSnapshot(function(s){
+    gastos=s.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    renderGastos();updateGStats();
+  });
+  db.collection('km').orderBy('fechaTimestamp','desc').onSnapshot(function(s){
+    kmRec=s.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    renderKm();
+  });
+  db.collection('medicos').orderBy('apellidos').onSnapshot(function(s){
+    medicos=s.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    doctors=medicos.map(function(m){return m.nombre+' '+m.apellidos;});
+    renderMed();
+  });
+  db.collection('documentos').orderBy('createdAt','desc').onSnapshot(function(s){
+    docs=s.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    renderDocs();
+  });
+  subscribeHospClin();
+  subscribeAlmacen();
+  db.collection('incidencias').orderBy('createdAt','desc').onSnapshot(function(s){
+    incs=s.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    renderIncs();
+  });
+}
+
+// ── NAVIGATION ────────────────────────────
+function showPage(name){
+  curPage=name;
+  document.querySelectorAll('.mob.open').forEach(function(m){m.classList.remove('open');});
+  document.querySelectorAll('.dv.open').forEach(function(d){d.classList.remove('open');});
+  document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+  document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('active');});
+  var pg=document.getElementById('pg-'+name); if(pg) pg.classList.add('active');
+  // Activar tab correspondiente
+  var tabEl=document.getElementById('tab-'+name);
+  if(tabEl) tabEl.classList.add('active');
+  // Activar nav item
+  var niMap={cirugias:'c',calendario:'cal',neo:'n',mensajes:'m',incidencias:'i'};
+  if(niMap[name]){var ni=document.getElementById('ni-'+niMap[name]);if(ni)ni.classList.add('active');}
+  // FAB
+  var fabMap={cirugias:'+',mensajes:'✉',gastos:'+',km:'📷',medicos:'+',incidencias:'+',hospitales:'+',clinicas:'+',almacen:'+'};
+  var fab=document.getElementById('fab');
+  if(fabMap[name]){fab.style.display='flex';fab.textContent=fabMap[name];}else{fab.style.display='none';}
+  if(name==='calendario') renderCal();
+  if(name==='hospitales') renderHosp();
+  if(name==='clinicas') renderClin();
+}
+function onFab(){
+  if(curPage==='cirugias') openCirMod();
+  else if(curPage==='mensajes') document.getElementById('mo-msg').classList.add('open');
+  else if(curPage==='gastos'){document.getElementById('g-f').value=new Date().toISOString().split('T')[0];document.getElementById('mo-gas').classList.add('open');}
+  else if(curPage==='km') openKmMod();
+  else if(curPage==='medicos') openMedMod();
+  else if(curPage==='incidencias') openIncGlobal();
+  else if(curPage==='hospitales') openHospMod();
+  else if(curPage==='clinicas') openClinMod();
+  else if(curPage==='almacen') openAlmMod();
+}
+function focusSearch(){showPage('cirugias');setTimeout(function(){document.getElementById('srch').focus();},100);}
+
+// ── CIRUGÍAS RENDER ───────────────────────
+var actFDiv='all', actFEstado='all';
+function setFDiv(el,f){actFDiv=f;document.querySelectorAll('#fr-div .fc').forEach(function(c){c.classList.remove('active');});el.classList.add('active');renderList();}
+function setFEstado(el,f){actFEstado=f;document.querySelectorAll('#fr-estado .fc').forEach(function(c){c.classList.remove('active');});el.classList.add('active');renderList();}
+function renderList(){
+  var list=surgeries.slice();
+  // Filtro por división
+  if(actFDiv==='trauma') list=list.filter(function(s){return (s.divisiones||[]).includes('Trauma')||(s.division||'').toLowerCase().includes('trauma');});
+  else if(actFDiv==='joint') list=list.filter(function(s){return (s.divisiones||[]).includes('Joint')||(s.division||'').toLowerCase().includes('joint');});
+  else if(actFDiv==='mitek') list=list.filter(function(s){return (s.divisiones||[]).includes('Mitek')||(s.division||'').toLowerCase().includes('mitek');});
+  // Filtro por estado
+  if(actFEstado==='pre') list=list.filter(function(s){return s.estado==='pre';});
+  else if(actFEstado==='post') list=list.filter(function(s){return s.estado==='post';});
+  else if(actFEstado==='anulada') list=list.filter(function(s){return s.estado==='anulada';});
+  else list=list.filter(function(s){return s.estado!=='anulada';});
+  var q=document.getElementById('srch').value.toLowerCase();
+  if(q) list=list.filter(function(s){return(s.hospital||'').toLowerCase().includes(q)||(s.doctor||'').toLowerCase().includes(q)||(s.historiaClinica||'').includes(q)||(s.neoNumero||'').includes(q)||String(s.numero||'').includes(q);});
+  var el=document.getElementById('list');
+  if(!list.length){el.innerHTML='<div class="empty"><div class="ei">🗂️</div>Sin resultados</div>';return;}
+  el.innerHTML=list.map(function(s){
+    var bc=s.estado==='pre'?'bp':s.estado==='post'?'bo':'ba';
+    var bt=s.estado==='pre'?'Pre-cirugía':s.estado==='post'?'Post-cirugía':'Anulada';
+    var mats=(s.materiales||[]).map(function(m){return m==='Depósito'?'📁':m==='Rotativo'?'📦':'🏥';}).join(' ');
+    var iP=incs.some(function(i){return i.cirugiaId===s.id&&!i.resuelta;});
+    var divs=(s.divisiones&&s.divisiones.length?s.divisiones:[s.division]).filter(Boolean).join(' · ');
+    var divColor=(s.divisiones||[]).includes('Trauma')?'#0ea5e9':(s.divisiones||[]).includes('Joint')?'#10b981':'#8b5cf6';
+    var clinStr=(s.clinicals||[]).filter(Boolean).join(', ')||(s.asignado||'');
+    return '<div class="card" onclick="openDet(\''+s.id+'\')" style="border-left:4px solid '+(s.estado==='pre'?'#f59e0b':s.estado==='post'?'#10b981':'#ef4444')+'">'  
+
+
+      +'<div style="font-size:10px;color:#4a6080;font-weight:600;margin-bottom:2px">#'+(s.numero||'—')+'</div>'
+      +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">'
+      +'<div><div style="font-weight:700;font-size:14px">'+s.hospital+'</div><div style="font-size:12px;color:#38bdf8;margin-top:2px">'+s.doctor+'</div></div>'
+      +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px"><span class="bdg '+bc+'">'+bt+'</span>'
+      +(s.sinGasto?'<span class="bdg" style="background:rgba(139,92,246,.15);color:#8b5cf6">Sin gasto</span>':'')
+      +(iP?'<span class="bdg ba">⚠️ Inc.</span>':'')+'</div></div>'
+      +'<div style="display:flex;gap:8px;flex-wrap:wrap;font-size:11px;color:#8899aa">'
+      +'<span>📅 '+s.fecha+' '+s.hora+'</span><span>'+mats+'</span>'
+      +'<span style="font-size:10px;padding:2px 7px;border-radius:4px;font-weight:600;background:'+(s.division==='Osteosíntesis'?'rgba(14,165,233,.15)':'rgba(139,92,246,.15)')+';color:'+(s.division==='Osteosíntesis'?'#0ea5e9':'#8b5cf6')+'">'+s.division+'</span></div>'
+      +(clinStr?'<div style="margin-top:8px;padding-top:8px;border-top:1px solid #1e2d45;font-size:11px;color:#4a6080">Clinical: '+clinStr+(s.enfermero?' · Enf: '+s.enfermero:'')+'</div>':'')
+      +'</div>';
+  }).join('');
+}
+function updateStats(){
+  var now=new Date(),act=surgeries.filter(function(s){return s.estado!=='anulada';});
+  var sw=new Date(now);sw.setDate(now.getDate()-now.getDay());
+  function fd(s){if(!s.fecha)return null;var p=s.fecha.split('/');return new Date(p[2],p[1]-1,p[0]);}
+  document.getElementById('st-h').textContent=act.filter(function(s){var d=fd(s);return d&&d.toDateString()===now.toDateString();}).length;
+  document.getElementById('st-s').textContent=act.filter(function(s){var d=fd(s);return d&&d>=sw;}).length;
+  document.getElementById('st-m').textContent=act.filter(function(s){var d=fd(s);return d&&d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();}).length;
+  document.getElementById('st-a').textContent=act.filter(function(s){var d=fd(s);return d&&d.getFullYear()===now.getFullYear();}).length;
+}
+
+// ── CIRUGÍAS CREAR/EDITAR ─────────────────
+function updSubtipo(){
+  document.getElementById('grp-trauma').style.display=document.getElementById('div-trauma').checked?'block':'none';
+  document.getElementById('grp-joint').style.display=document.getElementById('div-joint').checked?'block':'none';
+  document.getElementById('grp-mitek').style.display=document.getElementById('div-mitek').checked?'block':'none';
+}
+function openCirMod(){
+  editId=null;selDivVal=null;
+  document.getElementById('div-os').className='do';document.getElementById('div-or').className='do';
+  ['c-h','c-d','c-neo','c-enf','c-hc'].forEach(function(id){document.getElementById(id).value='';});
+  ['ck-dep','ck-rot','ck-pre','div-trauma','div-joint','div-mitek'].forEach(function(id){document.getElementById(id).checked=false;});
+  updSubtipo();
+  // Desmarcar todas las zonas anatómicas
+  document.querySelectorAll('#grp-trauma input, #grp-joint input, #grp-mitek input').forEach(function(i){i.checked=false;});
+  // Deseleccionar clinicals
+  var comSel=document.getElementById('c-com');
+  if(comSel){Array.from(comSel.options).forEach(function(o){o.selected=false;});}
+  document.getElementById('grp-neo').style.display='none';document.getElementById('grp-pre').style.display='none';
+  document.getElementById('pre-c').innerHTML='';
+  document.getElementById('c-f').value=new Date().toISOString().split('T')[0];
+  document.getElementById('c-hr').value='';
+  document.getElementById('mo-cir-t').textContent='Nueva Cirugía';
+  document.getElementById('btn-cir').textContent='✓ Crear cirugía';
+  document.getElementById('mo-cir').classList.add('open');
+}
+// selDiv legacy removed
+function togNeo(){document.getElementById('grp-neo').style.display=document.getElementById('ck-rot').checked?'block':'none';}
+function togPre(){document.getElementById('grp-pre').style.display=document.getElementById('ck-pre').checked?'block':'none';}
+function addPre(){
+  var c=document.getElementById('pre-c'),r=document.createElement('div');
+  r.style.cssText='display:grid;grid-template-columns:1fr 1fr auto;gap:7px;margin-bottom:7px;align-items:center';
+  r.innerHTML='<input type="text" class="pho" placeholder="Hospital origen" style="padding:8px;font-size:12px"><input type="text" class="pma" placeholder="Material" style="padding:8px;font-size:12px"><button onclick="this.parentElement.remove()" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#ef4444;border-radius:7px;padding:7px;width:32px;height:32px">✕</button>';
+  c.appendChild(r);
+}
+function saveCir(){
+  var h=document.getElementById('c-h').value.trim(), d=document.getElementById('c-d').value.trim();
+  var f=document.getElementById('c-f').value, hr=document.getElementById('c-hr').value;
+  var com='', cli='';
+  var neo=document.getElementById('c-neo').value.trim();
+  var matD=document.getElementById('ck-dep').checked, matR=document.getElementById('ck-rot').checked, matP=document.getElementById('ck-pre').checked;
+  var divTrauma=document.getElementById('div-trauma').checked;
+  var divJoint=document.getElementById('div-joint').checked;
+  var divMitek=document.getElementById('div-mitek').checked;
+  var enf=document.getElementById('c-enf').value.trim();
+  var hc=document.getElementById('c-hc').value.trim();
+  var clinicals=Array.from(document.getElementById('c-com').selectedOptions).map(function(o){return o.value;}).filter(Boolean);
+  if(!h||!d||!f||(!divTrauma&&!divJoint&&!divMitek)||(!matD&&!matR&&!matP)){toast('⚠️ Rellena los campos obligatorios (división y material)','w');return;}
+  var btn=document.getElementById('btn-cir');btn.textContent='Guardando…';btn.disabled=true;
+  if(!hospitals.includes(h)){hospitals.push(h);}
+  if(!doctors.includes(d)){doctors.push(d);}
+  // tipos se añaden via divisiones
+  surgCnt++;
+  var prestamos=[];
+  var phos=document.querySelectorAll('.pho'), pmas=document.querySelectorAll('.pma');
+  for(var pi=0;pi<phos.length;pi++){var ph=phos[pi].value.trim(),pm=pmas[pi]?pmas[pi].value.trim():'';if(ph||pm)prestamos.push({hospital:ph,material:pm,revisado:false,retirado:false,ordenRetirada:false});}
+  var fp=f.split('-'); var fStr=fp[2]+'/'+fp[1]+'/'+fp[0];
+  var mats=[];if(matD)mats.push('Depósito');if(matR)mats.push('Rotativo');if(matP)mats.push('Préstamo otro H.');
+  // Recoger divisiones y zonas anatómicas
+  var divisiones=[];
+  if(divTrauma){divisiones.push('Trauma');} if(divJoint){divisiones.push('Joint');} if(divMitek){divisiones.push('Mitek');}
+  var zonasTrauma=divTrauma?Array.from(document.querySelectorAll('#grp-trauma input:checked')).map(function(i){return i.parentElement.textContent.trim();}):[];
+  var zonasJoint=divJoint?Array.from(document.querySelectorAll('#grp-joint input:checked')).map(function(i){return i.parentElement.textContent.trim();}):[];
+  var zonasMitek=divMitek?Array.from(document.querySelectorAll('#grp-mitek input:checked')).map(function(i){return i.parentElement.textContent.trim();}):[];
+  var data={numero:surgCnt,hospital:h,doctor:d,tipo:divisiones.join('+'),divisiones:divisiones,zonasTrauma:zonasTrauma,zonasJoint:zonasJoint,zonasMitek:zonasMitek,clinicals:clinicals,enfermero:enf,historiaClinica:hc,neoNumero:neo,neoRevisado:false,
+    fecha:fStr,fechaTimestamp:new Date(f+'T'+(hr||'00:00')),hora:hr||'--:--',
+    division:divisiones.join(' + '),materiales:mats,prestamos:prestamos,
+    estado:'pre',altaPor:CU.p?CU.p.nombre:CU.email,revisado:false,revisorNombre:'',
+    episodio:'',comentarios:'',adminObservaciones:'',adminVistoBueno:false,
+    sinGasto:false,fotoUrl:'',createdAt:firebase.firestore.FieldValue.serverTimestamp()};
+  if(editId){
+    db.collection('surgeries').doc(editId).update(data).then(function(){closeM('mo-cir');toast('✓ Actualizado');});
+  } else {
+    db.collection('surgeries').add(data).then(function(){
+      saveCat({counter:surgCnt});
+      // Notificar al gerente
+      notifGerente('📅 Nueva cirugía #'+surgCnt,'Hospital: '+h+' — '+d+' ('+fStr+'). Registrada por '+(CU.p?CU.p.nombre:CU.email)+'.');
+      closeM('mo-cir');toast('✓ Cirugía #'+surgCnt+' creada');
+    }).catch(function(e){toast('Error: '+e.message,'e');});
+  }
+  btn.textContent='✓ Crear cirugía';btn.disabled=false;editId=null;
+}
+
+// ── DETAIL CIRUGÍA ────────────────────────
+function openDet(id){
+  var s=surgeries.find(function(x){return x.id===id;}); if(!s) return;
+  document.getElementById('dv-cir-t').textContent='#'+(s.numero||'—')+' · '+s.hospital;
+  var mats=s.materiales||[], isPost=s.estado==='post';
+  var incA=incs.filter(function(i){return i.cirugiaId===id&&i.tipo==='administracion';});
+  var incL=incs.filter(function(i){return i.cirugiaId===id&&i.tipo==='logistica';});
+  var divs=(s.divisiones&&s.divisiones.length?s.divisiones:[s.division]).filter(Boolean).join(' + ');
+  var zonas=[(s.zonasTrauma||[]).join(', '),(s.zonasJoint||[]).join(', '),(s.zonasMitek||[]).join(', ')].filter(Boolean).join(' | ');
+  var clinStr=(s.clinicals||[]).filter(Boolean).join(', ')||(s.asignado||'—');
+  document.getElementById('dv-cir-b').innerHTML=
+    '<div class="ds2"><div class="dst">📋 Información</div>'
+    +'<div class="dr"><span class="dl">Hospital</span><span>'+s.hospital+'</span></div>'
+    +'<div class="dr"><span class="dl">Cirujano</span><span>'+s.doctor+'</span></div>'
+    +'<div class="dr"><span class="dl">Fecha / Hora</span><span>'+s.fecha+' · '+s.hora+'</span></div>'
+    +'<div class="dr"><span class="dl">División</span><span>'+divs+'</span></div>'
+    +(zonas?'<div class="dr"><span class="dl">Zonas</span><span style="font-size:12px">'+zonas+'</span></div>':'')
+    +'<div class="dr"><span class="dl">Material</span><span>'+mats.join(' + ')+'</span></div>'
+    +'<div class="dr"><span class="dl">Clinical</span><span>'+clinStr+'</span></div>'
+    +(s.enfermero?'<div class="dr"><span class="dl">Enfermero</span><span>'+s.enfermero+'</span></div>':'')
+    +(s.historiaClinica?'<div class="dr"><span class="dl">Nº HC</span><span style="color:#0ea5e9;font-weight:700">'+s.historiaClinica+'</span></div>':'')
+    +'</div>'
+    +'<div class="ds2"><div class="dst">📦 Material</div>'
+    +(s.neoNumero?'<div class="dr"><span class="dl">NEO</span><span style="color:#0ea5e9;font-weight:700">'+s.neoNumero+'</span></div>':'')
+    +'<div class="cr"><div><div style="font-size:13px;font-weight:500">Material revisado</div><div style="font-size:11px;color:#4a6080">'+(s.revisado?'Por '+s.revisorNombre:'Pendiente')+'</div></div><div class="tg'+(s.revisado?' on':'')+'" onclick="togF(\''+id+'\',\'revisado\')"></div></div>'
+    +(s.neoNumero?'<div class="cr"><div><div style="font-size:13px;font-weight:500">NEO revisado</div></div><div class="tg'+(s.neoRevisado?' on':'')+'" onclick="togF(\''+id+'\',\'neoRevisado\')"></div></div>':'')
+    +'</div>'
+    +(isPost?'<div class="ds2"><div class="dst">🏥 Post-cirugía</div>'
+    +'<div class="fg"><label class="fl">Nº Historia Clínica</label><input style="padding:10px 13px;border-radius:10px;border:1px solid #1e2d45;background:#1a2236;color:#f0f4f8;font-size:14px;width:100%" value="'+(s.historiaClinica||'')+'" placeholder="Nº HC…" onblur="updF(\''+id+'\',\'historiaClinica\',this.value)"></div>'
+    +'<div class="fg"><label class="fl">Nº Episodio</label><input style="padding:10px 13px;border-radius:10px;border:1px solid #1e2d45;background:#1a2236;color:#f0f4f8;font-size:14px;width:100%" value="'+(s.episodio||'')+'" placeholder="Nº episodio…" onblur="updF(\''+id+'\',\'episodio\',this.value)"></div>'
+    +(s.fotoUrl?'<img src="'+s.fotoUrl+'" style="width:100%;border-radius:9px;margin-bottom:10px">'
+    :'<div class="pu" onclick="trigPhoto(\''+id+'\')"><div style="font-size:28px;margin-bottom:6px">📷</div><div style="font-size:12px;color:#8899aa">Subir foto del parte</div></div>')
+    +'<input type="file" id="fp-'+id+'" accept="image/*" capture="environment" style="display:none" onchange="upPhoto(\''+id+'\',this.files[0])">'
+    +'<div class="cr" style="margin-top:10px"><div><div style="font-size:13px;font-weight:500">Sin gasto</div></div><div class="tg'+(s.sinGasto?' on':'')+'" onclick="togF(\''+id+'\',\'sinGasto\')"></div></div>'
+    +'</div>'
+    :(s.estado==='pre'?'<button class="abtn ag" onclick="toPost(\''+id+'\')">🏥 Marcar como realizada</button>':''))
+    +'<div class="ds2"><div class="dst">🗂️ Administración</div>'
+    +'<div class="fg"><label class="fl">Observaciones</label><textarea style="width:100%;padding:10px;border-radius:10px;border:1px solid #1e2d45;background:#1a2236;color:#f0f4f8;font-size:13px;min-height:70px;resize:none;outline:none" onblur="updF(\''+id+'\',\'adminObservaciones\',this.value)">'+(s.adminObservaciones||'')+'</textarea></div>'
+    +'<div class="cr"><div><div style="font-size:13px;font-weight:500">Visto bueno admin</div></div><div class="tg'+(s.adminVistoBueno?' on':'')+'" onclick="togF(\''+id+'\',\'adminVistoBueno\')"></div></div>'
+    +'</div>'
+    +'<div class="ds2"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div class="dst" style="margin-bottom:0;color:#0ea5e9">🗂️ Admin ('+incA.length+')</div><button onclick="openInc(\''+id+'\',\''+s.hospital+'\',\'administracion\')" style="background:rgba(14,165,233,.15);border:1px solid rgba(14,165,233,.3);color:#0ea5e9;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer">+ Nueva</button></div>'
+    +incA.map(incCardHTML).join('')
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0 8px"><div class="dst" style="margin-bottom:0;color:#8b5cf6">🔧 Logística ('+incL.length+')</div><button onclick="openInc(\''+id+'\',\''+s.hospital+'\',\'logistica\')" style="background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.3);color:#8b5cf6;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer">+ Nueva</button></div>'
+    +incL.map(incCardHTML).join('')
+    +'</div>'
+    +'<div class="ds2"><div class="dst">💬 Comentarios</div>'
+    +'<textarea style="width:100%;padding:10px;border-radius:10px;border:1px solid #1e2d45;background:#1a2236;color:#f0f4f8;font-size:13px;min-height:70px;resize:none;outline:none" onblur="updF(\''+id+'\',\'comentarios\',this.value)">'+(s.comentarios||'')+'</textarea>'
+    +'</div>'
+    +'<button class="abtn as" onclick="editCir(\''+id+'\')">✏️ Editar expediente</button>'
+    +(s.estado!=='anulada'?'<button class="abtn ad" onclick="anulCir(\''+id+'\')">❌ Anular cirugía</button>':'');
+  document.getElementById('dv-cir').classList.add('open');
+}
+function updF(id,f,v){db.collection('surgeries').doc(id).update({[f]:v});}
+function togF(id,f){
+  var s=surgeries.find(function(x){return x.id===id;}); if(!s) return;
+  var v=!s[f], u={[f]:v};
+  if(f==='revisado') u.revisorNombre=v?CU.p?CU.p.nombre:CU.email:'';
+  // Actualizar localmente primero para evitar parpadeo
+  s[f]=v;
+  if(f==='revisado') s.revisorNombre=u.revisorNombre;
+  toast(v?'✓ Marcado':'Desmarcado');
+  // Rerenderizar inmediatamente con el valor local
+  openDet(id);
+  // Luego guardar en Firestore (sin rerenderizar al volver)
+  db.collection('surgeries').doc(id).update(u);
+}
+function toPost(id){db.collection('surgeries').doc(id).update({estado:'post'});toast('✓ Cirugía realizada');openDet(id);}
+function anulCir(id){
+  if(!confirm('¿Anular?'))return;
+  var s=surgeries.find(function(x){return x.id===id;});
+  db.collection('surgeries').doc(id).update({estado:'anulada'});
+  if(s) notifGerente('❌ Cirugía anulada #'+s.numero,'Hospital: '+s.hospital+' — '+s.doctor+' ('+s.fecha+'). Anulada por '+(CU.p?CU.p.nombre:CU.email)+'.');
+  closeDv('dv-cir');toast('❌ Anulada');
+}
+function trigPhoto(id){document.getElementById('fp-'+id).click();}
+function upPhoto(id,file){
+  toast('📷 Subiendo…');
+  var r=st.ref('partes/'+id+'_'+Date.now()+'.jpg');
+  r.put(file).then(function(){return r.getDownloadURL();}).then(function(url){
+    db.collection('surgeries').doc(id).update({fotoUrl:url});toast('✓ Foto subida');openDet(id);
+  });
+}
+function editCir(id){
+  var s=surgeries.find(function(x){return x.id===id;}); if(!s) return;
+  editId=id; closeDv('dv-cir');
+  document.getElementById('c-h').value=s.hospital; document.getElementById('c-d').value=s.doctor;
+  var fp=s.fecha.split('/'); document.getElementById('c-f').value=fp[2]+'-'+fp[1]+'-'+fp[0];
+  document.getElementById('c-hr').value=s.hora!=='--:--'?s.hora:'';
+  document.getElementById('c-t').value=s.tipo||''; document.getElementById('c-com').value=s.asignado||''; document.getElementById('c-cli').value=s.clinical||''; document.getElementById('c-neo').value=s.neoNumero||'';
+  selDiv(s.division==='Osteosíntesis'?'osteo':'orto');
+  document.getElementById('ck-dep').checked=(s.materiales||[]).includes('Depósito');
+  document.getElementById('ck-rot').checked=(s.materiales||[]).includes('Rotativo');
+  document.getElementById('ck-pre').checked=(s.materiales||[]).includes('Préstamo otro H.');
+  togNeo(); togPre();
+  document.getElementById('mo-cir-t').textContent='Editar #'+s.numero;
+  document.getElementById('btn-cir').textContent='✓ Guardar cambios';
+  document.getElementById('mo-cir').classList.add('open');
+}
+
+// ── CALENDARIO ────────────────────────────
+var calY=new Date().getFullYear(),calM=new Date().getMonth();
+var MES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+function chMonth(d){calM+=d;if(calM>11){calM=0;calY++;}if(calM<0){calM=11;calY--;}renderCal();}
+function renderCal(){
+  document.getElementById('cal-lbl').textContent=MES[calM]+' '+calY;
+  var g=document.getElementById('cal-grid'), days=['D','L','M','X','J','V','S'];
+  var html=days.map(function(d){return'<div style="text-align:center;font-size:10px;font-weight:600;color:#4a6080;padding:3px 0">'+d+'</div>';}).join('');
+  var first=new Date(calY,calM,1).getDay(), dim=new Date(calY,calM+1,0).getDate(), today=new Date();
+  var em={};
+  surgeries.forEach(function(s){if(!s.fecha)return;var p=s.fecha.split('/');if(Number(p[2])===calY&&Number(p[1])-1===calM)em[Number(p[0])]=(em[Number(p[0])]||0)+1;});
+  for(var i=0;i<first;i++) html+='<div></div>';
+  for(var dd=1;dd<=dim;dd++){
+    var isT=today.getDate()===dd&&today.getMonth()===calM&&today.getFullYear()===calY;
+    html+='<div onclick="showCalDay('+dd+')" style="aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:12px;cursor:pointer;position:relative;'+(isT?'background:#0ea5e9;color:#fff;font-weight:700;':em[dd]?'color:#38bdf8;font-weight:700;':'')+'">'
+      +dd+(em[dd]&&!isT?'<span style="position:absolute;bottom:2px;width:4px;height:4px;border-radius:50%;background:#0ea5e9"></span>':'')+'</div>';
+  }
+  g.innerHTML=html; showCalDay(today.getDate());
+}
+function showCalDay(d){
+  var evs=surgeries.filter(function(s){if(!s.fecha)return false;var p=s.fecha.split('/');return Number(p[0])===d&&Number(p[1])-1===calM&&Number(p[2])===calY;});
+  document.getElementById('cal-ttl').textContent=d+' '+MES[calM]+' — '+(evs.length?evs.length+' cirugía'+(evs.length>1?'s':''):'Sin cirugías');
+  document.getElementById('cal-list').innerHTML=evs.length?evs.map(function(s){
+    var bc=s.estado==='pre'?'bp':s.estado==='post'?'bo':'ba';
+    return'<div class="card" onclick="openDet(\''+s.id+'\')" style="border-left:4px solid '+(s.estado==='pre'?'#f59e0b':s.estado==='post'?'#10b981':'#ef4444')+'">'
+      +'<div style="font-weight:700;font-size:13px">'+s.hospital+'</div>'
+      +'<div style="font-size:12px;color:#38bdf8;margin:3px 0">'+s.doctor+'</div>'
+      +'<div style="display:flex;gap:8px;font-size:11px;color:#8899aa"><span>'+s.hora+'</span><span class="bdg '+bc+'" style="font-size:9px">'+(s.estado==='pre'?'Pre':'Post')+'</span></div></div>';
+  }).join(''):'<div class="empty"><div class="ei">📅</div>Sin cirugías</div>';
+}
+
+// ── NEO ───────────────────────────────────
+function renderNeo(){
+  var hoy=new Date();
+  var lista=surgeries.filter(function(s){
+    if(!s.neoNumero||!s.fecha)return false;
+    var p=s.fecha.split('/');var diff=(new Date(p[2],p[1]-1,p[0])-new Date(hoy.getFullYear(),hoy.getMonth(),hoy.getDate()))/86400000;
+    return diff>=0&&diff<=3;
+  });
+  var el=document.getElementById('neo-list');
+  if(!lista.length){el.innerHTML='<div class="empty"><div class="ei">📋</div>Sin NEOs próximos</div>';return;}
+  el.innerHTML=lista.map(function(s){return'<div class="card" onclick="openDet(\''+s.id+'\')" style="border-left:4px solid '+(s.neoRevisado?'#10b981':'#f59e0b')+'">'
+    +'<div style="display:flex;justify-content:space-between;margin-bottom:6px">'
+    +'<div><div style="font-weight:700;font-size:13px">#'+s.numero+' · '+s.hospital+'</div><div style="font-size:12px;color:#8899aa">'+s.doctor+' · '+s.fecha+'</div></div>'
+    +'<span class="bdg '+(s.neoRevisado?'bo':'bp')+'">'+(s.neoRevisado?'✓ Revisado':'⚠️ Pendiente')+'</span></div>'
+    +'<div style="font-size:12px;color:#0ea5e9">NEO: '+s.neoNumero+'</div></div>';}).join('');
+}
+
+// ── ALERTAS ───────────────────────────────
+function schedAlerts(){
+  var now=new Date();
+  function msto(h,m){var d=new Date(now);d.setHours(h,m,0,0);var ms=d-now;return ms>0?ms:ms+86400000;}
+  setTimeout(checkSinParte,msto(9,0));
+  setTimeout(alarma14,msto(14,0));
+  setTimeout(alarma15,msto(15,0));
+  setTimeout(resumen19,msto(19,0));
+  var vms=proxViernes12(now)-now; if(vms>0) setTimeout(resumenViernes,vms);
+}
+function proxViernes12(now){var d=new Date(now);d.setDate(d.getDate()+(5-d.getDay()+7)%7||7);d.setHours(12,0,0,0);return d;}
+function checkSinParte(){
+  setTimeout(checkSinParte,86400000);
+  var ay=new Date();ay.setDate(ay.getDate()-1);
+  var dd=String(ay.getDate()).padStart(2,'0'),mm=String(ay.getMonth()+1).padStart(2,'0'),yy=ay.getFullYear();
+  db.collection('surgeries').where('fecha','==',dd+'/'+mm+'/'+yy).get().then(function(s){
+    s.docs.forEach(function(d){var sg=Object.assign({id:d.id},d.data());
+      if(sg.estado==='post'&&!sg.fotoUrl&&!sg.sinGasto){
+        var dest=sg.asignado||sg.clinical||respH[sg.hospital]||''; if(!dest) return;
+        db.collection('messages').add({de:'Sistema MGtrauma',destinatarios:[dest],categoria:'urgente',
+          asunto:'⚠️ Cirugía sin parte — #'+sg.numero+' '+sg.hospital,
+          cuerpo:'La cirugía del '+sg.fecha+' en '+sg.hospital+' no tiene parte subido.',
+          leido:false,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+      }
+    });
+  });
+}
+function alarma14(){
+  setTimeout(alarma14,86400000);
+  var hoy=new Date().toDateString(), nom=CU.p?CU.p.nombre:CU.email;
+  var mis=surgeries.filter(function(s){if(!s.neoNumero||s.neoRevisado||!s.fecha)return false;var p=s.fecha.split('/');return new Date(p[2],p[1]-1,p[0]).toDateString()===hoy&&(s.asignado===nom||s.altaPor===nom);});
+  if(mis.length){toast('⏰ '+mis.length+' NEO(s) pendientes','w');if(Notification.permission==='granted')new Notification('MGtrauma NEO',{body:mis.length+' NEO(s) pendientes antes de las 16h'});}
+}
+function alarma15(){
+  setTimeout(alarma15,86400000);if(!canInf())return;
+  var hoy=new Date().toDateString();
+  var pend=surgeries.filter(function(s){if(!s.neoNumero||s.neoRevisado||!s.fecha)return false;var p=s.fecha.split('/');return new Date(p[2],p[1]-1,p[0]).toDateString()===hoy;});
+  if(!pend.length)return;
+  db.collection('users').get().then(function(us){
+    var ger=us.docs.filter(function(d){return['gerente','gestor'].includes(d.data().rol);}).map(function(d){return d.data().nombre;});
+    var lista=pend.map(function(s){return'• #'+s.numero+' '+s.hospital+' NEO:'+s.neoNumero;}).join('\n');
+    ger.forEach(function(g){db.collection('messages').add({de:'Sistema MGtrauma',destinatarios:[g],categoria:'solicitud',asunto:'📋 NEOs sin revisar hoy',cuerpo:lista,leido:false,createdAt:firebase.firestore.FieldValue.serverTimestamp()});});
+  });
+}
+function resumenViernes(){
+  setTimeout(resumenViernes,7*86400000);
+  var pend=incs.filter(function(i){return!i.resuelta;}); if(!pend.length)return;
+  db.collection('users').get().then(function(us){
+    var ger=us.docs.filter(function(d){return['gerente','gestor'].includes(d.data().rol);}).map(function(d){return d.data().nombre;});
+    var adm=us.docs.filter(function(d){return d.data().rol==='administracion';}).map(function(d){return d.data().nombre;});
+    var por={};pend.forEach(function(i){if(!por[i.hospital])por[i.hospital]=[];por[i.hospital].push(i);});
+    Object.keys(por).forEach(function(h){
+      var resp=respH[h];if(!resp)return;
+      var txt=por[h].map(function(i){return'• ['+i.tipo+'] '+i.descripcion;}).join('\n');
+      db.collection('messages').add({de:'Sistema MGtrauma',destinatarios:[resp],categoria:'informe',asunto:'📊 Incidencias semana — '+h,cuerpo:por[h].length+' pendientes:\n\n'+txt,leido:false,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+    });
+    var dests=[].concat(ger,adm).filter(function(v,i,a){return v&&a.indexOf(v)===i;});
+    if(dests.length){var total=Object.keys(por).map(function(h){return'• '+h+': '+por[h].length;}).join('\n');db.collection('messages').add({de:'Sistema MGtrauma',destinatarios:dests,categoria:'informe',asunto:'📊 Resumen semanal incidencias',cuerpo:'Pendientes:\n\n'+total,leido:false,createdAt:firebase.firestore.FieldValue.serverTimestamp()});}
+  });
+}
+function resumen19(){
+  setTimeout(resumen19,86400000);
+  var man=new Date();man.setDate(man.getDate()+1);
+  var dd=String(man.getDate()).padStart(2,'0'),mm=String(man.getMonth()+1).padStart(2,'0'),yy=man.getFullYear();
+  var fM=dd+'/'+mm+'/'+yy;
+  db.collection('surgeries').where('fecha','==',fM).get().then(function(s){
+    if(!s.size)return;
+    var cirs=s.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    db.collection('users').get().then(function(us){
+      var ger=us.docs.filter(function(d){return['gerente','gestor'].includes(d.data().rol);}).map(function(d){return d.data().nombre;});
+      var lista=cirs.map(function(c){return'• #'+c.numero+' '+c.hospital+' — '+c.doctor+' ('+c.hora+')';}).join('\n');
+      ger.forEach(function(g){db.collection('messages').add({de:'Sistema MGtrauma',destinatarios:[g],categoria:'solicitud',asunto:'📅 Cirugías mañana '+fM,cuerpo:cirs.length+' cirugías:\n\n'+lista,leido:false,createdAt:firebase.firestore.FieldValue.serverTimestamp()});});
+    });
+  });
+}
+
+// ── MENSAJERÍA ────────────────────────────
+function setMF(el,f){mff=f;document.querySelectorAll('#pg-mensajes .fc').forEach(function(c){c.classList.remove('active');});el.classList.add('active');renderMsgs();}
+function renderMsgs(){
+  var nom=CU?CU.p?CU.p.nombre:CU.email:'';
+  var list=messages.slice();
+  if(mff==='recibidos') list=list.filter(function(m){return(m.destinatarios||[]).includes(nom);});
+  else if(mff==='urgente') list=list.filter(function(m){return m.categoria==='urgente';});
+  else if(mff==='informe') list=list.filter(function(m){return m.categoria==='informe';});
+  var el=document.getElementById('msg-list');
+  if(!list.length){el.innerHTML='<div class="empty"><div class="ei">✉️</div>Sin mensajes</div>';return;}
+  el.innerHTML=list.map(function(m){
+    var tc={'informe':'rgba(14,165,233,.15)','solicitud':'rgba(245,158,11,.15)','comentario':'rgba(16,185,129,.15)','urgente':'rgba(239,68,68,.15)'}[m.categoria]||'rgba(16,185,129,.15)';
+    var tv={'informe':'#0ea5e9','solicitud':'#f59e0b','comentario':'#10b981','urgente':'#ef4444'}[m.categoria]||'#10b981';
+    var unr=(m.destinatarios||[]).includes(nom)&&!m.leido;
+    var ts=m.createdAt&&m.createdAt.toDate?m.createdAt.toDate():new Date();
+    return'<div class="card" onclick="openMsg(\''+m.id+'\')" style="'+(unr?'border-left:3px solid #0ea5e9;':'')+'">'
+      +'<div style="display:flex;justify-content:space-between;margin-bottom:5px"><div style="font-weight:700;font-size:13px">'+m.de+'</div><span style="font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600;background:'+tc+';color:'+tv+'">'+m.categoria+'</span></div>'
+      +'<div style="font-size:13px;font-weight:500;margin-bottom:3px">'+m.asunto+'</div>'
+      +'<div style="display:flex;justify-content:space-between"><div style="font-size:12px;color:#8899aa;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">'+m.cuerpo+'</div>'
+      +'<span style="font-size:10px;color:#4a6080;margin-left:8px">'+ts.toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'})+'</span></div></div>';
+  }).join('');
+}
+function openMsg(id){
+  var m=messages.find(function(x){return x.id===id;}); if(!m) return;
+  if(!m.leido) db.collection('messages').doc(id).update({leido:true});
+  document.getElementById('dv-msg-t').textContent=m.asunto;
+  var ts=m.createdAt&&m.createdAt.toDate?m.createdAt.toDate():new Date();
+  document.getElementById('dv-msg-b').innerHTML='<div class="ds2">'
+    +'<div class="dr"><span class="dl">De</span><span>'+m.de+'</span></div>'
+    +'<div class="dr"><span class="dl">Para</span><span>'+(m.destinatarios||[]).join(', ')+'</span></div>'
+    +'<div class="dr"><span class="dl">Fecha</span><span>'+ts.toLocaleString('es-ES')+'</span></div></div>'
+    +'<div class="ds2"><div style="font-weight:700;font-size:14px;margin-bottom:10px">'+m.asunto+'</div>'
+    +'<div style="font-size:14px;line-height:1.6;white-space:pre-wrap">'+m.cuerpo+'</div></div>'
+    +'<button class="abtn as" onclick="replyMsg(\''+id+'\')">↩️ Responder</button>';
+  document.getElementById('dv-msg').classList.add('open');
+}
+function replyMsg(id){
+  var m=messages.find(function(x){return x.id===id;}); if(!m) return;
+  closeDv('dv-msg'); document.getElementById('msg-as').value='RE: '+m.asunto;
+  var opts=document.getElementById('msg-dest').options;
+  for(var i=0;i<opts.length;i++) opts[i].selected=opts[i].value===m.de;
+  document.getElementById('mo-msg').classList.add('open');
+}
+function sendMsg(){
+  var dests=Array.from(document.getElementById('msg-dest').selectedOptions).map(function(o){return o.value;});
+  var as=document.getElementById('msg-as').value.trim(), cu=document.getElementById('msg-cu').value.trim();
+  if(!dests.length||!as||!cu){toast('⚠️ Rellena todos los campos','w');return;}
+  db.collection('messages').add({de:CU.p?CU.p.nombre:CU.email,destinatarios:dests,categoria:document.getElementById('msg-cat').value,asunto:as,cuerpo:cu,leido:false,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+  closeM('mo-msg');toast('✉️ Enviado');
+}
+function updateMsgBadge(){
+  var nom=CU?CU.p?CU.p.nombre:CU.email:'';
+  var n=messages.filter(function(m){return(m.destinatarios||[]).includes(nom)&&!m.leido;}).length;
+  var b=document.getElementById('msg-badge');
+  if(n>0){b.textContent=n;b.style.display='flex';}else{b.style.display='none';}
+}
+
+// ── GASTOS ────────────────────────────────
+function onGF(el){gFoto=el.files[0];document.getElementById('g-flbl').textContent='✓ '+gFoto.name;}
+function saveGasto(){
+  var f=document.getElementById('g-f').value, im=parseFloat(document.getElementById('g-i').value);
+  var co=document.getElementById('g-c').value, mo=document.getElementById('g-m').value.trim(), ju=document.getElementById('g-j').value.trim();
+  if(!f||!im||!co){toast('⚠️ Rellena fecha, importe y concepto','w');return;}
+  var nom=CU.p?CU.p.nombre:CU.email;
+  function saveG(url){
+    db.collection('gastos').add({fecha:f,importe:im,concepto:co,motivo:mo,justificacion:ju,fotoUrl:url||'',usuario:nom,createdAt:firebase.firestore.FieldValue.serverTimestamp()})
+      .then(function(){gFoto=null;document.getElementById('g-flbl').textContent='Tocar para adjuntar';closeM('mo-gas');toast('✓ Gasto guardado');})
+      .catch(function(e){toast('Error al guardar: '+e.message,'e');});
+  }
+  // Storage no disponible en plan gratuito - guardar sin foto
+  if(gFoto){
+    toast('ℹ️ Foto no disponible (requiere plan de pago). Guardando sin foto…','w');
+    gFoto=null;
+    document.getElementById('g-flbl').textContent='Tocar para adjuntar';
+  }
+  saveG('');
+}
+function renderGastos(){
+  var nom=CU?CU.p?CU.p.nombre:CU.email:'';
+  var r=rol();
+  var list=['gestor','gerente','administracion'].includes(r)?gastos:gastos.filter(function(g){return g.usuario===nom;});
+  var el=document.getElementById('gastos-list');
+  if(!list.length){el.innerHTML='<div class="empty"><div class="ei">🧾</div>Sin gastos</div>';return;}
+  el.innerHTML=list.map(function(g){return'<div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><div><div style="font-size:11px;color:#4a6080">'+g.fecha+'</div><div style="font-size:13px;font-weight:600;margin-top:2px">'+(g.motivo||g.concepto)+'</div></div><div style="font-weight:800;font-size:20px;color:#0ea5e9">'+Number(g.importe).toFixed(2)+'€</div></div><div style="font-size:12px;color:#8899aa">'+(g.justificacion||'')+'</div>'+(g.fotoUrl?'<img src="'+g.fotoUrl+'" style="width:60px;height:60px;object-fit:cover;border-radius:7px;margin-top:4px">':'')+'</div>';}).join('');
+}
+function updateGStats(){
+  var nom=CU?CU.p?CU.p.nombre:CU.email:'';
+  var r=rol();
+  var now=new Date(),sw=new Date(now);sw.setDate(now.getDate()-now.getDay());
+  var mis=['gestor','gerente','administracion'].includes(r)?gastos:gastos.filter(function(g){return g.usuario===nom;});
+  var sem=mis.filter(function(g){return new Date(g.fecha)>=sw;}).reduce(function(a,g){return a+Number(g.importe);},0);
+  var mes=mis.filter(function(g){var d=new Date(g.fecha);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();}).reduce(function(a,g){return a+Number(g.importe);},0);
+  var anio=mis.filter(function(g){return new Date(g.fecha).getFullYear()===now.getFullYear();}).reduce(function(a,g){return a+Number(g.importe);},0);
+  document.getElementById('g-s').textContent=sem.toFixed(0)+'€';
+  document.getElementById('g-m').textContent=mes.toFixed(0)+'€';
+  document.getElementById('g-a').textContent=anio.toFixed(0)+'€';
+}
+function expGastos(){
+  var nom=CU?CU.p?CU.p.nombre:CU.email:'';
+  var list=gastos.filter(function(g){return g.usuario===nom;}); if(!list.length){toast('Sin gastos','w');return;}
+  var ws=XLSX.utils.json_to_sheet(list.map(function(g){return{'Fecha':g.fecha,'Importe':Number(g.importe).toFixed(2),'Concepto':g.concepto,'Motivo':g.motivo||'','Justificación':g.justificacion||''};}));
+  var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Gastos');
+  XLSX.writeFile(wb,'MGtrauma_gastos_'+new Date().toISOString().split('T')[0]+'.xlsx');toast('📥 Excel descargado');
+}
+
+// ── KILÓMETROS ────────────────────────────
+function onKF(el){kFoto=el.files[0];document.getElementById('km-flbl').textContent='✓ Foto capturada';}
+var kmTipoActual='empresa';
+function setKmTab(tipo){
+  kmTipoActual=tipo;
+  document.getElementById('km-tab-emp').classList.toggle('active',tipo==='empresa');
+  document.getElementById('km-tab-par').classList.toggle('active',tipo==='particulares');
+  var r=rol();
+  var canReg=['gestor','gerente','administracion'].includes(r);
+  var btnAdd=document.getElementById('btn-km-add');
+  var note=document.getElementById('km-adm-note');
+  if(btnAdd) btnAdd.style.display=canReg?'flex':'none';
+  if(note) note.style.display=canReg?'none':'block';
+  renderKm();
+}
+function openKmMod(){
+  var canReg=['gestor','gerente','administracion'].includes(rol());
+  if(!canReg){toast('⚠️ Solo administración puede registrar km','w');return;}
+  var n=new Date();
+  document.getElementById('km-f').value=new Date(n.getTime()-n.getTimezoneOffset()*60000).toISOString().slice(0,16);
+  document.getElementById('km-l').value='';
+  var t=document.getElementById('km-mod-t');
+  if(t) t.textContent='Registrar Km '+(kmTipoActual==='empresa'?'empresa':'particulares');
+  document.getElementById('mo-km').classList.add('open');
+}
+function saveKm(){
+  var lec=parseInt(document.getElementById('km-l').value), f=document.getElementById('km-f').value;
+  if(!lec||!f){toast('⚠️ Rellena lectura y fecha','w');return;}
+  var nom=CU.p?CU.p.nombre:CU.email;
+  function saveK(url){db.collection('km').add({lectura:lec,fotoUrl:url||'',usuario:nom,tipo:kmTipoActual,fechaTimestamp:new Date(f),fecha:f.split('T')[0],createdAt:firebase.firestore.FieldValue.serverTimestamp()});kFoto=null;document.getElementById('km-flbl').textContent='Tocar para capturar';closeM('mo-km');toast('✓ Lectura registrada');}
+  if(kFoto){
+    toast('ℹ️ Foto no disponible (requiere plan de pago). Guardando sin foto…','w');
+    kFoto=null;
+    document.getElementById('km-flbl').textContent='Tocar para capturar';
+  }
+  saveK('');
+}
+function renderKm(){
+  var nom=CU?CU.p?CU.p.nombre:CU.email:'';
+  var r=rol();
+  var todos=['gestor','gerente','administracion'].includes(r)?kmRec:kmRec.filter(function(k){return k.usuario===nom;});
+  // Filtrar por tipo actual
+  var mis=todos.filter(function(k){return (k.tipo||'empresa')===kmTipoActual;}).sort(function(a,b){return new Date(a.fecha)-new Date(b.fecha);});
+  var hoy=new Date().toISOString().split('T')[0], hr=mis.filter(function(k){return k.fecha===hoy;});
+  document.getElementById('km-hoy').textContent=hr.length>=2?(hr[hr.length-1].lectura-hr[0].lectura)+' km':hr.length===1?hr[0].lectura.toLocaleString()+' km':'— km';
+  var el=document.getElementById('km-list');
+  if(!mis.length){el.innerHTML='<div class="empty"><div class="ei">🚗</div>Sin registros</div>';return;}
+  el.innerHTML=mis.slice().reverse().map(function(k,i,arr){var prev=arr[i+1]; var km=prev?k.lectura-prev.lectura:null;
+    return'<div class="card"><div style="display:flex;justify-content:space-between;align-items:center">'
+      +'<div><div style="font-size:11px;color:#4a6080">'+k.fecha+'</div><div style="font-size:14px;font-weight:600;margin-top:2px">'+k.lectura.toLocaleString()+' km</div></div>'
+      +(km!==null?'<div style="text-align:right"><div style="font-size:10px;color:#4a6080">Recorridos</div><div style="font-weight:800;font-size:20px;color:#10b981">+'+km+' km</div></div>':'<div style="font-size:12px;color:#4a6080">Primera lectura</div>')
+      +'</div>'+(k.fotoUrl?'<img src="'+k.fotoUrl+'" style="width:100%;border-radius:7px;margin-top:8px;max-height:120px;object-fit:cover">':'')+'</div>';
+  }).join('');
+}
+function expKm(){
+  var nom=CU?CU.p?CU.p.nombre:CU.email:'';
+  var mis=kmRec.filter(function(k){return k.usuario===nom;}).sort(function(a,b){return new Date(a.fecha)-new Date(b.fecha);}); if(!mis.length){toast('Sin registros','w');return;}
+  var ws=XLSX.utils.json_to_sheet(mis.map(function(k,i){var prev=mis[i-1];return{'Fecha':k.fecha,'Lectura km':k.lectura,'Km recorridos':prev?k.lectura-prev.lectura:'—'};}));
+  var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Kilómetros');
+  XLSX.writeFile(wb,'MGtrauma_km_'+new Date().toISOString().split('T')[0]+'.xlsx');toast('📥 Excel descargado');
+}
+
+// ── MÉDICOS ───────────────────────────────
+function filterMed(v){
+  var q=v.toLowerCase(), list=q?medicos.filter(function(m){return(m.nombre+' '+m.apellidos).toLowerCase().includes(q)||(m.especialidad||'').toLowerCase().includes(q);}):medicos;
+  var el=document.getElementById('med-list'), canE=['gestor','gerente','comercial'].includes(rol());
+  if(!list.length){el.innerHTML='<div class="empty"><div class="ei">👨‍⚕️</div>Sin médicos</div>';return;}
+  el.innerHTML=list.map(function(m){return'<div class="card">'
+    +'<div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px">'
+    +'<div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#0ea5e9,#8b5cf6);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0">'+ini(m.nombre+' '+m.apellidos)+'</div>'
+    +'<div style="flex:1"><div style="font-weight:700;font-size:15px">'+m.nombre+' '+m.apellidos+'</div><div style="font-size:12px;color:#0ea5e9;margin-top:2px">'+(m.especialidad||'Sin especialidad')+'</div>'+(m.hospital?'<div style="font-size:11px;color:#4a6080">🏥 '+m.hospital+'</div>':'')+'</div>'
+    +(canE?'<button onclick="openMedMod(\''+m.id+'\')" style="background:#1a2236;border:1px solid #1e2d45;border-radius:7px;padding:6px 10px;color:#8899aa;font-size:12px">✏️</button>':'')
+    +'</div>'
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap">'
+    +(m.telefono?'<a href="tel:'+m.telefono+'" style="flex:1;min-width:120px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:8px 12px;color:#10b981;font-size:12px;font-weight:600;text-align:center">📞 '+m.telefono+'</a>':'')
+    +(m.email?'<a href="mailto:'+m.email+'" style="flex:1;min-width:120px;background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.2);border-radius:8px;padding:8px 12px;color:#0ea5e9;font-size:12px;font-weight:600;text-align:center">✉️ Email</a>':'')
+    +'</div></div>';}).join('');
+}
+function renderMed(){filterMed('');}
+function openMedMod(id){
+  var m=id?medicos.find(function(x){return x.id===id;}):null;
+  var esps=['Traumatología','Cirugía Ortopédica','Neurocirugía','Cirugía de Columna','Cirugía de Rodilla','Cirugía de Cadera','Cirugía de Hombro','Cirugía de Mano','Otra'];
+  openDyn('<div class="mh"></div><div class="mt">'+(m?'Editar médico':'Nuevo médico')+'</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'
+    +'<div class="fg"><label class="fl">Nombre *</label><input id="med-n" type="text" value="'+(m?m.nombre:'')+'"></div>'
+    +'<div class="fg"><label class="fl">Apellidos *</label><input id="med-a" type="text" value="'+(m?m.apellidos:'')+'"></div></div>'
+    +'<div class="fg"><label class="fl">Especialidad</label><select id="med-e">'+esps.map(function(e){return'<option'+(m&&m.especialidad===e?' selected':'')+'>'+e+'</option>';}).join('')+'</select></div>'
+    +'<div class="fg"><label class="fl">Teléfono</label><input id="med-t" type="tel" value="'+(m?m.telefono||'':'')+'"></div>'
+    +'<div class="fg"><label class="fl">Email</label><input id="med-em" type="email" value="'+(m?m.email||'':'')+'"></div>'
+    +'<div class="fg"><label class="fl">Hospital principal</label><input id="med-h" type="text" value="'+(m?m.hospital||'':'')+'"></div>'
+    +'<button class="abtn ap" onclick="saveMed(\''+( id||'')+'\')">✓ '+(m?'Guardar':'Crear')+'</button>'
+    +(m?'<button class="abtn ad" onclick="delMed(\''+id+'\')">🗑️ Eliminar</button>':'')
+    +'<button class="abtn as" onclick="closeM(\'mo-dyn\')">Cancelar</button>');
+}
+function saveMed(id){
+  var n=document.getElementById('med-n').value.trim(), a=document.getElementById('med-a').value.trim();
+  if(!n||!a){toast('⚠️ Nombre y apellidos requeridos','w');return;}
+  var data={nombre:n,apellidos:a,especialidad:document.getElementById('med-e').value,
+    telefono:document.getElementById('med-t').value.trim(),email:document.getElementById('med-em').value.trim(),
+    hospital:document.getElementById('med-h').value.trim(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+  var esId = id && id.length > 5 && id !== 'undefined';
+  if(esId) {
+    db.collection('medicos').doc(id).update(data)
+      .then(function(){closeM('mo-dyn');toast('✓ Médico actualizado');})
+      .catch(function(e){toast('Error: '+e.message,'e');});
+  } else {
+    db.collection('medicos').add(Object.assign(data,{createdAt:firebase.firestore.FieldValue.serverTimestamp()}))
+      .then(function(){closeM('mo-dyn');toast('✓ Médico añadido');})
+      .catch(function(e){toast('Error al crear: '+e.message,'e');});
+  }
+}
+function delMed(id){if(!confirm('¿Eliminar?'))return;db.collection('medicos').doc(id).delete();closeM('mo-dyn');toast('🗑️ Eliminado');}
+
+// ── DOCUMENTOS ────────────────────────────
+function renderDocs(){
+  var el=document.getElementById('docs-grid');if(!el)return;
+  el.innerHTML=CARPETAS.map(function(c){
+    var cnt=docs.filter(function(d){return d.carpetaId===c.id;}).length;
+    return'<div onclick="openCarpeta(\''+c.id+'\',\''+c.n+'\',\''+c.i+'\')" style="background:#111827;border:1px solid #1e2d45;border-radius:12px;padding:16px;text-align:center;cursor:pointer">'
+      +'<div style="font-size:32px;margin-bottom:8px">'+c.i+'</div>'
+      +'<div style="font-weight:700;font-size:13px;line-height:1.3;margin-bottom:4px">'+c.n+'</div>'
+      +'<div style="font-size:11px;color:#4a6080">'+cnt+' archivo'+(cnt!==1?'s':'')+'</div></div>';
+  }).join('');
+}
+function openCarpeta(id,nombre,icono){
+  carpetaActual=id;
+  var canUp=['gestor','gerente'].includes(rol())||(rol()==='logistica'&&id==='logistica-doc');
+  var lista=docs.filter(function(d){return d.carpetaId===id;});
+  var canD=['gestor','gerente'].includes(rol());
+  openDyn('<div class="mh"></div>'
+    +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">'
+    +'<div style="font-weight:800;font-size:18px;flex:1">'+icono+' '+nombre+'</div>'
+    +(canUp?'<button onclick="openSubirDoc()" style="background:#0ea5e9;border:none;border-radius:8px;color:#fff;padding:7px 12px;font-weight:600;font-size:12px;cursor:pointer">⬆️ Subir</button>':'')
+    +'</div>'
+    +(!lista.length?'<div class="empty"><div class="ei">📄</div>Sin documentos</div>'
+    :lista.map(function(d){
+      var ext=(d.nombre||'').split('.').pop().toLowerCase();
+      var ico=ext==='pdf'?'📕':ext==='mp4'||ext==='mov'?'🎬':ext==='doc'||ext==='docx'?'📘':'📄';
+      var sz=d.size?(d.size>1048576?(d.size/1048576).toFixed(1)+' MB':(d.size/1024).toFixed(0)+' KB'):'';
+      return'<div style="display:flex;align-items:center;gap:12px;padding:10px;border-bottom:1px solid #1e2d45">'
+        +'<div style="font-size:24px">'+ico+'</div>'
+        +'<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+d.nombre+'</div><div style="font-size:11px;color:#4a6080">'+sz+(d.descripcion?' · '+d.descripcion:'')+'</div></div>'
+        +'<a href="'+d.url+'" target="_blank" style="background:rgba(14,165,233,.15);border:1px solid rgba(14,165,233,.3);color:#0ea5e9;border-radius:7px;padding:6px 10px;font-size:11px;font-weight:600;text-decoration:none">⬇️</a>'
+        +(canD?'<button onclick="delDoc(\''+d.id+'\',\''+d.storagePath+'\')" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#ef4444;border-radius:7px;padding:6px 10px;font-size:11px;cursor:pointer">🗑️</button>':'')
+        +'</div>';
+    }).join(''))
+    +'<button class="abtn as" style="margin-top:12px" onclick="closeM(\'mo-dyn\')">Cerrar</button>');
+}
+var docFile=null;
+function openSubirDoc(){
+  var esCom=carpetaActual==='comunicados';
+  openDyn('<div class="mh"></div><div class="mt">⬆️ Subir documento</div>'
+    +'<div class="fg"><label class="fl">Archivo *</label>'
+    +'<div class="pu" id="up-dz" onclick="document.getElementById(\'up-fi\').click()"><div style="font-size:36px;margin-bottom:8px">📎</div><div style="font-weight:700;font-size:14px;margin-bottom:4px" id="up-t">Toca para seleccionar</div><div style="font-size:11px;color:#4a6080">PDF · Word · PowerPoint · Vídeo · Imágenes</div></div>'
+    +'<input type="file" id="up-fi" accept=".pdf,.doc,.docx,.ppt,.pptx,.mp4,.mov,.avi,.jpg,.jpeg,.png,.gif,.webp,image/*" style="display:none" onchange="onDocSel(this)"></div>'
+    +'<div class="fg"><label class="fl">Descripción (opcional)</label><input id="up-desc" type="text" placeholder="Breve descripción…"></div>'
+    +(esCom?'<div style="background:rgba(14,165,233,.08);border:1px solid rgba(14,165,233,.2);border-radius:9px;padding:11px;margin-bottom:14px;font-size:12px;color:#8899aa">📢 Se notificará a todos los usuarios</div>':'')
+    +'<div id="up-prog" style="display:none;margin-bottom:14px"><div style="display:flex;justify-content:space-between;font-size:12px;color:#8899aa;margin-bottom:6px"><span>Subiendo…</span><span id="up-pct">0%</span></div><div style="background:#1e2d45;border-radius:4px;height:8px;overflow:hidden"><div id="up-pb" style="background:#0ea5e9;height:100%;width:0%;transition:width .2s;border-radius:4px"></div></div></div>'
+    +'<button id="up-btn" onclick="doSubir()" disabled style="width:100%;padding:13px;border-radius:10px;border:none;background:#0ea5e9;color:#fff;font-weight:700;cursor:pointer;opacity:.5;margin-bottom:8px">⬆️ Subir</button>'
+    +'<button class="abtn as" onclick="closeM(\'mo-dyn\')">Cancelar</button>');
+}
+function onDocSel(el){
+  docFile=el.files[0];if(!docFile)return;
+  document.getElementById('up-dz').style.borderColor='#10b981';
+  document.getElementById('up-t').textContent='✓ '+docFile.name;
+  var btn=document.getElementById('up-btn');btn.disabled=false;btn.style.opacity='1';
+}
+function doSubir(){
+  if(!docFile||!carpetaActual){toast('⚠️ Selecciona un archivo','w');return;}
+  var desc=document.getElementById('up-desc').value.trim();
+  var btn=document.getElementById('up-btn');
+  btn.disabled=true;btn.textContent='Subiendo…';
+  document.getElementById('up-prog').style.display='block';
+  document.getElementById('up-pb').style.width='10%';
+  document.getElementById('up-pct').textContent='Subiendo…';
+  var path='documentos/'+carpetaActual+'/'+Date.now()+'_'+docFile.name;
+  var metadata={contentType:docFile.type};
+  var ref=st.ref(path);
+  ref.put(docFile,metadata).then(function(snapshot){
+    document.getElementById('up-pb').style.width='90%';
+    return snapshot.ref.getDownloadURL();
+  }).then(function(url){
+    document.getElementById('up-pb').style.width='100%';
+    db.collection('documentos').add({nombre:docFile.name,descripcion:desc,url:url,carpetaId:carpetaActual,storagePath:path,size:docFile.size,subidoPor:CU.p?CU.p.nombre:CU.email,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+    if(carpetaActual==='comunicados'){db.collection('users').get().then(function(us){var todos=us.docs.map(function(d){return d.data().nombre;}).filter(Boolean);db.collection('messages').add({de:'Sistema MGtrauma',destinatarios:todos,categoria:'informe',asunto:'📢 Nuevo comunicado: '+docFile.name,cuerpo:'Se ha publicado: '+docFile.name+(desc?' — '+desc:''),leido:false,createdAt:firebase.firestore.FieldValue.serverTimestamp()});});}
+    docFile=null;closeM('mo-dyn');toast('✓ Documento subido');
+  }).catch(function(e){
+    toast('Error al subir: '+e.message,'e');
+    btn.disabled=false;btn.textContent='⬆️ Subir';
+    document.getElementById('up-prog').style.display='none';
+  });
+}
+function delDoc(id,path){if(!confirm('¿Borrar?'))return;db.collection('documentos').doc(id).delete();if(path)st.ref(path).delete().catch(function(){});toast('🗑️ Eliminado');}
+
+// ── INCIDENCIAS ───────────────────────────
+function incCardHTML(i){
+  var col=i.tipo==='administracion'?'#0ea5e9':'#8b5cf6';
+  var bg=i.tipo==='administracion'?'rgba(14,165,233,.08)':'rgba(139,92,246,.08)';
+  return'<div style="background:'+bg+';border:1px solid '+col+'33;border-radius:9px;padding:11px;margin-bottom:8px">'
+    +'<div style="display:flex;justify-content:space-between;margin-bottom:5px"><div style="font-size:12px;font-weight:600;color:'+col+'">'+(i.tipo==='administracion'?'🗂️ Administración':'🔧 Logística')+'</div>'
+    +'<span style="font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600;background:'+(i.resuelta?'rgba(16,185,129,.15)':'rgba(239,68,68,.15)')+';color:'+(i.resuelta?'#10b981':'#ef4444')+'">'+(i.resuelta?'✓ Resuelta':'Pendiente')+'</span></div>'
+    +'<div style="font-size:13px;margin-bottom:4px">'+i.descripcion+'</div>'
+    +'<div style="font-size:10px;color:#4a6080">Por '+(i.abiertaPor||'—')+'</div>'
+    +(i.resuelta&&i.comentarioResolucion?'<div style="font-size:11px;color:#10b981;margin-top:4px">✓ '+i.comentarioResolucion+'</div>':'')
+    +(!i.resuelta?'<button onclick="resolverInc(\''+i.id+'\')" style="margin-top:8px;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:#10b981;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;width:100%">✓ Resolver</button>':'')
+    +'</div>';
+}
+function setIF(el,f){iff=f;document.querySelectorAll('#pg-incidencias .fc').forEach(function(c){c.classList.remove('active');});el.classList.add('active');renderIncs();}
+function renderIncs(){
+  var list=incs.slice();
+  if(iff==='administracion') list=list.filter(function(i){return i.tipo==='administracion';});
+  else if(iff==='logistica') list=list.filter(function(i){return i.tipo==='logistica';});
+  else if(iff==='pendientes') list=list.filter(function(i){return!i.resuelta;});
+  var el=document.getElementById('inc-list');
+  if(!list.length){el.innerHTML='<div class="empty"><div class="ei">✅</div>Sin incidencias</div>';return;}
+  var por={};list.forEach(function(i){if(!por[i.hospital])por[i.hospital]=[];por[i.hospital].push(i);});
+  el.innerHTML=Object.keys(por).map(function(h){
+    return'<div style="margin-bottom:16px"><div style="font-weight:700;font-size:13px;color:#8899aa;margin-bottom:8px;display:flex;justify-content:space-between"><span>🏥 '+h+'</span><span style="font-size:11px;color:#4a6080">'+por[h].filter(function(i){return!i.resuelta;}).length+' pendiente(s)</span></div>'
+      +por[h].map(incCardHTML).join('')+'</div>';
+  }).join('');
+}
+function openInc(cirId,hosp,tipo){
+  openDyn('<div class="mh"></div><div class="mt" style="color:'+(tipo==='administracion'?'#0ea5e9':'#8b5cf6')+'">'+(tipo==='administracion'?'🗂️ Incidencia administración':'🔧 Incidencia logística')+'</div>'
+    +'<div style="font-size:12px;color:#8899aa;margin-bottom:16px">🏥 '+hosp+'</div>'
+    +'<div class="fg"><label class="fl">Descripción *</label><textarea id="inc-desc" style="min-height:100px" placeholder="'+(tipo==='administracion'?'Ej: El consumo no cuadra…':'Ej: Falta un destornillador…')+'"></textarea></div>'
+    +'<button class="abtn ap" onclick="saveInc(\''+cirId+'\',\''+hosp+'\',\''+tipo+'\')">⚠️ Abrir incidencia</button>'
+    +'<button class="abtn as" onclick="closeM(\'mo-dyn\')">Cancelar</button>');
+}
+function saveInc(cirId,hosp,tipo){
+  var desc=document.getElementById('inc-desc').value.trim(); if(!desc){toast('⚠️ Escribe la descripción','w');return;}
+  var por=CU.p?CU.p.nombre:CU.email;
+  db.collection('incidencias').add({cirugiaId:cirId,hospital:hosp,tipo:tipo,descripcion:desc,abiertaPor:por,resuelta:false,comentarioResolucion:'',createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+  db.collection('users').get().then(function(us){
+    var resp=respH[hosp];
+    var adm=us.docs.filter(function(d){return d.data().rol==='administracion';}).map(function(d){return d.data().nombre;});
+    var ger=us.docs.filter(function(d){return['gerente','gestor'].includes(d.data().rol);}).map(function(d){return d.data().nombre;});
+    var dests=[].concat(resp?[resp]:[],tipo==='administracion'?adm:[],ger).filter(function(v,i,a){return v&&a.indexOf(v)===i;});
+    if(dests.length) db.collection('messages').add({de:por,destinatarios:dests,categoria:'urgente',asunto:'⚠️ Incidencia '+tipo+' — '+hosp,cuerpo:por+' abrió: "'+desc+'"',leido:false,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+  });
+  closeM('mo-dyn');toast('⚠️ Incidencia abierta');
+  if(cirId) setTimeout(function(){openDet(cirId);},500);
+}
+function openIncGlobal(){
+  openDyn('<div class="mh"></div><div class="mt">⚠️ Nueva incidencia</div>'
+    +'<div class="fg"><label class="fl">Hospital</label><input id="ing-h" type="text" placeholder="Hospital…"></div>'
+    +'<div class="fg"><label class="fl">Tipo</label><select id="ing-t"><option value="administracion">🗂️ Administración</option><option value="logistica">🔧 Logística</option></select></div>'
+    +'<div class="fg"><label class="fl">Descripción *</label><textarea id="ing-d" style="min-height:100px" placeholder="Describe la incidencia…"></textarea></div>'
+    +'<button class="abtn ap" onclick="saveIncG()">⚠️ Abrir</button>'
+    +'<button class="abtn as" onclick="closeM(\'mo-dyn\')">Cancelar</button>');
+}
+function saveIncG(){
+  var h=document.getElementById('ing-h').value.trim(), t=document.getElementById('ing-t').value, d=document.getElementById('ing-d').value.trim();
+  if(!h||!d){toast('⚠️ Rellena hospital y descripción','w');return;}
+  var por=CU.p?CU.p.nombre:CU.email;
+  db.collection('incidencias').add({cirugiaId:'',hospital:h,tipo:t,descripcion:d,abiertaPor:por,resuelta:false,comentarioResolucion:'',createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+  closeM('mo-dyn');toast('⚠️ Incidencia abierta');
+}
+function resolverInc(id){
+  openDyn('<div class="mh"></div><div class="mt" style="color:#10b981">✓ Resolver incidencia</div>'
+    +'<div class="fg"><label class="fl">Comentario de resolución *</label><textarea id="res-c" style="min-height:80px" placeholder="¿Cómo se resolvió?"></textarea></div>'
+    +'<button class="abtn ag" onclick="doResolverInc(\''+id+'\')">✓ Marcar resuelta</button>'
+    +'<button class="abtn as" onclick="closeM(\'mo-dyn\')">Cancelar</button>');
+}
+function doResolverInc(id){
+  var c=document.getElementById('res-c').value.trim(); if(!c){toast('⚠️ Añade comentario','w');return;}
+  db.collection('incidencias').doc(id).update({resuelta:true,comentarioResolucion:c,resueltaPor:CU.p?CU.p.nombre:CU.email,resueltaAt:firebase.firestore.FieldValue.serverTimestamp()});
+  closeM('mo-dyn');toast('✓ Resuelta');
+}
+
+// ── INFORMES ──────────────────────────────
+function switchIT(){var t=document.getElementById('inf-t').value;['h','m','c','cl'].forEach(function(x){document.getElementById('if-'+x).style.display=({'h':'hospital','m':'medico','c':'comercial','cl':'clinical'}[x]===t?'block':'none');});}
+function genInf(){
+  if(!canInf()){toast('Sin permisos','w');return;}
+  var tipo=document.getElementById('inf-t').value, desde=document.getElementById('inf-d').value, hasta=document.getElementById('inf-h2').value;
+  var hosp=document.getElementById('inf-h').value.trim().toLowerCase();
+  function fd(s){if(!s.fecha)return null;var p=s.fecha.split('/');return new Date(p[2],p[1]-1,p[0]);}
+  var list=surgeries.filter(function(s){return s.estado!=='anulada';});
+  if(desde) list=list.filter(function(s){var d=fd(s);return d&&d>=new Date(desde);});
+  if(hasta) list=list.filter(function(s){var d=fd(s);return d&&d<=new Date(hasta);});
+  if(hosp) list=list.filter(function(s){return(s.hospital||'').toLowerCase().includes(hosp);});
+  if(tipo==='medico'){var v=document.getElementById('inf-m').value.trim().toLowerCase();if(v)list=list.filter(function(s){return(s.doctor||'').toLowerCase().includes(v);});}
+  if(tipo==='comercial'){var v=document.getElementById('inf-c').value.trim().toLowerCase();if(v)list=list.filter(function(s){return(s.asignado||'').toLowerCase().includes(v);});}
+  if(tipo==='clinical'){var v=document.getElementById('inf-cl').value.trim().toLowerCase();if(v)list=list.filter(function(s){return(s.clinical||'').toLowerCase().includes(v);});}
+  window._lastInf=list;
+  var el=document.getElementById('inf-res');
+  if(!list.length){el.innerHTML='<div class="empty"><div class="ei">📊</div>Sin resultados</div>';return;}
+  var total=list.length, os=list.filter(function(s){return s.division==='Osteosíntesis';}).length, or=list.filter(function(s){return s.division==='Ortopedia';}).length;
+  el.innerHTML='<div class="ds2"><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:14px">'
+    +'<div class="sc"><div class="sn" style="color:#0ea5e9">'+total+'</div><div class="sl">Total</div></div>'
+    +'<div class="sc"><div class="sn" style="color:#10b981">'+os+'</div><div class="sl">Osteosíntesis</div></div>'
+    +'<div class="sc"><div class="sn" style="color:#8b5cf6">'+or+'</div><div class="sl">Ortopedia</div></div></div>'
+    +list.map(function(s){return'<div style="display:grid;grid-template-columns:36px 1fr 1fr auto;gap:7px;padding:8px 0;border-bottom:1px solid #1e2d45;font-size:11px"><div style="color:#4a6080">#'+(s.numero||'—')+'</div><div><div style="font-weight:600">'+s.hospital+'</div><div style="color:#8899aa">'+s.doctor+'</div></div><div><div>'+s.fecha+'</div><div style="color:#8899aa">'+(s.tipo||'—')+'</div></div><span class="bdg '+(s.estado==='post'?'bo':'bp')+'" style="font-size:9px">'+(s.estado==='post'?'Post':'Pre')+'</span></div>';}).join('')
+    +'<button class="abtn ag" style="margin-top:12px" onclick="expInf()">📥 Excel</button></div>';
+}
+function expInf(){
+  var list=window._lastInf||[];if(!list.length)return;
+  var ws=XLSX.utils.json_to_sheet(list.map(function(s){return{'Nº':s.numero||'','Hospital':s.hospital||'','Cirujano':s.doctor||'','Fecha':s.fecha||'','División':s.division||'','Tipo':s.tipo||'','Material':(s.materiales||[]).join(' + '),'Estado':s.estado||'','Comercial':s.asignado||'','Clinical':s.clinical||'','NEO':s.neoNumero||'','Nº HC':s.historiaClinica||'','Nº Episodio':s.episodio||'','Sin gasto':s.sinGasto?'Sí':'No'};}));
+  var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Cirugías');
+  XLSX.writeFile(wb,'MGtrauma_informe_'+new Date().toISOString().split('T')[0]+'.xlsx');toast('📥 Excel descargado');
+}
+
+// ── USUARIOS ──────────────────────────────
+function loadUsers(){
+  db.collection('users').get().then(function(s){
+    var el=document.getElementById('users-list');if(!el)return;
+    if(!s.size){el.innerHTML='<div style="padding:13px;font-size:13px;color:#4a6080">Sin usuarios</div>';return;}
+    el.innerHTML=s.docs.map(function(d){var u=d.data(),rl=ROLES.find(function(r){return r.id===u.rol;})||{l:u.rol};
+      return'<div style="display:flex;align-items:center;justify-content:space-between;padding:13px 14px;border-bottom:1px solid #1e2d45">'
+        +'<div style="display:flex;align-items:center;gap:10px">'
+        +'<div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,rgba(14,165,233,.3),rgba(139,92,246,.3));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px">'+ini(u.nombre||'U')+'</div>'
+        +'<div><div style="font-size:14px;font-weight:500">'+(u.nombre||'—')+'</div><div style="font-size:11px;color:#4a6080">'+(u.email||'')+' · '+rl.l+'</div></div></div>'
+        +'<button onclick="editUser(\''+d.id+'\',\''+u.nombre+'\',\''+u.rol+'\')" style="background:none;border:none;color:#0ea5e9;font-size:13px;cursor:pointer">✏️</button></div>';
+    }).join('');
+  });
+}
+function openNewUser(){
+  openDyn('<div class="mh"></div><div class="mt">Nuevo Usuario</div>'
+    +'<div class="fg"><label class="fl">Nombre *</label><input id="nu-n" type="text"></div>'
+    +'<div class="fg"><label class="fl">Email *</label><input id="nu-e" type="email"></div>'
+    +'<div class="fg"><label class="fl">Contraseña *</label><input id="nu-p" type="password" placeholder="Mínimo 6 caracteres"></div>'
+    +'<div class="fg"><label class="fl">Rol *</label><select id="nu-r">'+ROLES.map(function(r){return'<option value="'+r.id+'">'+r.l+'</option>';}).join('')+'</select></div>'
+    +'<button class="abtn ap" onclick="crearUser()">✓ Crear usuario</button>'
+    +'<button class="abtn as" onclick="closeM(\'mo-dyn\')">Cancelar</button>');
+}
+function crearUser(){
+  var n=document.getElementById('nu-n').value.trim(), e=document.getElementById('nu-e').value.trim();
+  var p=document.getElementById('nu-p').value, r=document.getElementById('nu-r').value;
+  if(!n||!e||!p){toast('⚠️ Rellena todos los campos','w');return;}
+  var sec;try{sec=firebase.app('sec');}catch(x){sec=firebase.initializeApp(firebase.app().options,'sec');}
+  sec.auth().createUserWithEmailAndPassword(e,p).then(function(cred){
+    return db.collection('users').doc(cred.user.uid).set({nombre:n,email:e,rol:r,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+  }).then(function(){
+    return db.collection('catalogues').doc('main').get();
+  }).then(function(s){
+    var eu=s.exists?(s.data().users||[]):[];
+    if(!eu.includes(n)) return db.collection('catalogues').doc('main').update({users:eu.concat([n])});
+  }).then(function(){
+    sec.auth().signOut(); closeM('mo-dyn'); toast('✓ Usuario '+n+' creado'); loadUsers();
+  }).catch(function(err){toast('Error: '+(err.code==='auth/email-already-in-use'?'Email ya registrado':err.message),'e');});
+}
+function editUser(uid,nombre,rolActual){
+  openDyn('<div class="mh"></div><div class="mt">Editar usuario</div>'
+    +'<div style="font-weight:700;font-size:16px;margin-bottom:16px">'+nombre+'</div>'
+    +'<div class="fg"><label class="fl">Rol</label><select id="eu-r">'+ROLES.map(function(r){return'<option value="'+r.id+'"'+(r.id===rolActual?' selected':'')+'>'+r.l+'</option>';}).join('')+'</select></div>'
+    +'<button class="abtn ap" onclick="saveUserRol(\''+uid+'\')">✓ Guardar</button>'
+    +'<button class="abtn as" onclick="closeM(\'mo-dyn\')">Cancelar</button>');
+}
+function saveUserRol(uid){
+  var r=document.getElementById('eu-r').value;
+  db.collection('users').doc(uid).update({rol:r});
+  closeM('mo-dyn');toast('✓ Rol actualizado');loadUsers();
+}
+
+// ── RESPONSABLES HOSPITAL ─────────────────
+function renderRespList(){
+  var el=document.getElementById('resp-list');if(!el)return;
+  if(!hospitals.length){el.innerHTML='<div style="padding:13px;font-size:13px;color:#4a6080">Sin hospitales registrados aún</div>';return;}
+  el.innerHTML=hospitals.map(function(h){return'<div style="display:flex;align-items:center;justify-content:space-between;padding:13px 14px;border-bottom:1px solid #1e2d45"><div><div style="font-size:13px;font-weight:500">'+h+'</div><div style="font-size:11px;color:#4a6080">'+(respH[h]||'Sin responsable')+'</div></div></div>';}).join('');
+}
+function openRespMod(){
+  if(!hospitals.length){toast('⚠️ Sin hospitales','w');return;}
+  openDyn('<div class="mh"></div><div class="mt">🏥 Responsables de hospital</div>'
+    +hospitals.map(function(h){var k='rh-'+h.replace(/\s/g,'_');return'<div class="fg"><label class="fl" style="font-size:11px">'+h+'</label><select id="'+k+'"><option value="">Sin responsable</option>'+users.map(function(u){return'<option value="'+u+'"'+(respH[h]===u?' selected':'')+'>'+u+'</option>';}).join('')+'</select></div>';}).join('')
+    +'<button class="abtn ap" onclick="saveResp()">✓ Guardar</button>'
+    +'<button class="abtn as" onclick="closeM(\'mo-dyn\')">Cancelar</button>');
+}
+function saveResp(){
+  hospitals.forEach(function(h){var k='rh-'+h.replace(/\s/g,'_');var el=document.getElementById(k);if(el)respH[h]=el.value;});
+  saveCat();closeM('mo-dyn');renderRespList();toast('✓ Guardado');
+}
+
+// ── RESET ─────────────────────────────────
+function openReset(){
+  openDyn('<div class="mh"></div><div class="mt" style="color:#ef4444">⚠️ Resetear sistema</div>'
+    +'<div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:14px;margin-bottom:16px;font-size:13px;line-height:1.6">Se borrará todo excepto <strong>usuarios y roles</strong>. Esta acción no se puede deshacer.</div>'
+    +'<div class="fg"><label class="fl">Escribe CONFIRMAR para continuar</label><input id="rst-c" type="text" placeholder="CONFIRMAR"></div>'
+    +'<button class="abtn ad" onclick="doReset()">🗑️ Resetear ahora</button>'
+    +'<button class="abtn as" onclick="closeM(\'mo-dyn\')">Cancelar</button>');
+}
+function doReset(){
+  if(document.getElementById('rst-c').value!=='CONFIRMAR'){toast('⚠️ Escribe CONFIRMAR','w');return;}
+  Promise.all(['surgeries','messages','gastos','km','incidencias','documentos'].map(function(col){return db.collection(col).get().then(function(s){return Promise.all(s.docs.map(function(d){return d.ref.delete();}));});})).then(function(){
+    // Conservar usuarios, médicos y hospitales — solo resetear cirugías y actividad
+    return db.collection('catalogues').doc('main').get();
+  }).then(function(snap){
+    var d=snap.exists?snap.data():{};
+    return db.collection('catalogues').doc('main').set({
+      hospitals:d.hospitals||[],
+      doctors:d.doctors||[],
+      tipos:d.tipos||[],
+      users:d.users||[],
+      responsablesHospital:d.responsablesHospital||{},
+      counter:0
+    });
+  }).then(function(){closeM('mo-dyn');toast('✅ Sistema reseteado (usuarios, médicos y hospitales conservados)');}).catch(function(e){toast('Error: '+e.message,'e');});
+}
+
+// ── AUTOCOMPLETE ──────────────────────────
+function acS(input,key,lid){
+  var val=input.value.toLowerCase(), el=document.getElementById(lid);
+  var data=key==='hospitals'?hospitals:key==='doctors'?doctors:tipos;
+  if(!val){el.classList.remove('open');return;}
+  var m=data.filter(function(x){return x.toLowerCase().includes(val);});
+  if(!m.length){el.classList.remove('open');return;}
+  el.innerHTML=m.map(function(v){return'<div class="aci" onclick="selAC(\''+input.id+'\',\''+lid+'\',this.textContent)">'+v+'</div>';}).join('');
+  el.classList.add('open');
+}
+function selAC(iid,lid,val){document.getElementById(iid).value=val;document.getElementById(lid).classList.remove('open');}
+document.addEventListener('click',function(e){if(!e.target.classList.contains('aci')&&!e.target.matches('[oninput*="acS"]'))document.querySelectorAll('.acl').forEach(function(el){el.classList.remove('open');});});
+
+
+// ── HOSPITALES ────────────────────────────────────────────────
+var hospData=[], clinData=[];
+
+function subscribeHospClin(){
+  db.collection('hospitales').orderBy('nombre').onSnapshot(function(s){
+    hospData=s.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    if(curPage==='hospitales') renderHosp();
+  });
+  db.collection('clinicas').orderBy('nombre').onSnapshot(function(s){
+    clinData=s.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    if(curPage==='clinicas') renderClin();
+  });
+}
+
+function renderHosp(q){
+  var list=q?hospData.filter(function(h){return h.nombre.toLowerCase().includes(q.toLowerCase());}):hospData;
+  var el=document.getElementById('hosp-list'); if(!el) return;
+  var canE=['gestor','gerente'].includes(rol());
+  if(!list.length){el.innerHTML='<div class="empty"><div class="ei">🏥</div>Sin hospitales</div>';return;}
+  el.innerHTML=list.map(function(h){return '<div class="card">'
+    +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">'
+    +'<div><div style="font-weight:700;font-size:15px">🏥 '+h.nombre+'</div>'
+    +(h.direccion?'<div style="font-size:12px;color:#8899aa;margin-top:2px">📍 '+h.direccion+'</div>':'')+'</div>'
+    +(canE?'<button onclick="openHospMod(\''+h.id+'\')" style="background:#1a2236;border:1px solid #1e2d45;border-radius:7px;padding:6px 10px;color:#8899aa;font-size:12px;cursor:pointer">✏️</button>':'')
+    +'</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px">'
+    +(h.jefeServicio?'<div style="color:#4a6080">👨‍⚕️ Jefe servicio<br><span style="color:#f0f4f8">'+h.jefeServicio+'</span></div>':'')
+    +(h.supervisor?'<div style="color:#4a6080">👤 Supervisor<br><span style="color:#f0f4f8">'+h.supervisor+'</span></div>':'')
+    +(h.esterilizacion?'<div style="color:#4a6080">🧪 Esterilización<br><span style="color:#f0f4f8">'+h.esterilizacion+'</span></div>':'')
+    +(h.administracion?'<div style="color:#4a6080">📋 Administración<br><span style="color:#f0f4f8">'+h.administracion+'</span></div>':'')
+    +'</div></div>';}).join('');
+}
+
+function filterHosp(v){renderHosp(v);}
+
+function openHospMod(id){
+  var h=id?hospData.find(function(x){return x.id===id;}):null;
+  openDyn('<div class="mh"></div><div class="mt">'+(h?'Editar hospital':'Nuevo hospital')+'</div>'
+    +'<div class="fg"><label class="fl">Nombre *</label><input id="hm-n" type="text" value="'+(h?h.nombre||'':'')+'"></div>'
+    +'<div class="fg"><label class="fl">Dirección</label><input id="hm-dir" type="text" value="'+(h?h.direccion||'':'')+'"></div>'
+    +'<div class="fg"><label class="fl">Jefe de servicio</label><input id="hm-js" type="text" value="'+(h?h.jefeServicio||'':'')+'"></div>'
+    +'<div class="fg"><label class="fl">Supervisor contacto</label><input id="hm-sup" type="text" value="'+(h?h.supervisor||'':'')+'"></div>'
+    +'<div class="fg"><label class="fl">Esterilización contacto</label><input id="hm-est" type="text" value="'+(h?h.esterilizacion||'':'')+'"></div>'
+    +'<div class="fg"><label class="fl">Administración contacto</label><input id="hm-adm" type="text" value="'+(h?h.administracion||'':'')+'"></div>'
+    +'<button class="abtn ap" onclick="saveHosp(\''+( id||'')+'\')">✓ '+(h?'Guardar':'Crear')+'</button>'
+    +(h?'<button class="abtn ad" onclick="delHosp(\''+id+'\')">'+'🗑️ Eliminar</button>':'')  
+
+    +'<button class="abtn as" onclick="closeM(\'mo-dyn\')">Cancelar</button>');
+}
+
+function saveHosp(id){
+  var n=document.getElementById('hm-n').value.trim(); if(!n){toast('⚠️ Nombre requerido','w');return;}
+  var data={nombre:n,direccion:document.getElementById('hm-dir').value.trim(),
+    jefeServicio:document.getElementById('hm-js').value.trim(),supervisor:document.getElementById('hm-sup').value.trim(),
+    esterilizacion:document.getElementById('hm-est').value.trim(),administracion:document.getElementById('hm-adm').value.trim(),
+    updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+  var esId = id && id.length > 5 && id !== 'undefined';
+  if(esId){
+    db.collection('hospitales').doc(id).update(data)
+      .then(function(){closeM('mo-dyn');toast('✓ Hospital actualizado');})
+      .catch(function(e){toast('Error: '+e.message,'e');});
+  } else {
+    db.collection('hospitales').add(Object.assign(data,{createdAt:firebase.firestore.FieldValue.serverTimestamp()}))
+      .then(function(){
+        if(!hospitals.includes(n)){hospitals.push(n);saveCat();}
+        closeM('mo-dyn');toast('✓ Hospital creado');
+      })
+      .catch(function(e){toast('Error al crear: '+e.message,'e');});
+  }
+}
+
+function delHosp(id){if(!confirm('¿Eliminar hospital?'))return;db.collection('hospitales').doc(id).delete();closeM('mo-dyn');toast('🗑️ Eliminado');}
+
+// ── CLÍNICAS ──────────────────────────────────────────────────
+function renderClin(q){
+  var list=q?clinData.filter(function(h){return h.nombre.toLowerCase().includes(q.toLowerCase());}):clinData;
+  var el=document.getElementById('clin-list'); if(!el) return;
+  var canE=['gestor','gerente'].includes(rol());
+  if(!list.length){el.innerHTML='<div class="empty"><div class="ei">🏨</div>Sin clínicas</div>';return;}
+  el.innerHTML=list.map(function(h){return '<div class="card">'
+    +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">'
+    +'<div><div style="font-weight:700;font-size:15px">🏨 '+h.nombre+'</div>'
+    +(h.direccion?'<div style="font-size:12px;color:#8899aa;margin-top:2px">📍 '+h.direccion+'</div>':'')+'</div>'
+    +(canE?'<button onclick="openClinMod(\''+h.id+'\')" style="background:#1a2236;border:1px solid #1e2d45;border-radius:7px;padding:6px 10px;color:#8899aa;font-size:12px;cursor:pointer">✏️</button>':'')
+    +'</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px">'
+    +(h.jefeServicio?'<div style="color:#4a6080">👨‍⚕️ Jefe servicio<br><span style="color:#f0f4f8">'+h.jefeServicio+'</span></div>':'')
+    +(h.supervisor?'<div style="color:#4a6080">👤 Supervisor<br><span style="color:#f0f4f8">'+h.supervisor+'</span></div>':'')
+    +(h.esterilizacion?'<div style="color:#4a6080">🧪 Esterilización<br><span style="color:#f0f4f8">'+h.esterilizacion+'</span></div>':'')
+    +(h.administracion?'<div style="color:#4a6080">📋 Administración<br><span style="color:#f0f4f8">'+h.administracion+'</span></div>':'')
+    +'</div></div>';}).join('');
+}
+
+function filterClin(v){renderClin(v);}
+
+function openClinMod(id){
+  var h=id?clinData.find(function(x){return x.id===id;}):null;
+  openDyn('<div class="mh"></div><div class="mt">'+(h?'Editar clínica':'Nueva clínica')+'</div>'
+    +'<div class="fg"><label class="fl">Nombre *</label><input id="cm-n" type="text" value="'+(h?h.nombre||'':'')+'"></div>'
+    +'<div class="fg"><label class="fl">Dirección</label><input id="cm-dir" type="text" value="'+(h?h.direccion||'':'')+'"></div>'
+    +'<div class="fg"><label class="fl">Jefe de servicio</label><input id="cm-js" type="text" value="'+(h?h.jefeServicio||'':'')+'"></div>'
+    +'<div class="fg"><label class="fl">Supervisor contacto</label><input id="cm-sup" type="text" value="'+(h?h.supervisor||'':'')+'"></div>'
+    +'<div class="fg"><label class="fl">Esterilización contacto</label><input id="cm-est" type="text" value="'+(h?h.esterilizacion||'':'')+'"></div>'
+    +'<div class="fg"><label class="fl">Administración contacto</label><input id="cm-adm" type="text" value="'+(h?h.administracion||'':'')+'"></div>'
+    +'<button class="abtn ap" onclick="saveClin(\''+( id||'')+'\')">✓ '+(h?'Guardar':'Crear')+'</button>'
+    +(h?'<button class="abtn ad" onclick="delClin(\''+id+'\')">🗑️ Eliminar</button>':'')
+    +'<button class="abtn as" onclick="closeM(\'mo-dyn\')">Cancelar</button>');
+}
+
+function saveClin(id){
+  var n=document.getElementById('cm-n').value.trim(); if(!n){toast('⚠️ Nombre requerido','w');return;}
+  var data={nombre:n,direccion:document.getElementById('cm-dir').value.trim(),
+    jefeServicio:document.getElementById('cm-js').value.trim(),supervisor:document.getElementById('cm-sup').value.trim(),
+    esterilizacion:document.getElementById('cm-est').value.trim(),administracion:document.getElementById('cm-adm').value.trim(),
+    updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+  var esIdC = id && id.length > 5 && id !== 'undefined';
+  if(esIdC){
+    db.collection('clinicas').doc(id).update(data)
+      .then(function(){closeM('mo-dyn');toast('✓ Clínica actualizada');})
+      .catch(function(e){toast('Error: '+e.message,'e');});
+  } else {
+    db.collection('clinicas').add(Object.assign(data,{createdAt:firebase.firestore.FieldValue.serverTimestamp()}))
+      .then(function(){closeM('mo-dyn');toast('✓ Clínica creada');})
+      .catch(function(e){toast('Error al crear: '+e.message,'e');});
+  }
+}
+
+function delClin(id){if(!confirm('¿Eliminar clínica?'))return;db.collection('clinicas').doc(id).delete();closeM('mo-dyn');toast('🗑️ Eliminado');}
+
+function notifGerente(asunto, cuerpo){
+  db.collection('users').get().then(function(us){
+    var ger=us.docs.filter(function(d){return['gerente','gestor'].includes(d.data().rol)&&d.data().nombre!==(CU.p?CU.p.nombre:CU.email);}).map(function(d){return d.data().nombre;});
+    if(!ger.length) return;
+    db.collection('messages').add({de:'Sistema MGtrauma',destinatarios:ger,categoria:'solicitud',asunto:asunto,cuerpo:cuerpo,leido:false,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+  });
+}
+
+
+// ── ALMACÉN ───────────────────────────────────────────────────
+var almData=[], almTipo='implantes';
+
+function subscribeAlmacen(){
+  db.collection('almacen').orderBy('referencia').onSnapshot(function(s){
+    almData=s.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    if(curPage==='almacen') renderAlm();
+  });
+}
+
+function setAlmTab(tipo){
+  almTipo=tipo;
+  document.getElementById('alm-tab-imp').classList.toggle('active',tipo==='implantes');
+  document.getElementById('alm-tab-ins').classList.toggle('active',tipo==='instrumental');
+  renderAlm();
+}
+
+function filterAlm(q){ renderAlm(q); }
+
+function renderAlm(q){
+  var list=almData.filter(function(a){return (a.tipo||'implantes')===almTipo;});
+  if(q) list=list.filter(function(a){return (a.referencia||'').toLowerCase().includes(q.toLowerCase())||(a.descripcion||'').toLowerCase().includes(q.toLowerCase());});
+  // Stats
+  var total=list.length;
+  var bajo=list.filter(function(a){return (a.cantidad||0)>0&&(a.cantidad||0)<=(a.minimo||5);}).length;
+  var cero=list.filter(function(a){return (a.cantidad||0)===0;}).length;
+  document.getElementById('alm-total').textContent=total;
+  document.getElementById('alm-bajo').textContent=bajo;
+  document.getElementById('alm-cero').textContent=cero;
+  var el=document.getElementById('alm-list'); if(!el) return;
+  var canE=['gestor','gerente','logistica','administracion'].includes(rol());
+  if(!list.length){el.innerHTML='<div class="empty"><div class="ei">📦</div>Sin '+(almTipo==='implantes'?'implantes':'instrumental')+'</div>';return;}
+  // Ordenar: sin stock primero, luego bajo, luego normal
+  list.sort(function(a,b){
+    var sa=a.cantidad||0, sb=b.cantidad||0;
+    var ma=a.minimo||5, mb=b.minimo||5;
+    var pa=sa===0?0:sa<=ma?1:2, pb=sb===0?0:sb<=mb?1:2;
+    return pa-pb || (a.referencia||'').localeCompare(b.referencia||'');
+  });
+  el.innerHTML=list.map(function(a){
+    var cant=a.cantidad||0, min=a.minimo||5;
+    var estado=cant===0?'#ef4444':cant<=min?'#f59e0b':'#10b981';
+    var estadoTxt=cant===0?'Sin stock':cant<=min?'Stock bajo':'OK';
+    return '<div class="card" style="border-left:4px solid '+estado+'">'
+      +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">'
+      +'<div style="flex:1"><div style="font-weight:700;font-size:14px">'+(a.referencia||'—')+'</div>'
+      +'<div style="font-size:12px;color:#8899aa;margin-top:2px">'+(a.descripcion||'')+'</div>'
+      +(a.proveedor?'<div style="font-size:11px;color:#4a6080;margin-top:2px">📦 '+a.proveedor+'</div>':'')
+      +'</div>'
+      +'<div style="text-align:right;flex-shrink:0;margin-left:12px">'
+      +'<div style="font-weight:800;font-size:22px;color:'+estado+'">'+cant+'</div>'
+      +'<div style="font-size:10px;color:#4a6080">uds</div>'
+      +'<div style="font-size:10px;padding:2px 6px;border-radius:8px;background:'+estado+'22;color:'+estado+';margin-top:2px">'+estadoTxt+'</div>'
+      +'</div></div>'
+      +(canE?'<div style="display:flex;gap:8px;margin-top:8px">'
+      +'<button onclick="adjAlm(\''+a.id+'\','+cant+',-1)" style="flex:1;padding:8px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:8px;color:#ef4444;font-weight:700;font-size:16px;cursor:pointer">−</button>'
+      +'<button onclick="adjAlm(\''+a.id+'\','+cant+',1)" style="flex:1;padding:8px;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);border-radius:8px;color:#10b981;font-weight:700;font-size:16px;cursor:pointer">+</button>'
+      +'<button onclick="openAlmMod(\''+a.id+'\')" style="padding:8px 12px;background:#1a2236;border:1px solid #1e2d45;border-radius:8px;color:#8899aa;font-size:12px;cursor:pointer">✏️</button>'
+      +'</div>':'')
+      +'</div>';
+  }).join('');
+}
+
+function adjAlm(id,cantActual,delta){
+  var nueva=Math.max(0,cantActual+delta);
+  db.collection('almacen').doc(id).update({cantidad:nueva,ultimaActualizacion:firebase.firestore.FieldValue.serverTimestamp(),actualizadoPor:CU.p?CU.p.nombre:CU.email})
+    .then(function(){toast(delta>0?'✓ +1 unidad añadida':'✓ -1 unidad retirada');})
+    .catch(function(e){toast('Error: '+e.message,'e');});
+}
+
+function openAlmMod(id){
+  var a=id?almData.find(function(x){return x.id===id;}):null;
+  openDyn('<div class="mh"></div><div class="mt">'+(a?'Editar material':'Nuevo material')+'</div>'
+    +'<div class="fg"><label class="fl">Tipo</label><select id="am-tipo"><option value="implantes"'+(a&&a.tipo==='implantes'?' selected':'')+'>🦴 Implante</option><option value="instrumental"'+(a&&a.tipo==='instrumental'?' selected':'')+'>🔧 Instrumental</option></select></div>'
+    +'<div class="fg"><label class="fl">Referencia *</label><input id="am-ref" type="text" value="'+(a?a.referencia||'':'')+'"></div>'
+    +'<div class="fg"><label class="fl">Descripción</label><input id="am-desc" type="text" value="'+(a?a.descripcion||'':'')+'"></div>'
+    +'<div class="fg"><label class="fl">Proveedor</label><input id="am-prov" type="text" value="'+(a?a.proveedor||'':'')+'"></div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'
+    +'<div class="fg"><label class="fl">Cantidad actual</label><input id="am-cant" type="number" min="0" value="'+(a?a.cantidad||0:0)+'"></div>'
+    +'<div class="fg"><label class="fl">Mínimo stock</label><input id="am-min" type="number" min="0" value="'+(a?a.minimo||5:5)+'"></div></div>'
+    +'<div class="fg"><label class="fl">Ubicación</label><input id="am-ubic" type="text" placeholder="Ej: Estante A-3" value="'+(a?a.ubicacion||'':'')+'"></div>'
+    +'<div class="fg"><label class="fl">Notas</label><textarea id="am-notas" style="min-height:60px">'+(a?a.notas||'':'')+'</textarea></div>'
+    +'<button class="abtn ap" onclick="saveAlm(\''+( id||'')+'\')">✓ '+(a?'Guardar':'Crear')+'</button>'
+    +(a?'<button class="abtn ad" onclick="delAlm(\'+id+\')">'+'🗑️ Eliminar</button>':'')
+    +'<button class="abtn as" onclick="closeM(\'mo-dyn\')">Cancelar</button>');
+}
+
+function saveAlm(id){
+  var ref=document.getElementById('am-ref').value.trim(); if(!ref){toast('⚠️ Referencia requerida','w');return;}
+  var data={referencia:ref,descripcion:document.getElementById('am-desc').value.trim(),
+    proveedor:document.getElementById('am-prov').value.trim(),tipo:document.getElementById('am-tipo').value,
+    cantidad:parseInt(document.getElementById('am-cant').value)||0,minimo:parseInt(document.getElementById('am-min').value)||5,
+    ubicacion:document.getElementById('am-ubic').value.trim(),notas:document.getElementById('am-notas').value.trim(),
+    updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+  var esId = id && id.length > 5 && id !== 'undefined';
+  if(esId){
+    db.collection('almacen').doc(id).update(data)
+      .then(function(){closeM('mo-dyn');toast('✓ Material actualizado');})
+      .catch(function(e){toast('Error: '+e.message,'e');});
+  } else {
+    db.collection('almacen').add(Object.assign(data,{createdAt:firebase.firestore.FieldValue.serverTimestamp()}))
+      .then(function(){closeM('mo-dyn');toast('✓ Material añadido al almacén');})
+      .catch(function(e){toast('Error al crear: '+e.message,'e');});
+  }
+}
+
+function delAlm(id){if(!confirm('¿Eliminar este material?'))return;db.collection('almacen').doc(id).delete();closeM('mo-dyn');toast('🗑️ Eliminado');}
+
+if('serviceWorker' in navigator) window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js');});
+if(Notification.permission==='default') Notification.requestPermission();
+</script>
+</body>
+</html>
