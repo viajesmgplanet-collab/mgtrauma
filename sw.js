@@ -1,35 +1,38 @@
-const CACHE_NAME = 'mgtrauma-v1';
-const ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  'https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap'
-];
-
-self.addEventListener('install', e => {
-  e.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
-  );
+// MGtrauma Service Worker - Notificaciones Push
+self.addEventListener('install', function(e){
   self.skipWaiting();
 });
 
-self.addEventListener('activate', e => {
-  e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
-    )
-  );
-  self.clients.claim();
+self.addEventListener('activate', function(e){
+  e.waitUntil(self.clients.claim());
 });
 
-self.addEventListener('fetch', e => {
-  // Firebase y APIs siempre van a la red
-  if (e.request.url.includes('firebaseio.com') ||
-      e.request.url.includes('googleapis.com/identitytoolkit') ||
-      e.request.url.includes('firestore.googleapis.com')) {
-    return;
-  }
-  e.respondWith(
-    caches.match(e.request).then(cached => cached || fetch(e.request))
+// Recibir notificación push
+self.addEventListener('push', function(e){
+  var data={titulo:'MGtrauma',cuerpo:'Tienes un aviso pendiente'};
+  try{ data=e.data.json(); }catch(err){}
+  e.waitUntil(
+    self.registration.showNotification(data.titulo||'MGtrauma',{
+      body: data.cuerpo||'',
+      icon: '/icons/icon-192.png',
+      badge: '/icons/icon-192.png',
+      requireInteraction: true,
+      vibrate: [200,100,200],
+      tag: data.tag||'mgtrauma',
+      data: data
+    })
+  );
+});
+
+// Al tocar la notificación - abrir la app
+self.addEventListener('notificationclick', function(e){
+  e.notification.close();
+  e.waitUntil(
+    self.clients.matchAll({type:'window'}).then(function(cls){
+      for(var i=0;i<cls.length;i++){
+        if(cls[i].url&&cls[i].focus) return cls[i].focus();
+      }
+      if(self.clients.openWindow) return self.clients.openWindow('/');
+    })
   );
 });
