@@ -21,6 +21,3 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({error: error.message});
   }
 };
-
-Enviado desde el correo móvil personal de Carlos Gómez
-
